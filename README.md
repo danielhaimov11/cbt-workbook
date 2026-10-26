@@ -6,39 +6,61 @@
 
 ---
 
-## ⚡ הורדה מהירה ושימוש מיידי (למשתמשים ללא רקע טכני)
+## ⚡ איך מורידים ומפעילים? (הסבר פשוט ללא רקע טכני)
 
-**אין צורך בתוכנות, בהתקנות או בידע ב-Git!** 
-כל המערכת בנויה כקובץ HTML עצמאי שפועל ישירות בכל דפדפן (Chrome, Edge, Safari, Firefox) במחשב או בטלפון הנייד.
-
-### 📥 קישורי הורדה ישירים:
-
-| קובץ / גרסה | תיאור | קישור להורדה ישירה |
-| :--- | :--- | :--- |
-| **גרסה 3 (מומלצת ביותר ⭐⭐⭐)** | **מערכת היברידית מלאה**: היסטוריה, חיפוש, עריכה + סנכרון דו-כיווני מול **Google Sheets** בענן או הורדת Excel מקומי | [⬇️ **הורד את CBT_WorkbookV3.html**](https://github.com/danielhaimov11/cbt-workbook/raw/main/CBT_WorkbookV3.html) |
-| **גרסה 2 (מקומי מתקדם)** | מערכת עצמאית מקומית הכוללת היסטוריית רשומות, חיפוש, סינון, צפייה ועריכה חוזרת (שמירה ב-Excel בלבד) | [⬇️ **הורד את CBT_WorkbookV2.html**](https://github.com/danielhaimov11/cbt-workbook/raw/main/CBT_WorkbookV2.html) |
-| **גרסה 1 (בסיסית)** | מודול מילוי מהיר לפרק 3 ופרק 4 עם שמירה מקומית ב-`localStorage` והורדת Excel | [⬇️ **הורד את CBT_Workbook.html**](https://github.com/danielhaimov11/cbt-workbook/raw/main/CBT_Workbook.html) |
-| **קוד שרת ענן ([Code.gs](Code.gs))** | קוד Apps Script להדבקה ב-Google Sheets לצורך סנכרון ענן אישי | [📋 **צפה ב-Code.gs**](https://github.com/danielhaimov11/cbt-workbook/raw/main/Code.gs) |
-| **כל הפרויקט (ZIP)** | כל הקבצים, הגרסאות וקוד השרת בחבילה אחת | [📦 **הורדת קובץ ZIP מלא**](https://github.com/danielhaimov11/cbt-workbook/archive/refs/heads/main.zip) |
-
-> 💡 **טיפ להורדה:** אם הדפדפן מציג את תוכן הקובץ במקום להורידו:  
-> לחצו על הקישור עם **מקש ימני בעכבר** ובחרו באפשרות **"שמור קישור בשם..."** (*Save link as...*).
+> ⚠️ **שימו לב: מדוע לחיצה רגילה מציגה קוד?**  
+> אתר GitHub מציג קובצי HTML כטקסט קוד מטעמי אבטחה אם לוחצים עליהם ישירות.  
+> **כדי להוריד את הקובץ כמערכת עובדת למחשב שלכם, השתמשו באחת מ-3 הדרכים הפשוטות הבאות:**
 
 ---
 
-## 🚀 איך זה עובד? מענה מושלם לכל סוגי המשתמשים
+### 🌟 אפשרות 1 (הכי מומלצת): הורדת קובץ ZIP בלחיצה אחת
+לחצו על הקישור הבא להורדת כל המערכת כקובץ מכווץ:
+👉 [📦 **לחצו כאן להורדת כל הפרויקט בקובץ ZIP**](https://github.com/danielhaimov11/cbt-workbook/archive/refs/heads/main.zip)
+
+1. הקובץ `cbt-workbook-main.zip` יירד ישירות לתיקיית ההורדות במחשב שלכם.
+2. פתחו את ה-ZIP (חלצו אותו).
+3. לחצו דאבל-קליק על **`CBT_WorkbookV3.html`** – והמערכת תיפתח ותעבוד מיד!
+
+---
+
+### 🎯 אפשרות 2: הורדה דרך דף הגרסאות הרשמי (Releases)
+עברו לדף השחרור הרשמי בגיטהאב:
+👉 [🚀 **מעבר לדף הגרסה הרשמי (Release v3.0.0)**](https://github.com/danielhaimov11/cbt-workbook/releases/tag/v3.0.0)
+
+תחת הכותרת **Assets** בתחתית ההודעה, לחצו על:
+- [⬇️ **`CBT_WorkbookV3.html`**](https://github.com/danielhaimov11/cbt-workbook/releases/download/v3.0.0/CBT_WorkbookV3.html) (גרסה 3 היברידית)
+- [⬇️ **`CBT_WorkbookV2.html`**](https://github.com/danielhaimov11/cbt-workbook/releases/download/v3.0.0/CBT_WorkbookV2.html) (גרסה 2 מקומית)
+- [⬇️ **`CBT_Workbook.html`**](https://github.com/danielhaimov11/cbt-workbook/releases/download/v3.0.0/CBT_Workbook.html) (גרסה 1 בסיסית)
+
+---
+
+### 🖱️ אפשרות 3: שמירה באמצעות מקש ימני בעכבר
+אם אתם רוצים להוריד קובץ יחיד ישירות מכאן:
+
+| קובץ / גרסה | תיאור | הורדה במקש ימני |
+| :--- | :--- | :--- |
+| **גרסה 3 (מומלצת ⭐⭐⭐)** | מערכת היברידית מלאה: היסטוריה, עריכה, Excel + סנכרון Google Sheets | [**CBT_WorkbookV3.html**](https://github.com/danielhaimov11/cbt-workbook/raw/main/CBT_WorkbookV3.html) |
+| **גרסה 2 (מקומי מתקדם)** | היסטוריה, חיפוש, עריכה ושמירת Excel מקומית בלבד | [**CBT_WorkbookV2.html**](https://github.com/danielhaimov11/cbt-workbook/raw/main/CBT_WorkbookV2.html) |
+| **גרסה 1 (בסיסית)** | מודול מילוי מהיר לפרק 3 ופרק 4 והורדת Excel | [**CBT_Workbook.html**](https://github.com/danielhaimov11/cbt-workbook/raw/main/CBT_Workbook.html) |
+| **קוד שרת ([Code.gs](Code.gs))** | קוד שרת Apps Script לסנכרון ענן אישי | [**Code.gs**](https://github.com/danielhaimov11/cbt-workbook/raw/main/Code.gs) |
+
+> 📌 **הוראות:** לחצו על שם הקובץ עם **מקש ימני בעכבר** &larr; בחרו **"שמור קישור בשם..."** (*Save link as...*) &larr; שמרו בשולחן העבודה ופתחו אותו בלחיצה כפולה.
+
+---
+
+## 🚀 איך המערכת עובדת? (מענה לכל סוגי המשתמשים)
 
 המערכת בגרסה 3 מעניקה חופש בחירה מוחלט:
 
 ### 1. משתמש שרוצה לעבוד רק מקומית (ללא ענן):
-- מוריד את הקובץ [`CBT_WorkbookV3.html`](https://github.com/danielhaimov11/cbt-workbook/raw/main/CBT_WorkbookV3.html) או [`CBT_WorkbookV2.html`](https://github.com/danielhaimov11/cbt-workbook/raw/main/CBT_WorkbookV2.html).
-- לוחץ לחיצה כפולה (Double-Click) עליו והוא נפתח מיד בדפדפן.
+- פותח את הקובץ שהוריד (`CBT_WorkbookV3.html`) בדפדפן הרגיל (Chrome / Edge / Safari).
 - כל הנתונים נשמרים במחשב שלו, ובכל שמירה יורד קובץ Excel מעודכן (`יומן_תרגול_CBT.xlsx`).
 
 ### 2. משתמש שרוצה לחבר את הקובץ המקומי ל-Google Sheets הפרטי שלו (ב-2 דקות):
-1. פותחים את [`CBT_WorkbookV3.html`](https://github.com/danielhaimov11/cbt-workbook/raw/main/CBT_WorkbookV3.html) ולוחצים בתפריט העליון על **"☁️ הגדרות ענן"**.
+1. פותחים את [`CBT_WorkbookV3.html`](CBT_WorkbookV3.html) ולוחצים בתפריט העליון על **"☁️ הגדרות ענן"**.
 2. לוחצים על הכפתור השחור **"📋 העתק קוד שרת (Code.gs)"** המובנה בחלון.
-3. פותחים גיליון Google Sheets חדש בחשבון הגוגל שלכם:
+3. פותחים גיליון Google Sheets חדש בחשבון הגוגל האישי:
    * נכנסים ל-**הרחבות (Extensions)** &larr; **Apps Script**.
    * מדביקים את הקוד שהועתק.
    * לוחצים למעלה על **Deploy (פריסה)** &larr; **New deployment (פריסה חדשה)** &larr; בוחרים סוג **Web app**.
@@ -46,9 +68,10 @@
 4. מעתיקים את ה-**Web app URL** שנוצר ומדביקים אותו בחלון ההגדרות בחוברת.
 5. **זהו!** המערכת מחוברת: שמירה, עריכה ומחיקה מסתנכרנות לענן, וכפתור **"🔄 סנכרן מ-Google Sheets"** מושך את כל הנתונים לכל מכשיר.
 
-### 3. משתמש שרוצה לעבוד מתוך Google Sheets ישירות (שיטת "צור עותק"):
-- פותחים את הגיליון שבו הוגדר ה-`Code.gs`, מוסיפים בעורך ה-Apps Script קובץ בשם `index.html` ומדביקים בו את תוכן `CBT_WorkbookV3.html`.
-- כל מי שמקבל קישור עם `/copy` יכול לשכפל את הגיליון ישירות ל-Drive שלו ולעבוד בו מיידית!
+### 3. הרצה ישירה באינטרנט ללא צורך בהורדת קובץ (דרך Google Apps Script):
+- פותחים את הגיליון שבו הוגדר ה-`Code.gs`, מוסיפים בעורך ה-Apps Script קובץ HTML בשם `index.html` ומדביקים בו את תוכן `CBT_WorkbookV3.html`.
+- מקבלים קישור אינטרנטי של ה-Web App (`https://script.google.com/macros/s/.../exec`).
+- לחיצה על קישור זה פותחת את המערכת מיד כאתר פעיל ומחובר ברשת – בלי להוריד שום קובץ!
 
 ---
 
@@ -77,13 +100,6 @@
 git clone https://github.com/danielhaimov11/cbt-workbook.git
 cd cbt-workbook
 ```
-
-קבצי הפרויקט המרכזיים:
-- `CBT_WorkbookV3.html` - גרסה 3 ההיברידית (מקומי + ענן)
-- `CBT_WorkbookV2.html` - גרסה 2 המקומית המלאה
-- `CBT_Workbook.html` - גרסה 1 הבסיסית
-- `Code.gs` - קוד השרת ל-Google Apps Script
-- `CHANGELOG.md` - יומן שחרורים וגרסאות מלא
 
 ---
 
