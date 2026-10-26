@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מרחב תרגול CBT | מערכת עצמאית מלאה</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SheetJS for Excel Export/Import -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Rubik', sans-serif;
+        }
+
+        .tab-active-blue {
+            background-color: #eff6ff;
+            color: #1d4ed8;
+            border-bottom: 2px solid #2563eb;
+        }
+
+        .tab-active-indigo {
+            background-color: #eef2ff;
+            color: #4338ca;
+            border-bottom: 2px solid #4f46e5;
+        }
+
+        .tab-active-emerald {
+            background-color: #ecfdf5;
+            color: #047857;
+            border-bottom: 2px solid #059669;
+        }
+
+        .tab-inactive {
+            color: #6b7280;
+        }
+
+        .tab-inactive:hover {
+            color: #374151;
+            background-color: #f9fafb;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen pb-12">
+
+    <!-- תפריט עליון -->
+    <nav class="bg-white shadow-md mb-6 sticky top-0 z-40">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-wrap justify-between py-3 items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <span id="brandTitle" class="text-xl font-bold text-blue-600 transition-colors">מרחב תרגול
+                        CBT</span>
+                    <span
+                        class="bg-green-100 text-green-800 text-xs px-2.5 py-1 rounded-full font-medium border border-green-300">
+                        🔒 שמירה מקומית בלבד
+                    </span>
+                </div>
+
+                <!-- לשוניות ניווט -->
+                <div class="flex flex-wrap gap-1 sm:space-x-2 sm:space-x-reverse">
+                    <button type="button" id="tabBtn4" onclick="switchTab('chapter4')"
+                        class="tab-active-blue px-3.5 py-2 rounded-md text-sm font-medium transition">
+                        פרק 4: תחזיות חרדתיות
+                    </button>
+                    <button type="button" id="tabBtn3" onclick="switchTab('chapter3')"
+                        class="tab-inactive px-3.5 py-2 rounded-md text-sm font-medium transition">
+                        פרק 3: ניתוח טריגרים
+                    </button>
+                    <button type="button" id="tabBtnHistory" onclick="switchTab('history')"
+                        class="tab-inactive px-3.5 py-2 rounded-md text-sm font-medium transition flex items-center gap-1.5">
+                        <span>📋 היסטוריה ועריכה</span>
+                        <span id="totalBadge"
+                            class="bg-gray-200 text-gray-700 text-xs px-1.5 py-0.5 rounded-full font-bold">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- סרגל כלים לניהול נתונים ואקסל -->
+    <div class="max-w-4xl mx-auto px-4 mb-6">
+        <div
+            class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-2 text-sm text-gray-700">
+                <span>📊 רשומות שמורות במכשיר:</span>
+                <span class="font-bold text-blue-600" id="countCh4">0</span> (פרק 4) |
+                <span class="font-bold text-indigo-600" id="countCh3">0</span> (פרק 3)
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <!-- הורדת אקסל יזומה -->
+                <button type="button" onclick="downloadExcelFile()"
+                    class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-sm transition flex items-center gap-1.5">
+                    <span>📥 הורד קובץ Excel מרוכז</span>
+                </button>
+                <!-- ייבוא אקסל קיים -->
+                <label
+                    class="bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 text-xs font-semibold px-3 py-2 rounded-lg cursor-pointer transition flex items-center gap-1.5">
+                    <span>📂 טען Excel קיים למיזוג</span>
+                    <input type="file" id="excelUpload" accept=".xlsx, .xls" class="hidden"
+                        onchange="importExcelFile(event)">
+                </label>
+                <!-- איפוס נתונים -->
+                <button type="button" onclick="clearLocalData()"
+                    class="text-red-600 hover:bg-red-50 border border-transparent hover:border-red-200 text-xs font-medium px-2.5 py-2 rounded-lg transition">
+                    🗑️ איפוס הכל
+                </button>
+            </div>
+        </div>
+        <div id="globalAlert" class="hidden mt-3 p-3 text-center text-sm font-semibold rounded-lg"></div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- קונטיינר פרק 4: בדיקת תחזיות חרדתיות -->
+    <!-- ========================================== -->
+    <div id="view-chapter4"
+        class="max-w-4xl mx-auto bg-white p-6 md:p-10 shadow-lg rounded-xl border-t-8 border-blue-500 mb-8">
+
+        <!-- באנר מצב עריכה (מוסתר כברירת מחדל) -->
+        <div id="editBannerCh4"
+            class="hidden mb-6 bg-amber-50 border border-amber-300 p-4 rounded-lg flex justify-between items-center">
+            <div class="text-amber-800 text-sm font-semibold">
+                ✏️ הינך במצב עריכת רשומה קיימת (פרק 4). לחיצה על שמירה תעדכן את הרשומה.
+            </div>
+            <button type="button" onclick="cancelEdit('chapter4')"
+                class="text-xs bg-white border border-amber-400 text-amber-800 px-3 py-1.5 rounded hover:bg-amber-100 font-bold">
+                ביטול עריכה
+            </button>
+        </div>
+
+        <div class="border-b pb-6 mb-6">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">דף עבודה: פרק 4</h1>
+            <h2 class="text-xl text-blue-600 font-medium">בדיקת תחזיות חרדתיות וניסויים התנהגותיים</h2>
+            <p class="text-gray-500 mt-1 text-sm">מבוסס על הספר "הערכה עצמית נמוכה: מבוא והשפעות" (Melanie Fennell)</p>
+        </div>
+
+        <form id="formChapter4" onsubmit="handleFormSubmit(event, 'chapter4')">
+            <input type="hidden" id="editIndexCh4" value="-1">
+
+            <!-- חלק א -->
+            <div class="mb-8">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm">א'</span>
+                    זיהוי בזמן אמת
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">תאריך ושעה:</label>
+                        <input type="text" name="datetime" id="datetimeCh4"
+                            class="w-full border border-gray-300 rounded-md p-2.5 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-400 outline-none"
+                            required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">המצב / הטריגר (מה קרה או עומד
+                            לקרות?):</label>
+                        <input type="text" name="trigger"
+                            class="w-full border border-gray-300 rounded-md p-2.5 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-400 outline-none"
+                            required>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">רגשות ותחושות גופניות (דרגו עוצמה
+                        0–100):</label>
+                    <textarea name="feelings" rows="2"
+                        class="w-full border border-gray-300 rounded-md p-2.5 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-400 outline-none"></textarea>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">התחזית החרדתית (מה אני חושב/ת שישתבש?
+                        ממה אני פוחד/ת?):</label>
+                    <textarea name="prediction" rows="2"
+                        class="w-full border border-gray-300 rounded-md p-2.5 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-400 outline-none"
+                        required></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">אמצעי זהירות והגנה (מה אני עושה כדי
+                        למנוע מזה לקרות?):</label>
+                    <textarea name="safety" rows="2"
+                        class="w-full border border-gray-300 rounded-md p-2.5 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-400 outline-none"></textarea>
+                </div>
+            </div>
+
+            <!-- חלק ב -->
+            <div class="mb-8 border-t pt-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <span class="bg-green-100 text-green-600 px-3 py-1 rounded-full text-sm">ב'</span>
+                    הטלת ספק ובחינה מחדש
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">מהן הראיות <span
+                                class="underline">בעד</span> התחזית החרדתית?</label>
+                        <textarea name="evidence_for" rows="3"
+                            class="w-full border border-gray-300 rounded-md p-2.5 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-green-400 outline-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">מהן הראיות <span
+                                class="underline">נגד</span> התחזית החרדתית?</label>
+                        <textarea name="evidence_against" rows="3"
+                            class="w-full border border-gray-300 rounded-md p-2.5 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-green-400 outline-none"></textarea>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">מהו התרחיש הכי גרוע?</label>
+                        <textarea name="worst_case" rows="2"
+                            class="w-full border border-gray-300 rounded-md p-2.5 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-green-400 outline-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">מהו התרחיש <span
+                                class="text-green-700">הסביר ביותר</span>?</label>
+                        <textarea name="realistic_case" rows="2"
+                            class="w-full border border-gray-300 rounded-md p-2.5 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-green-400 outline-none"></textarea>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">המחשבה החלופית (פרספקטיבה מאוזנת
+                        ודירוג אמונה 0–100):</label>
+                    <textarea name="alternative_thought" rows="2"
+                        class="w-full border border-gray-300 rounded-md p-2.5 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-green-400 outline-none"></textarea>
+                </div>
+            </div>
+
+            <!-- חלק ג -->
+            <div class="mb-8 border-t pt-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <span class="bg-purple-100 text-purple-600 px-3 py-1 rounded-full text-sm">ג'</span>
+                    ניסוי התנהגותי בעולם האמיתי
+                </h3>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">הפעולה המתוכננת (מה אני הולך/ת לעשות
+                        כדי לבחון את התחזית?):</label>
+                    <textarea name="planned_action" rows="2"
+                        class="w-full border border-gray-300 rounded-md p-2.5 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-purple-400 outline-none"></textarea>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">על איזה אמצעי זהירות אני מתחייב/ת
+                        לוותר הפעם?</label>
+                    <textarea name="dropped_safety" rows="2"
+                        class="w-full border border-gray-300 rounded-md p-2.5 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-purple-400 outline-none"></textarea>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">התוצאות בפועל (מה קרה
+                        במציאות?):</label>
+                    <textarea name="actual_results" rows="3"
+                        class="w-full border border-gray-300 rounded-md p-2.5 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-purple-400 outline-none"></textarea>
+                </div>
+
+                <div class="bg-yellow-50 border border-yellow-300 p-4 rounded-md">
+                    <label class="block text-sm font-semibold text-gray-800 mb-1">⭐ קרדיט עצמי וטפיחה על השכם (על מה
+                        מגיע לי כל הכבוד?):</label>
+                    <textarea name="self_credit" rows="2"
+                        class="w-full border border-yellow-200 rounded-md p-2.5 bg-white focus:ring-2 focus:ring-yellow-400 outline-none"></textarea>
+                </div>
+            </div>
+
+            <!-- כפתור שמירה -->
+            <div class="text-center pt-4 border-t">
+                <button type="submit" id="submitBtnCh4"
+                    class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-10 rounded-lg shadow-md transition duration-150 ease-in-out text-lg">
+                    שמור והורד קובץ Excel מעודכן
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- קונטיינר פרק 3: ניתוח טריגרים ומעגל הקסמים -->
+    <!-- ========================================== -->
+    <div id="view-chapter3"
+        class="hidden max-w-4xl mx-auto bg-white p-6 md:p-10 shadow-lg rounded-xl border-t-8 border-indigo-500 mb-8">
+
+        <!-- באנר מצב עריכה (מוסתר כברירת מחדל) -->
+        <div id="editBannerCh3"
+            class="hidden mb-6 bg-amber-50 border border-amber-300 p-4 rounded-lg flex justify-between items-center">
+            <div class="text-amber-800 text-sm font-semibold">
+                ✏️ הינך במצב עריכת רשומה קיימת (פרק 3). לחיצה על שמירה תעדכן את הרשומה.
+            </div>
+            <button type="button" onclick="cancelEdit('chapter3')"
+                class="text-xs bg-white border border-amber-400 text-amber-800 px-3 py-1.5 rounded hover:bg-amber-100 font-bold">
+                ביטול עריכה
+            </button>
+        </div>
+
+        <div class="border-b pb-6 mb-6">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">דף עבודה: פרק 3</h1>
+            <h2 class="text-xl text-indigo-600 font-medium">שרטוט מעגל הקסמים האישי וניתוח טריגרים</h2>
+            <p class="text-gray-500 mt-1 text-sm">מבוסס על הספר "הערכה עצמית נמוכה: מבוא והשפעות" (Melanie Fennell)</p>
+        </div>
+
+        <div class="mb-6 bg-indigo-50 p-4 rounded-md text-indigo-800 text-sm">
+            <strong>הנחיה:</strong> השתמשו בדף זה כדי לנתח מצבים שעוררו בכם חרדה, חוסר ביטחון או תחושה שאינכם עומדים
+            בציפיות. מלאו את השלבים כדי לזהות את מעגל הקסמים המנציח את ההערכה העצמית הנמוכה.
+        </div>
+
+        <form id="formChapter3" onsubmit="handleFormSubmit(event, 'chapter3')">
+            <input type="hidden" id="editIndexCh3" value="-1">
+
+            <!-- שלב 1 -->
+            <div class="mb-10">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <span class="bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full text-sm">1</span>
+                    זיהוי הטריגר (המצב המעורר)
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">תאריך ושעה:</label>
+                        <input type="text" name="datetime" id="datetimeCh3"
+                            class="w-full border border-gray-300 rounded-md p-2.5 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-400 outline-none"
+                            required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">תיאור המצב (מה קרה? איפה היית? עם
+                            מי?):</label>
+                        <input type="text" name="situation"
+                            class="w-full border border-gray-300 rounded-md p-2.5 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-400 outline-none"
+                            required>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">איזה "כלל לחיים" שלך הופר או עמד בסכנת
+                        הפרה במצב זה?</label>
+                    <textarea name="broken_rule" rows="2"
+                        class="w-full border border-gray-300 rounded-md p-2.5 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-400 outline-none"></textarea>
+                </div>
+            </div>
+
+            <!-- שלב 2 -->
+            <div class="mb-10 border-t pt-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <span class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-sm">2</span>
+                    שרטוט מעגל הקסמים (הספירלה היורדת)
+                </h3>
+
+                <div class="space-y-6 relative">
+                    <div class="hidden md:block absolute right-[1.1rem] top-8 bottom-8 w-1 bg-gray-200 z-0"></div>
+
+                    <div class="flex items-start gap-4 relative z-10">
+                        <div
+                            class="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center font-bold flex-shrink-0 mt-2">
+                            א'</div>
+                        <div class="flex-grow">
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">הפעלת השורה התחתונה (איזו
+                                אמונה שלילית לגבי עצמך התעוררה?):</label>
+                            <textarea name="bottom_line" rows="2"
+                                class="w-full border border-red-200 rounded-md p-2.5 bg-red-50 focus:bg-white focus:ring-2 focus:ring-red-400 outline-none"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-4 relative z-10">
+                        <div
+                            class="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold flex-shrink-0 mt-2">
+                            ב'</div>
+                        <div class="flex-grow">
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">ניבויים שליליים וחרדה (מה חששת
+                                שיקרה? אילו תחושות גופניות חווית?):</label>
+                            <textarea name="negative_predictions" rows="2"
+                                class="w-full border border-orange-200 rounded-md p-2.5 bg-orange-50 focus:bg-white focus:ring-2 focus:ring-orange-400 outline-none"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-4 relative z-10">
+                        <div
+                            class="w-8 h-8 rounded-full bg-yellow-500 text-white flex items-center justify-center font-bold flex-shrink-0 mt-2">
+                            ג'</div>
+                        <div class="flex-grow">
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">התנהגות הגנתית/אמצעי זהירות
+                                (מה עשית כדי להתגונן מהגרוע מכל?):</label>
+                            <textarea name="safety_behaviors" rows="2"
+                                class="w-full border border-yellow-300 rounded-md p-2.5 bg-yellow-50 focus:bg-white focus:ring-2 focus:ring-yellow-400 outline-none"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-4 relative z-10">
+                        <div
+                            class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold flex-shrink-0 mt-2">
+                            ד'</div>
+                        <div class="flex-grow">
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">אישור האמונה וביקורת עצמית
+                                (איך התוצאה אישרה את ה"שורה התחתונה"?):</label>
+                            <textarea name="confirmation" rows="2"
+                                class="w-full border border-blue-200 rounded-md p-2.5 bg-blue-50 focus:bg-white focus:ring-2 focus:ring-blue-400 outline-none"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-4 relative z-10">
+                        <div
+                            class="w-8 h-8 rounded-full bg-purple-500 text-white flex items-center justify-center font-bold flex-shrink-0 mt-2">
+                            ה'</div>
+                        <div class="flex-grow">
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">דיכאון / מצב רוח ירוד (איך
+                                הרגשת בסוף האירוע?):</label>
+                            <textarea name="low_mood" rows="2"
+                                class="w-full border border-purple-200 rounded-md p-2.5 bg-purple-50 focus:bg-white focus:ring-2 focus:ring-purple-400 outline-none"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- שלב 3 -->
+            <div class="mb-8 border-t pt-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <span class="bg-teal-100 text-teal-600 px-3 py-1 rounded-full text-sm">3</span>
+                    רפלקציה ותובנות
+                </h3>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">מה ניתן ללמוד ממעגל קסמים זה? אילו
+                        דפוסים חוזרים אתה מזהה?</label>
+                    <textarea name="reflection" rows="3"
+                        class="w-full border border-teal-200 rounded-md p-2.5 bg-teal-50 focus:bg-white focus:ring-2 focus:ring-teal-400 outline-none"></textarea>
+                </div>
+            </div>
+
+            <!-- כפתור שמירה -->
+            <div class="text-center pt-4 border-t mt-6">
+                <button type="submit" id="submitBtnCh3"
+                    class="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-10 rounded-lg shadow-md transition duration-150 ease-in-out text-lg">
+                    שמור והורד קובץ Excel מעודכן
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- קונטיינר היסטוריה, חיפוש ועריכה -->
+    <!-- ========================================== -->
+    <div id="view-history"
+        class="hidden max-w-5xl mx-auto bg-white p-6 md:p-10 shadow-lg rounded-xl border-t-8 border-emerald-500 mb-8">
+        <div class="border-b pb-6 mb-6 flex flex-wrap justify-between items-center gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800 mb-1">ארכיון והיסטוריית תרגולים</h1>
+                <p class="text-gray-500 text-sm">צפייה, חיפוש, עריכה והשלמה של דפי עבודה קודמים ששמרת</p>
+            </div>
+        </div>
+
+        <!-- סרגל חיפוש וסינון -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <div class="md:col-span-2">
+                <label class="block text-xs font-semibold text-gray-600 mb-1">🔍 חיפוש חופשי בכל הרשומות:</label>
+                <input type="text" id="searchInput" oninput="renderHistoryTable()"
+                    placeholder="חפש לפי מצב, טריגר, מחשבה, תאריך..."
+                    class="w-full border border-gray-300 rounded-md p-2 bg-white focus:ring-2 focus:ring-emerald-400 outline-none text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-600 mb-1">📂 סינון לפי פרק:</label>
+                <select id="filterChapter" onchange="renderHistoryTable()"
+                    class="w-full border border-gray-300 rounded-md p-2 bg-white focus:ring-2 focus:ring-emerald-400 outline-none text-sm">
+                    <option value="all">הצג הכל (פרק 3 + פרק 4)</option>
+                    <option value="chapter4">פרק 4: תחזיות חרדתיות בלבד</option>
+                    <option value="chapter3">פרק 3: ניתוח טריגרים בלבד</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- טבלת רשומות -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-right border-collapse">
+                <thead>
+                    <tr class="bg-gray-100 text-gray-700 text-xs uppercase border-b-2 border-gray-200">
+                        <th class="py-3 px-4">סוג טופס</th>
+                        <th class="py-3 px-4">תאריך</th>
+                        <th class="py-3 px-4">המצב / הטריגר</th>
+                        <th class="py-3 px-4">מוקד (תחזית / שורה תחתונה)</th>
+                        <th class="py-3 px-4">תוצאה / רפלקציה</th>
+                        <th class="py-3 px-4 text-center">פעולות</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTableBody" class="divide-y divide-gray-200 text-sm">
+                    <!-- מוזן דינמית ע"י JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <div id="emptyHistoryMsg" class="hidden text-center py-12 text-gray-500">
+            לא נמצאו רשומות תואמות. מלא טופס חדש או טען קובץ Excel קיים למעלה.
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- חלון קופץ (Modal) לצפייה מלאה ברשומה -->
+    <!-- ========================================== -->
+    <div id="recordModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+            <div id="modalHeader" class="p-4 bg-gray-800 text-white flex justify-between items-center">
+                <h3 id="modalTitle" class="text-lg font-bold">פרטי רשומה</h3>
+                <button type="button" onclick="closeModal()"
+                    class="text-gray-300 hover:text-white text-2xl leading-none">&times;</button>
+            </div>
+            <div id="modalBody" class="p-6 overflow-y-auto space-y-4 text-sm">
+                <!-- מוזן דינמית -->
+            </div>
+            <div class="p-4 bg-gray-50 border-t flex justify-end gap-3">
+                <button type="button" id="modalEditBtn"
+                    class="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-4 py-2 rounded-lg text-sm transition">
+                    ✏️ ערוך רשומה זו
+                </button>
+                <button type="button" onclick="closeModal()"
+                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold px-4 py-2 rounded-lg text-sm transition">
+                    סגור
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'cbt_standalone_records_v1';
+
+        window.addEventListener('DOMContentLoaded', () => {
+            refreshTimestamps();
+            updateRecordCounters();
+        });
+
+        function refreshTimestamps() {
+            const nowStr = new Date().toLocaleString('he-IL');
+            if (document.getElementById('editIndexCh4').value === "-1") {
+                document.getElementById('datetimeCh4').value = nowStr;
+            }
+            if (document.getElementById('editIndexCh3').value === "-1") {
+                document.getElementById('datetimeCh3').value = nowStr;
+            }
+        }
+
+        // ניווט בין שלוש הלשוניות
+        function switchTab(tab) {
+            const view4 = document.getElementById('view-chapter4');
+            const view3 = document.getElementById('view-chapter3');
+            const viewHist = document.getElementById('view-history');
+
+            const btn4 = document.getElementById('tabBtn4');
+            const btn3 = document.getElementById('tabBtn3');
+            const btnHist = document.getElementById('tabBtnHistory');
+            const brand = document.getElementById('brandTitle');
+
+            view4.classList.add('hidden');
+            view3.classList.add('hidden');
+            viewHist.classList.add('hidden');
+
+            btn4.className = 'tab-inactive px-3.5 py-2 rounded-md text-sm font-medium transition';
+            btn3.className = 'tab-inactive px-3.5 py-2 rounded-md text-sm font-medium transition';
+            btnHist.className = 'tab-inactive px-3.5 py-2 rounded-md text-sm font-medium transition flex items-center gap-1.5';
+
+            if (tab === 'chapter4') {
+                view4.classList.remove('hidden');
+                btn4.className = 'tab-active-blue px-3.5 py-2 rounded-md text-sm font-medium transition';
+                brand.className = 'text-xl font-bold text-blue-600 transition-colors';
+            } else if (tab === 'chapter3') {
+                view3.classList.remove('hidden');
+                btn3.className = 'tab-active-indigo px-3.5 py-2 rounded-md text-sm font-medium transition';
+                brand.className = 'text-xl font-bold text-indigo-600 transition-colors';
+            } else if (tab === 'history') {
+                viewHist.classList.remove('hidden');
+                btnHist.className = 'tab-active-emerald px-3.5 py-2 rounded-md text-sm font-medium transition flex items-center gap-1.5';
+                brand.className = 'text-xl font-bold text-emerald-600 transition-colors';
+                renderHistoryTable();
+            }
+            refreshTimestamps();
+        }
+
+        function getStoredData() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return { chapter4: [], chapter3: [] };
+                const parsed = JSON.parse(raw);
+                return {
+                    chapter4: Array.isArray(parsed.chapter4) ? parsed.chapter4 : [],
+                    chapter3: Array.isArray(parsed.chapter3) ? parsed.chapter3 : []
+                };
+            } catch (e) {
+                return { chapter4: [], chapter3: [] };
+            }
+        }
+
+        function saveStoredData(data) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            updateRecordCounters();
+        }
+
+        function updateRecordCounters() {
+            const data = getStoredData();
+            const c4 = data.chapter4.length;
+            const c3 = data.chapter3.length;
+            document.getElementById('countCh4').innerText = c4;
+            document.getElementById('countCh3').innerText = c3;
+            document.getElementById('totalBadge').innerText = c4 + c3;
+        }
+
+        function showAlert(message, type = 'success') {
+            const alertBox = document.getElementById('globalAlert');
+            if (type === 'success') {
+                alertBox.className = 'mt-3 p-3 text-center text-sm font-semibold rounded-lg bg-green-100 text-green-800 border border-green-300 block';
+            } else {
+                alertBox.className = 'mt-3 p-3 text-center text-sm font-semibold rounded-lg bg-red-100 text-red-800 border border-red-300 block';
+            }
+            alertBox.innerText = message;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setTimeout(() => { alertBox.classList.add('hidden'); }, 6000);
+        }
+
+        // שמירה או עדכון של טופס
+        function handleFormSubmit(e, chapter) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            const payload = Object.fromEntries(formData.entries());
+            const timestamp = new Date().toLocaleString('he-IL');
+
+            const db = getStoredData();
+
+            if (chapter === 'chapter4') {
+                const editIdx = parseInt(document.getElementById('editIndexCh4').value, 10);
+                const recordObj = {
+                    "חותמת זמן שמירה": editIdx >= 0 ? (db.chapter4[editIdx]["חותמת זמן שמירה"] || timestamp) : timestamp,
+                    "תאריך מהטופס": payload.datetime || '',
+                    "המצב / הטריגר": payload.trigger || '',
+                    "רגשות ותחושות": payload.feelings || '',
+                    "התחזית החרדתית": payload.prediction || '',
+                    "אמצעי זהירות": payload.safety || '',
+                    "ראיות בעד": payload.evidence_for || '',
+                    "ראיות נגד": payload.evidence_against || '',
+                    "התרחיש הכי גרוע": payload.worst_case || '',
+                    "התרחיש הסביר ביותר": payload.realistic_case || '',
+                    "מחשבה חלופית": payload.alternative_thought || '',
+                    "פעולה מתוכננת": payload.planned_action || '',
+                    "ויתור על אמצעי זהירות": payload.dropped_safety || '',
+                    "תוצאות בפועל": payload.actual_results || '',
+                    "קרדיט עצמי": payload.self_credit || ''
+                };
+
+                if (editIdx >= 0 && editIdx < db.chapter4.length) {
+                    db.chapter4[editIdx] = recordObj;
+                    cancelEdit('chapter4');
+                } else {
+                    db.chapter4.push(recordObj);
+                }
+            } else {
+                const editIdx = parseInt(document.getElementById('editIndexCh3').value, 10);
+                const recordObj = {
+                    "חותמת זמן שמירה": editIdx >= 0 ? (db.chapter3[editIdx]["חותמת זמן שמירה"] || timestamp) : timestamp,
+                    "תאריך מהטופס": payload.datetime || '',
+                    "תיאור המצב": payload.situation || '',
+                    "כלל שהופר": payload.broken_rule || '',
+                    "שורה תחתונה": payload.bottom_line || '',
+                    "ניבויים שליליים": payload.negative_predictions || '',
+                    "התנהגות הגנתית": payload.safety_behaviors || '',
+                    "אישור וביקורת": payload.confirmation || '',
+                    "דיכאון/מצב רוח": payload.low_mood || '',
+                    "רפלקציה ותובנות": payload.reflection || ''
+                };
+
+                if (editIdx >= 0 && editIdx < db.chapter3.length) {
+                    db.chapter3[editIdx] = recordObj;
+                    cancelEdit('chapter3');
+                } else {
+                    db.chapter3.push(recordObj);
+                }
+            }
+
+            saveStoredData(db);
+            downloadExcelFile();
+            form.reset();
+            refreshTimestamps();
+            showAlert('✓ הנתונים נשמרו בהצלחה וקובץ ה-Excel המעודכן ירד למכשירך!');
+        }
+
+        // רינדור טבלת ההיסטוריה והחיפוש
+        function renderHistoryTable() {
+            const db = getStoredData();
+            const query = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+            const filter = document.getElementById('filterChapter').value;
+            const tbody = document.getElementById('historyTableBody');
+            const emptyMsg = document.getElementById('emptyHistoryMsg');
+
+            tbody.innerHTML = '';
+            let combined = [];
+
+            if (filter === 'all' || filter === 'chapter4') {
+                db.chapter4.forEach((item, index) => {
+                    combined.push({
+                        chapter: 'chapter4',
+                        index: index,
+                        badge: '<span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded border border-blue-200">פרק 4: תחזיות</span>',
+                        date: item["תאריך מהטופס"] || item["חותמת זמן שמירה"] || '',
+                        trigger: item["המצב / הטריגר"] || '',
+                        focus: item["התחזית החרדתית"] || '',
+                        outcome: item["תוצאות בפועל"] || item["מחשבה חלופית"] || '',
+                        raw: item
+                    });
+                });
+            }
+
+            if (filter === 'all' || filter === 'chapter3') {
+                db.chapter3.forEach((item, index) => {
+                    combined.push({
+                        chapter: 'chapter3',
+                        index: index,
+                        badge: '<span class="bg-indigo-100 text-indigo-800 text-xs font-semibold px-2.5 py-0.5 rounded border border-indigo-200">פרק 3: טריגרים</span>',
+                        date: item["תאריך מהטופס"] || item["חותמת זמן שמירה"] || '',
+                        trigger: item["תיאור המצב"] || '',
+                        focus: item["שורה תחתונה"] || item["ניבויים שליליים"] || '',
+                        outcome: item["רפלקציה ותובנות"] || '',
+                        raw: item
+                    });
+                });
+            }
+
+            // סינון לפי מילת חיפוש בכל השדות של הרשומה
+            if (query) {
+                combined = combined.filter(entry => {
+                    const allValues = Object.values(entry.raw).join(' ').toLowerCase();
+                    return allValues.includes(query);
+                });
+            }
+
+            // הצגה מהחדש לישן
+            combined.reverse();
+
+            if (combined.length === 0) {
+                emptyMsg.classList.remove('hidden');
+                return;
+            }
+            emptyMsg.classList.add('hidden');
+
+            combined.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50 transition';
+                tr.innerHTML = `
+                    <td class="py-3 px-4 whitespace-nowrap">${item.badge}</td>
+                    <td class="py-3 px-4 text-gray-600 whitespace-nowrap text-xs">${escapeHtml(item.date)}</td>
+                    <td class="py-3 px-4 font-medium text-gray-800 max-w-[180px] truncate" title="${escapeHtml(item.trigger)}">${escapeHtml(item.trigger)}</td>
+                    <td class="py-3 px-4 text-gray-600 max-w-[200px] truncate" title="${escapeHtml(item.focus)}">${escapeHtml(item.focus)}</td>
+                    <td class="py-3 px-4 text-gray-600 max-w-[180px] truncate" title="${escapeHtml(item.outcome)}">${escapeHtml(item.outcome || '—')}</td>
+                    <td class="py-3 px-4 whitespace-nowrap text-center">
+                        <div class="flex items-center justify-center gap-1.5">
+                            <button onclick="viewRecord('${item.chapter}', ${item.index})" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded text-xs font-medium transition" title="צפייה מלאה">
+                                👁️ צפייה
+                            </button>
+                            <button onclick="loadRecordForEdit('${item.chapter}', ${item.index})" class="bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 px-2.5 py-1 rounded text-xs font-medium transition" title="עריכה / השלמה">
+                                ✏️ ערוך
+                            </button>
+                            <button onclick="deleteSingleRecord('${item.chapter}', ${item.index})" class="bg-red-50 hover:bg-red-100 text-red-600 px-2 py-1 rounded text-xs font-medium transition" title="מחיקה">
+                                🗑️
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // פתיחת חלון צפייה מלאה ברשומה
+        function viewRecord(chapter, index) {
+            const db = getStoredData();
+            const record = db[chapter][index];
+            if (!record) return;
+
+            const modal = document.getElementById('recordModal');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+            const editBtn = document.getElementById('modalEditBtn');
+
+            title.innerText = chapter === 'chapter4' ? 'פרק 4: בדיקת תחזיות חרדתיות' : 'פרק 3: ניתוח טריגרים ומעגל הקסמים';
+            body.innerHTML = '';
+
+            Object.entries(record).forEach(([key, val]) => {
+                const block = document.createElement('div');
+                block.className = 'bg-gray-50 p-3 rounded-lg border border-gray-200';
+                block.innerHTML = `
+                    <div class="text-xs font-bold text-gray-500 mb-1">${escapeHtml(key)}:</div>
+                    <div class="text-gray-800 whitespace-pre-wrap">${escapeHtml(val || '—')}</div>
+                `;
+                body.appendChild(block);
+            });
+
+            editBtn.onclick = () => {
+                closeModal();
+                loadRecordForEdit(chapter, index);
+            };
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('recordModal').classList.add('hidden');
+        }
+
+        // טעינת רשומה לטופס לצורך עריכה או השלמת פרטים
+        function loadRecordForEdit(chapter, index) {
+            const db = getStoredData();
+            const record = db[chapter][index];
+            if (!record) return;
+
+            if (chapter === 'chapter4') {
+                switchTab('chapter4');
+                const form = document.getElementById('formChapter4');
+                document.getElementById('editIndexCh4').value = index;
+                document.getElementById('editBannerCh4').classList.remove('hidden');
+                document.getElementById('submitBtnCh4').innerText = '💾 שמור שינויים ועדכן Excel';
+
+                form.elements['datetime'].value = record["תאריך מהטופס"] || '';
+                form.elements['trigger'].value = record["המצב / הטריגר"] || '';
+                form.elements['feelings'].value = record["רגשות ותחושות"] || '';
+                form.elements['prediction'].value = record["התחזית החרדתית"] || '';
+                form.elements['safety'].value = record["אמצעי זהירות"] || '';
+                form.elements['evidence_for'].value = record["ראיות בעד"] || '';
+                form.elements['evidence_against'].value = record["ראיות נגד"] || '';
+                form.elements['worst_case'].value = record["התרחיש הכי גרוע"] || '';
+                form.elements['realistic_case'].value = record["התרחיש הסביר ביותר"] || '';
+                form.elements['alternative_thought'].value = record["מחשבה חלופית"] || '';
+                form.elements['planned_action'].value = record["פעולה מתוכננת"] || '';
+                form.elements['dropped_safety'].value = record["ויתור על אמצעי זהירות"] || '';
+                form.elements['actual_results'].value = record["תוצאות בפועל"] || '';
+                form.elements['self_credit'].value = record["קרדיט עצמי"] || '';
+            } else {
+                switchTab('chapter3');
+                const form = document.getElementById('formChapter3');
+                document.getElementById('editIndexCh3').value = index;
+                document.getElementById('editBannerCh3').classList.remove('hidden');
+                document.getElementById('submitBtnCh3').innerText = '💾 שמור שינויים ועדכן Excel';
+
+                form.elements['datetime'].value = record["תאריך מהטופס"] || '';
+                form.elements['situation'].value = record["תיאור המצב"] || '';
+                form.elements['broken_rule'].value = record["כלל שהופר"] || '';
+                form.elements['bottom_line'].value = record["שורה תחתונה"] || '';
+                form.elements['negative_predictions'].value = record["ניבויים שליליים"] || '';
+                form.elements['safety_behaviors'].value = record["התנהגות הגנתית"] || '';
+                form.elements['confirmation'].value = record["אישור וביקורת"] || '';
+                form.elements['low_mood'].value = record["דיכאון/מצב רוח"] || '';
+                form.elements['reflection'].value = record["רפלקציה ותובנות"] || '';
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function cancelEdit(chapter) {
+            if (chapter === 'chapter4') {
+                document.getElementById('editIndexCh4').value = "-1";
+                document.getElementById('editBannerCh4').classList.add('hidden');
+                document.getElementById('submitBtnCh4').innerText = 'שמור והורד קובץ Excel מעודכן';
+                document.getElementById('formChapter4').reset();
+            } else {
+                document.getElementById('editIndexCh3').value = "-1";
+                document.getElementById('editBannerCh3').classList.add('hidden');
+                document.getElementById('submitBtnCh3').innerText = 'שמור והורד קובץ Excel מעודכן';
+                document.getElementById('formChapter3').reset();
+            }
+            refreshTimestamps();
+        }
+
+        function deleteSingleRecord(chapter, index) {
+            if (!confirm('האם למחוק רשומה זו מהזיכרון המקומי?')) return;
+            const db = getStoredData();
+            db[chapter].splice(index, 1);
+            saveStoredData(db);
+            renderHistoryTable();
+            showAlert('הרשומה נמחקה בהצלחה.');
+        }
+
+        // ייצוא כל הנתונים לקובץ אקסל (SheetJS)
+        function downloadExcelFile() {
+            const db = getStoredData();
+            if (db.chapter4.length === 0 && db.chapter3.length === 0) {
+                showAlert('אין עדיין רשומות שמורות לייצוא. מלא טופס תחילה.', 'error');
+                return;
+            }
+
+            const wb = XLSX.utils.book_new();
+            wb.Workbook = { Views: [{ RTL: true }] };
+
+            const ws4Data = db.chapter4.length > 0 ? db.chapter4 : [{ "הודעה": "טרם הוזנו נתונים לפרק 4" }];
+            const ws4 = XLSX.utils.json_to_sheet(ws4Data);
+            ws4['!views'] = [{ rightToLeft: true }];
+            XLSX.utils.book_append_sheet(wb, ws4, "פרק_4_תחזיות");
+
+            const ws3Data = db.chapter3.length > 0 ? db.chapter3 : [{ "הודעה": "טרם הוזנו נתונים לפרק 3" }];
+            const ws3 = XLSX.utils.json_to_sheet(ws3Data);
+            ws3['!views'] = [{ rightToLeft: true }];
+            XLSX.utils.book_append_sheet(wb, ws3, "פרק_3_טריגרים");
+
+            XLSX.writeFile(wb, "יומן_תרגול_CBT.xlsx");
+        }
+
+        // ייבוא קובץ אקסל קיים
+        function importExcelFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const db = getStoredData();
+
+                    if (workbook.SheetNames.includes("פרק_4_תחזיות")) {
+                        const imported4 = XLSX.utils.sheet_to_json(workbook.Sheets["פרק_4_תחזיות"]);
+                        db.chapter4 = imported4.filter(row => !row["הודעה"]);
+                    }
+
+                    if (workbook.SheetNames.includes("פרק_3_טריגרים")) {
+                        const imported3 = XLSX.utils.sheet_to_json(workbook.Sheets["פרק_3_טריגרים"]);
+                        db.chapter3 = imported3.filter(row => !row["הודעה"]);
+                    }
+
+                    saveStoredData(db);
+                    renderHistoryTable();
+                    showAlert('✓ קובץ האקסל נטען בהצלחה! כל הרשומות זמינות כעת גם בלשונית ההיסטוריה.');
+                } catch (err) {
+                    showAlert('שגיאה בטעינת קובץ האקסל: ודא שזהו קובץ תקין שנוצר על ידי המערכת.', 'error');
+                }
+                event.target.value = '';
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function clearLocalData() {
+            if (confirm('האם אתה בטוח שברצונך למחוק את כל הרשומות השמורות בדפדפן זה? (קבצי אקסל שכבר הורדת למחשב לא יימחקו)')) {
+                localStorage.removeItem(STORAGE_KEY);
+                updateRecordCounters();
+                renderHistoryTable();
+                showAlert('הזיכרון המקומי בדפדפן אופס בהצלחה.');
+            }
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+    </script>
+</body>
+
+</html>
