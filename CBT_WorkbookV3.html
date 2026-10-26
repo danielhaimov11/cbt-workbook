@@ -528,13 +528,47 @@
     <div id="cloudModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden">
             <div class="p-4 bg-indigo-700 text-white flex justify-between items-center">
-                <h3 class="text-lg font-bold flex items-center gap-2">☁️ הגדרות שמירה וחיבור ל-Google Sheets</h3>
+                <h3 class="text-lg font-bold flex items-center gap-2">☁️ חיבור וסנכרון מול Google Sheets</h3>
                 <button type="button" onclick="closeCloudModal()"
                     class="text-indigo-200 hover:text-white text-2xl leading-none">&times;</button>
             </div>
             <div class="p-6 overflow-y-auto space-y-5 text-sm">
 
-                <!-- בחירת מצב עבודה -->
+                <!-- באנר חיווי סביבה אם רץ ישירות ב-Apps Script -->
+                <div id="gasNativeBanner" class="hidden bg-emerald-50 border border-emerald-300 p-4 rounded-xl text-emerald-800">
+                    <div class="font-bold text-base flex items-center gap-2 mb-1">
+                        <span>🎉</span>
+                        <span>המערכת פועלת כעת ישירות בתוך ה-Google Sheets שלך!</span>
+                    </div>
+                    <p class="text-xs text-emerald-700 leading-relaxed">
+                        כל הנתונים שאתה מזין נשמרים ישירות לתוך גליונות <strong>פרק_4_תחזיות</strong> ו-<strong>פרק_3_טריגרים</strong> בגיליון זה בלחיצת כפתור אחת, ללא צורך בהגדרת קישורים!
+                    </p>
+                </div>
+
+                <!-- אפשרות 1: הפעלה בלחיצת כפתור אחת מתוך Google Sheets -->
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-xl border border-indigo-200">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-bold text-indigo-900 text-sm flex items-center gap-1.5">
+                            <span>⭐</span>
+                            <span>הדרך הפשוטה ביותר: הפעלה ישירה ב-Google Sheets (0 הגדרות!)</span>
+                        </span>
+                    </div>
+                    <p class="text-xs text-indigo-800 leading-relaxed mb-3">
+                        בכל פעם שאתה פותח את גיליון ה-Google Sheets שלך, מופיע למעלה תפריט מובנה:
+                        <br>
+                        <strong>🧠 מרחב תרגול CBT &larr; 🚀 פתח חוברת תרגול (חלון מלא)</strong>
+                        <br>
+                        לחיצה אחת פותחת את כל האפליקציה ישירות בתוך הגיליון, בלי להעתיק שום קישור ובלי שום הגדרות טכניות!
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" onclick="copyGasScript()"
+                            class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+                            <span>📋 העתק קוד שרת (Code.gs) לגיליון שלך</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- בחירת מצב עבודה (מקומי / ענן / משולב) -->
                 <div>
                     <label class="block font-bold text-gray-800 mb-2">בחר איך לשמור את הנתונים שלך כברירת מחדל:</label>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -562,11 +596,10 @@
                     </div>
                 </div>
 
-                <!-- הזנת כתובת Web App -->
+                <!-- הזנת כתובת Web App (לעבודה מקובץ HTML מקומי) -->
                 <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                    <label class="block font-bold text-gray-800 mb-1">🔗 כתובת ה-Web App של ה-Google Sheets שלך:</label>
-                    <p class="text-xs text-gray-500 mb-2">אם אתה מריץ קובץ זה מתוך המחשב שלך, הדבק כאן את כתובת ה-Web
-                        App שיצרת בגיליון האישי שלך (מסתיים ב-<code>/exec</code>).</p>
+                    <label class="block font-bold text-gray-800 mb-1">🔗 כתובת ה-Web App של ה-Google Sheets שלך (לעבודה מקובץ מקומי):</label>
+                    <p class="text-xs text-gray-500 mb-2">אם אתה מריץ קובץ HTML זה מתוך המחשב/טלפון ורוצה שיסנכרן לגיליון שלך, הדבק כאן את כתובת ה-Web App (מסתיים ב-<code>/exec</code>):</p>
                     <div class="flex gap-2">
                         <input type="url" id="cloudUrlInput" dir="ltr"
                             placeholder="https://script.google.com/macros/s/.../exec"
@@ -578,27 +611,14 @@
                     </div>
                 </div>
 
-                <!-- מדריך + העתקת קוד ה-Apps Script -->
+                <!-- מדריך הגדרה מהיר ב-3 שלבים -->
                 <div class="border-t pt-4">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="font-bold text-gray-800">🛠️ איך לחבר גיליון Google Sheets אישי ב-2 דקות?</span>
-                        <button type="button" onclick="copyGasScript()"
-                            class="bg-gray-800 hover:bg-gray-900 text-white text-xs px-3 py-1.5 rounded-md font-medium transition">
-                            📋 העתק קוד שרת (Code.gs)
-                        </button>
-                    </div>
-                    <ol
-                        class="list-decimal list-inside space-y-1 text-xs text-gray-600 bg-indigo-50 p-3.5 rounded-lg border border-indigo-100">
-                        <li>פתח גיליון <strong>Google Sheets</strong> חדש בחשבון הגוגל שלך.</li>
-                        <li>בתפריט העליון לחץ על <strong>הרחבות (Extensions)</strong> &larr; <strong>Apps
-                                Script</strong>.</li>
-                        <li>מחק את הקוד הקיים שם, לחץ על הכפתור השחור למעלה <strong>"העתק קוד שרת"</strong> והדבק אותו
-                            בעורך.</li>
-                        <li>לחץ למעלה על <strong>Deploy (פריסה)</strong> &larr; <strong>New deployment (פריסה
-                                חדשה)</strong> &larr; בחר בסוג <strong>Web app</strong>.</li>
-                        <li>הגדר: <em>Execute as:</em> <strong>Me</strong>, ובשדה <em>Who has access:</em> בחר
-                            <strong>Anyone</strong>. לחץ על Deploy.</li>
-                        <li>העתק את ה-<strong>Web app URL</strong> שקיבלת והדבק אותו בתיבה למעלה!</li>
+                    <span class="font-bold text-gray-800 block mb-2">🛠️ איך להגדיר את הגיליון בפעם הראשונה (ב-2 דקות):</span>
+                    <ol class="list-decimal list-inside space-y-1.5 text-xs text-gray-600 bg-gray-50 p-3.5 rounded-lg border border-gray-200">
+                        <li>פתח גיליון <strong>Google Sheets</strong> חדש ב-Google Drive האישי שלך.</li>
+                        <li>לחץ בתפריט למעלה על <strong>הרחבות (Extensions) &larr; Apps Script</strong>.</li>
+                        <li>מחק את מה שרשום שם, לחץ על הכפתור הסגול למעלה <strong>"העתק קוד שרת"</strong> והדבק בעורך.</li>
+                        <li>שמור (Ctrl+S) ורענן את הגיליון — מיד יופיע לך תפריט עליון חדש: <strong>🧠 מרחב תרגול CBT</strong> שממנו אפשר להפעיל את המערכת בלחיצת כפתור אחת!</li>
                     </ol>
                 </div>
 
@@ -623,6 +643,13 @@
         const isNativeGasEnv = (typeof google !== 'undefined' && google.script && google.script.run);
 
         window.addEventListener('DOMContentLoaded', () => {
+            // זיהוי אוטומטי של כתובת ענן מפרמטר ב-URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const paramCloudUrl = urlParams.get('cloudUrl');
+            if (paramCloudUrl && paramCloudUrl.startsWith('http')) {
+                saveCloudConfigObj({ mode: 'cloud', url: paramCloudUrl });
+            }
+
             refreshTimestamps();
             updateRecordCounters();
             updateCloudStatusUI();
@@ -658,7 +685,7 @@
 
             if (cfg.mode === 'cloud' && isCloudConfigured) {
                 dot.className = 'w-2 h-2 rounded-full bg-indigo-600';
-                text.innerText = '☁️ מחובר ל-Google Sheets';
+                text.innerText = isNativeGasEnv ? '☁️ מחובר לגיליון זה (ישיר)' : '☁️ מחובר ל-Google Sheets';
                 badge.className = 'bg-indigo-50 hover:bg-indigo-100 text-indigo-800 text-xs px-3 py-1 rounded-full font-semibold border border-indigo-300 transition flex items-center gap-1.5';
                 if (document.getElementById('editIndexCh4').value === "-1") btn4.innerText = 'שמור ב-Google Sheets ☁️';
                 if (document.getElementById('editIndexCh3').value === "-1") btn3.innerText = 'שמור ב-Google Sheets ☁️';
@@ -682,6 +709,14 @@
             document.getElementById('cloudUrlInput').value = cfg.url || '';
             const radio = document.querySelector(`input[name="pref_mode"][value="${cfg.mode}"]`);
             if (radio) radio.checked = true;
+
+            const gasBanner = document.getElementById('gasNativeBanner');
+            if (isNativeGasEnv) {
+                gasBanner.classList.remove('hidden');
+            } else {
+                gasBanner.classList.add('hidden');
+            }
+
             document.getElementById('cloudModal').classList.remove('hidden');
         }
 
@@ -1235,7 +1270,75 @@
 
         // העתקת קוד ה-Apps Script ללוח של המשתמש בלחיצת כפתור
         function copyGasScript() {
-            const gasCode = `function doGet(e) {
+            const gasCode = `/**
+ * מרחב תרגול CBT | Google Apps Script Backend
+ */
+
+function onOpen() {
+  initSheetsIfMissing();
+  SpreadsheetApp.getUi()
+    .createMenu('🧠 מרחב תרגול CBT')
+    .addItem('🚀 פתח חוברת תרגול (חלון מלא)', 'openCbtDialog')
+    .addItem('📱 פתח בסרגל צד (Sidebar)', 'openCbtSidebar')
+    .addSeparator()
+    .addItem('🔗 קישור להרצה ישירה מהטלפון / מחשב', 'showWebAppUrlDialog')
+    .addToUi();
+}
+
+function openCbtDialog() {
+  var html = HtmlService.createHtmlOutputFromFile('index')
+    .setWidth(1150)
+    .setHeight(820)
+    .setTitle('מרחב תרגול CBT | מערכת עצמאית');
+  SpreadsheetApp.getUi().showModalDialog(html, 'מרחב תרגול CBT');
+}
+
+function openCbtSidebar() {
+  var html = HtmlService.createHtmlOutputFromFile('index')
+    .setTitle('מרחב תרגול CBT');
+  SpreadsheetApp.getUi().showSidebar(html);
+}
+
+function showWebAppUrlDialog() {
+  var url = ScriptApp.getService().getUrl();
+  var ui = SpreadsheetApp.getUi();
+  if (url) {
+    var html = HtmlService.createHtmlOutput(
+      '<div style="direction:rtl; font-family:sans-serif; padding:15px; text-align:right;">' +
+      '<h3 style="color:#1d4ed8; margin-top:0;">🔗 קישור האפליקציה האישי שלך:</h3>' +
+      '<p style="font-size:13px; color:#374151;">לחיצה על קישור זה מכל מחשב או טלפון תפתח ישירות את המערכת מסונכרנת לגיליון זה:</p>' +
+      '<input type="text" value="' + url + '" style="width:100%; padding:10px; font-size:12px; border:1px solid #cbd5e1; border-radius:6px; box-sizing:border-box;" readonly onclick="this.select();">' +
+      '<p style="font-size:12px; color:#6b7280; margin-top:12px;">💡 שמור קישור זה במועדפים בטלפון או במחשב לעבודה נוחה בכל עת.</p>' +
+      '</div>'
+    ).setWidth(520).setHeight(220);
+    ui.showModalDialog(html, 'קישור ה-Web App האישי שלך');
+  } else {
+    ui.alert(
+      'פריסה נדרשת לקבלת קישור',
+      'כדי לקבל קישור הפעלה לטלפון, יש לבצע פעם אחת Deploy -> New deployment -> לבחור Web app בעורך ה-Apps Script.',
+      ui.ButtonSet.OK
+    );
+  }
+}
+
+function initSheetsIfMissing() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var headers4 = [
+    "חותמת זמן שמירה", "תאריך מהטופס", "המצב / הטריגר", "רגשות ותחושות",
+    "התחזית החרדתית", "אמצעי זהירות", "ראיות בעד", "ראיות נגד",
+    "התרחיש הכי גרוע", "התרחיש הסביר ביותר", "מחשבה חלופית",
+    "פעולה מתוכננת", "ויתור על אמצעי זהירות", "תוצאות בפועל", "קרדיט עצמי"
+  ];
+  var headers3 = [
+    "חותמת זמן שמירה", "תאריך מהטופס", "תיאור המצב", "כלל שהופר", 
+    "שורה תחתונה", "ניבויים שליליים", "התנהגות הגנתית", 
+    "אישור וביקורת", "דיכאון/מצב רוח", "רפלקציה ותובנות"
+  ];
+  if (!ss.getSheetByName("פרק_4_תחזיות")) writeObjectsToSheet(ss, "פרק_4_תחזיות", headers4, [], "#d0e0e3");
+  if (!ss.getSheetByName("פרק_3_טריגרים")) writeObjectsToSheet(ss, "פרק_3_טריגרים", headers3, [], "#c5cae9");
+}
+
+function doGet(e) {
   if (e && e.parameter && e.parameter.action === 'loadAll') {
     return ContentService.createTextOutput(JSON.stringify(getAllRecordsForClient()))
       .setMimeType(ContentService.MimeType.JSON);
