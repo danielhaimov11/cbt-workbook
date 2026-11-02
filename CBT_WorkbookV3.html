@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מרחב תרגול CBT | מערכת מאוחדת (אקסל מקומי + Google Sheets)</title>
+    <title>מרחב תרגול CBT | מערכת מאוחדת ואוטומטית</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- SheetJS for Excel Export/Import -->
@@ -60,9 +60,9 @@
                     <span id="brandTitle" class="text-xl font-bold text-blue-600 transition-colors">🧠 מרחב תרגול CBT</span>
                     <button type="button" onclick="openCloudModal()" id="cloudStatusBadge"
                         class="bg-green-50 hover:bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full font-medium border border-green-300 transition flex items-center gap-1.5"
-                        title="לחץ להגדרות שמירה ו-Google Sheets">
+                        title="לחץ להגדרות סנכרון אוטומטי ל-Excel או Google Sheets">
                         <span id="cloudStatusDot" class="w-2 h-2 rounded-full bg-green-600"></span>
-                        <span id="cloudStatusText">🔒 פרטי לגמרי (שמירה מקומית / Excel)</span>
+                        <span id="cloudStatusText">🔒 שמירה אוטומטית (מקומי + Excel)</span>
                     </button>
                 </div>
 
@@ -87,7 +87,7 @@
         </div>
     </nav>
 
-    <!-- סרגל כלים פשוט ונוח למשתמשים לא-טכניים (Excel + Google Sheets בלחיצת כפתור) -->
+    <!-- סרגל כלים אוטומטי ופשוט למשתמשים לא-טכניים -->
     <div class="max-w-4xl mx-auto px-4 mb-6">
         <div id="dropZone"
             class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex flex-wrap items-center justify-between gap-4 transition">
@@ -97,30 +97,32 @@
                     <span class="font-bold text-blue-600" id="countCh4">0</span> (פרק 4) |
                     <span class="font-bold text-indigo-600" id="countCh3">0</span> (פרק 3)
                 </div>
-                <span class="text-xs text-gray-400 hidden md:inline">• ניתן גם לגרור לכאן קובץ Excel לטעינה מהירה</span>
+                <span id="linkedFileBadge" class="hidden text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-md font-semibold">
+                    🔗 מסונכרן אוטומטית לקובץ Excel במחשב
+                </span>
             </div>
 
             <div class="flex flex-wrap gap-2 items-center">
-                <!-- טעינת אקסל קיים (להמשך עבודה / צפייה) -->
-                <label
-                    class="bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 text-xs font-bold px-3.5 py-2 rounded-lg cursor-pointer transition flex items-center gap-1.5 shadow-sm"
-                    title="טען קובץ אקסל ששמרת בעבר או שמילאת ידנית באקסל">
-                    <span>📂 טען קובץ Excel</span>
-                    <input type="file" id="excelUpload" accept=".xlsx, .xls" class="hidden"
-                        onchange="importExcelFile(event)">
-                </label>
+                <!-- חיבור / פתיחת קובץ Excel עם סנכרון אוטומטי דו-כיווני -->
+                <button type="button" onclick="connectOrLoadExcelAuto()"
+                    class="bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 text-xs font-bold px-3.5 py-2 rounded-lg transition flex items-center gap-1.5 shadow-sm"
+                    title="בחר קובץ Excel קיים מהמחשב — המערכת תטען אותו ותעדכן אותו אוטומטית בכל שמירה!">
+                    <span>📂 פתח / חבר קובץ Excel אוטומטי</span>
+                </button>
+                <input type="file" id="excelUpload" accept=".xlsx, .xls" class="hidden"
+                    onchange="importExcelFile(event)">
 
-                <!-- הורדת אקסל מרוכז / תבנית מוכנה למילוי -->
-                <button type="button" onclick="downloadExcelFile()"
+                <!-- הורדת / שמירת אקסל מרוכז -->
+                <button type="button" onclick="saveOrDownloadExcelNow()"
                     class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3.5 py-2 rounded-lg shadow-sm transition flex items-center gap-1.5"
-                    title="מוריד קובץ Excel מסודר עם כל הנתונים שלך (או תבנית מוכנה למילוי)">
-                    <span>📥 שמור / הורד Excel</span>
+                    title="שומר ומעדכן את קובץ ה-Excel שלך">
+                    <span>📥 שמור ל-Excel עכשיו</span>
                 </button>
 
-                <!-- יצירת / חיבור Google Sheets בלחיצת כפתור -->
-                <button type="button" onclick="openCloudModal()"
+                <!-- Google Sheets בלחיצת כפתור -->
+                <button type="button" onclick="handleOneClickGoogleSheetsButton()"
                     class="bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 text-xs font-bold px-3.5 py-2 rounded-lg transition flex items-center gap-1.5 shadow-sm">
-                    <span>🟢 Google Sheets בלחיצת כפתור</span>
+                    <span>🟢 Google Sheets</span>
                 </button>
 
                 <!-- כפתור סנכרון מהיר (מוצג כשמחובר לענן) -->
@@ -137,6 +139,20 @@
                 </button>
             </div>
         </div>
+
+        <!-- באנר חיבור קובץ שמור מהפעלה קודמת (מוצג אוטומטית אם קיים קובץ מקושר) -->
+        <div id="reconnectFileBanner"
+            class="hidden mt-3 bg-blue-50 border border-blue-200 p-3 rounded-xl flex flex-wrap items-center justify-between gap-2 text-xs text-blue-900">
+            <div class="flex items-center gap-2 font-medium">
+                <span>🔄</span>
+                <span id="reconnectFileText">נמצא קובץ Excel אישי מחובר מהפעם הקודמת. לחץ כדי לסנכרן אותו אוטומטית:</span>
+            </div>
+            <button type="button" onclick="resumeSavedFileHandle()"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-1.5 rounded-lg transition shadow-sm">
+                טען וסנכרן אוטומטית
+            </button>
+        </div>
+
         <div id="globalAlert" class="hidden mt-3 p-3.5 text-center text-sm font-semibold rounded-lg shadow-sm"></div>
     </div>
 
@@ -150,7 +166,7 @@
         <div id="editBannerCh4"
             class="hidden mb-6 bg-amber-50 border border-amber-300 p-4 rounded-lg flex justify-between items-center">
             <div class="text-amber-800 text-sm font-semibold">
-                ✏️ הינך במצב עריכת רשומה קיימת (פרק 4). לחיצה על שמירה תעדכן את הרשומה.
+                ✏️ הינך במצב עריכת רשומה קיימת (פרק 4). לחיצה על שמירה תעדכן את הרשומה אוטומטית.
             </div>
             <button type="button" onclick="cancelEdit('chapter4')"
                 class="text-xs bg-white border border-amber-400 text-amber-800 px-3 py-1.5 rounded hover:bg-amber-100 font-bold">
@@ -302,7 +318,7 @@
             <div class="text-center pt-4 border-t">
                 <button type="submit" id="submitBtnCh4"
                     class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-10 rounded-lg shadow-md transition duration-150 ease-in-out text-lg">
-                    💾 שמור והורד קובץ Excel מעודכן
+                    💾 שמור ועדכן קובץ Excel אוטומטית
                 </button>
             </div>
         </form>
@@ -318,7 +334,7 @@
         <div id="editBannerCh3"
             class="hidden mb-6 bg-amber-50 border border-amber-300 p-4 rounded-lg flex justify-between items-center">
             <div class="text-amber-800 text-sm font-semibold">
-                ✏️ הינך במצב עריכת רשומה קיימת (פרק 3). לחיצה על שמירה תעדכן את הרשומה.
+                ✏️ הינך במצב עריכת רשומה קיימת (פרק 3). לחיצה על שמירה תעדכן את הרשומה אוטומטית.
             </div>
             <button type="button" onclick="cancelEdit('chapter3')"
                 class="text-xs bg-white border border-amber-400 text-amber-800 px-3 py-1.5 rounded hover:bg-amber-100 font-bold">
@@ -462,7 +478,7 @@
             <div class="text-center pt-4 border-t mt-6">
                 <button type="submit" id="submitBtnCh3"
                     class="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-10 rounded-lg shadow-md transition duration-150 ease-in-out text-lg">
-                    💾 שמור והורד קובץ Excel מעודכן
+                    💾 שמור ועדכן קובץ Excel אוטומטית
                 </button>
             </div>
         </form>
@@ -479,14 +495,13 @@
                 <p class="text-gray-500 text-sm">צפייה, חיפוש, עריכה והשלמה של דפי עבודה קודמים ששמרת או שטענת מקובץ Excel</p>
             </div>
             <div class="flex gap-2">
-                <label
-                    class="bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 text-xs font-bold px-3.5 py-2 rounded-lg cursor-pointer transition flex items-center gap-1.5">
-                    <span>📂 טען Excel להיסטוריה</span>
-                    <input type="file" accept=".xlsx, .xls" class="hidden" onchange="importExcelFile(event)">
-                </label>
-                <button type="button" onclick="downloadExcelFile()"
+                <button type="button" onclick="connectOrLoadExcelAuto()"
+                    class="bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 text-xs font-bold px-3.5 py-2 rounded-lg transition flex items-center gap-1.5">
+                    <span>📂 פתח / חבר קובץ Excel</span>
+                </button>
+                <button type="button" onclick="saveOrDownloadExcelNow()"
                     class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3.5 py-2 rounded-lg transition flex items-center gap-1.5">
-                    <span>📥 ייצא הכל ל-Excel</span>
+                    <span>📥 שמור הכל ל-Excel</span>
                 </button>
             </div>
         </div>
@@ -528,7 +543,7 @@
         </div>
 
         <div id="emptyHistoryMsg" class="hidden text-center py-12 text-gray-500">
-            לא נמצאו רשומות תואמות. מלא טופס חדש או לחץ על <strong>"📂 טען קובץ Excel"</strong> למעלה.
+            לא נמצאו רשומות תואמות. מלא טופס חדש או לחץ על <strong>"📂 פתח / חבר קובץ Excel אוטומטי"</strong> למעלה.
         </div>
     </div>
 
@@ -557,12 +572,12 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- חלון קופץ (Modal) ליצירת Google Sheets בלחיצת כפתור והגדרות שמירה -->
+    <!-- חלון קופץ (Modal) לעבודה אוטומטית עם Excel ו-Google Sheets -->
     <!-- ========================================== -->
     <div id="cloudModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden">
             <div class="p-4 bg-indigo-700 text-white flex justify-between items-center">
-                <h3 class="text-lg font-bold flex items-center gap-2">🟢 עבודה עם Excel ו-Google Sheets (ללא ידע טכני)</h3>
+                <h3 class="text-lg font-bold flex items-center gap-2">🟢 שמירה אוטומטית ב-Excel או ב-Google Sheets</h3>
                 <button type="button" onclick="closeCloudModal()"
                     class="text-indigo-200 hover:text-white text-2xl leading-none">&times;</button>
             </div>
@@ -579,48 +594,66 @@
                     </p>
                 </div>
 
-                <!-- דרך 1: הכי פשוטה למשתמשים לא טכניים - אקסל / העלאה ל-Google Sheets בלי קוד -->
+                <!-- אפשרות 1: סנכרון אוטומטי לקובץ Excel קבוע במחשב / Google Drive המקומי (ללא שום העתק-הדבק!) -->
                 <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-200">
                     <div class="font-bold text-emerald-900 text-base mb-1 flex items-center gap-1.5">
-                        <span>1️⃣</span>
-                        <span>אפשרות א': עבודה עם קובץ Excel או Google Sheets (בלי שום הגדרות!)</span>
+                        <span>✨</span>
+                        <span>הכי נוח ואוטומטי (0 הגדרות): קובץ Excel מתעדכן לבד!</span>
                     </div>
                     <p class="text-xs text-emerald-800 leading-relaxed mb-3">
-                        הורד קובץ Excel מוכן ומעוצב עם כל העמודות. תוכל למלא אותו דרך דף זה (ולטעון אותו חזרה בכל עת באמצעות <strong>"📂 טען קובץ Excel"</strong>), או לגרור אותו ל-Google Drive שלך ולפתוח אותו כטבלת Google Sheets פרטית!
+                        בלחיצה אחת בחר איפה לשמור את הקובץ <strong><code>יומן_תרגול_CBT.xlsx</code></strong> במחשב שלך (או בתיקיית ה-Google Drive במחשב).<br>
+                        מרגע זה, <strong>כל שמירה או עריכה בדף תעדכן את אותו קובץ Excel אוטומטית ברקע</strong> — בלי להוריד קבצים כפולים ובלי שום פעולה טכנית!
                     </p>
                     <div class="flex flex-wrap gap-2">
-                        <button type="button" onclick="downloadExcelFile()"
+                        <button type="button" onclick="createNewLinkedExcelFile()"
                             class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition shadow-sm">
-                            📥 הורד קובץ Excel מוכן עכשיו
+                            ⚡ צור וחבר קובץ Excel אוטומטי עכשיו
                         </button>
-                        <a href="https://docs.google.com/spreadsheets/u/0/" target="_blank" rel="noopener noreferrer"
+                        <button type="button" onclick="connectOrLoadExcelAuto()"
                             class="bg-white hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-bold px-4 py-2.5 rounded-lg transition">
-                            🌐 פתח את Google Sheets שלי
-                        </a>
+                            📂 חבר קובץ Excel קיים מהמחשב
+                        </button>
                     </div>
                 </div>
 
-                <!-- דרך 2: יצירת אפליקציית Google Sheets אוטומטית בלחיצת כפתור -->
+                <!-- אפשרות 2: פתיחה ב-Google Sheets בענן -->
                 <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-xl border border-indigo-200">
                     <div class="font-bold text-indigo-900 text-base mb-1 flex items-center gap-1.5">
-                        <span>2️⃣</span>
-                        <span>אפשרות ב': הפיכת Google Sheets לאפליקציה בלחיצת כפתור!</span>
+                        <span>☁️</span>
+                        <span>עבודה ב-Google Sheets בענן</span>
                     </div>
                     <p class="text-xs text-indigo-800 leading-relaxed mb-3">
-                        רוצה שהחוברת המעוצבת הזו תיפתח ישירות מתוך כפתור קבוע בתוך ה-Google Sheets הפרטי שלך?
+                        רוצה לעבוד ב-Google Sheets בדפדפן? לחץ על הכפתור הראשון כדי להוריד את הקובץ המוכן ולפתוח את Google Sheets (שם פשוט גוררים את הקובץ פנימה והוא הופך לגיליון Google Sheets מוכן עם כל העמודות!).
                     </p>
-                    <div class="mb-3">
-                        <button type="button" onclick="oneClickCreateGoogleSheetApp()"
-                            class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-5 py-3 rounded-lg transition flex items-center justify-center gap-2 shadow-md">
-                            <span>⚡ לחץ כאן: העתק מערכת ופתח Google Sheets חדש</span>
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" onclick="downloadExcelAndOpenGoogleSheets()"
+                            class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition shadow-sm flex items-center gap-1.5">
+                            <span>🚀 הורד קובץ מוכן ופתח את Google Sheets</span>
                         </button>
                     </div>
-                    <ol class="list-decimal list-inside space-y-1 text-xs text-indigo-900 bg-white/80 p-3 rounded-lg border border-indigo-100">
-                        <li>לחץ על הכפתור הסגול למעלה (המערכת מעתיקה את הקוד האוטומטי ופותחת לך גיליון Google Sheets חדש).</li>
-                        <li>בגיליון שנפתח, לחץ בתפריט העליון על: <strong>הרחבות (Extensions) &larr; Apps Script</strong>.</li>
-                        <li>מחק את הטקסט הקצר שמופיע שם, הדבק (<strong>Ctrl+V</strong>) ולחץ על סמל השמירה 💾 (<strong>Ctrl+S</strong>).</li>
-                        <li>רענן את הגיליון — יופיע לך למעלה תפריט <strong>🧠 מרחב תרגול CBT</strong> שמקים את הטבלאות ופותח את האפליקציה בלחיצה אחת!</li>
-                    </ol>
+
+                    <!-- למתקדמים / בעל המערכת: יצירת תבנית מאסטר עם תפריט מובנה -->
+                    <details class="mt-3 bg-white/80 p-3 rounded-lg border border-indigo-100 text-xs">
+                        <summary class="font-bold text-indigo-900 cursor-pointer">⚙️ למנהל המערכת: איך ליצור קישור תבנית (Template) בשביל משתמשים אחרים?</summary>
+                        <div class="mt-2 space-y-2 text-indigo-950">
+                            <p>דפדפנים חוסמים מסיבות אבטחה הזרקת קוד אוטומטית לחשבון Google של משתמש. כדי שהמשתמשים שלך יקבלו את האפליקציה בתוך Google Sheets <strong>בלחיצה אחת בלבד (ללא העתק-הדבק)</strong>, בצע זאת <strong>פעם אחת בלבד</strong> כבעל המערכת:</p>
+                            <ol class="list-decimal list-inside space-y-1">
+                                <li>לחץ על <button type="button" onclick="oneClickCreateGoogleSheetApp()" class="underline font-bold text-indigo-700">העתק קוד מערכת ופתח Google Sheet חדש</button>.</li>
+                                <li>בגיליון שנפתח לחץ <strong>הרחבות &larr; Apps Script</strong>, הדבק (Ctrl+V) ושמור (Ctrl+S).</li>
+                                <li>לחץ בגיליון על כפתור <strong>"שתף" (Share)</strong> הירוק למעלה &larr; שנה ל-<strong>"כל מי שקיבל את הקישור יכול לצפות"</strong> והעתק את הקישור.</li>
+                                <li>החלף את הסיומת <code>/edit?usp=sharing</code> בסיומת <strong><code>/copy</code></strong> והדבק בתיבה למטה:</li>
+                            </ol>
+                            <div class="flex gap-2 pt-1">
+                                <input type="url" id="templateCopyUrlInput" dir="ltr"
+                                    placeholder="https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/copy"
+                                    class="flex-grow border border-indigo-300 rounded-md p-2 text-xs bg-white outline-none">
+                                <button type="button" onclick="saveTemplateCopyUrl()"
+                                    class="bg-indigo-600 text-white font-bold px-3 py-1.5 rounded-md text-xs whitespace-nowrap">
+                                    שמור קישור תבנית
+                                </button>
+                            </div>
+                        </div>
+                    </details>
                 </div>
 
                 <!-- בחירת מצב שמירה כברירת מחדל -->
@@ -630,8 +663,8 @@
                         <label class="border rounded-lg p-3 cursor-pointer hover:bg-gray-50 flex items-start gap-2">
                             <input type="radio" name="pref_mode" value="local" class="mt-1">
                             <div>
-                                <div class="font-bold text-gray-800">💻 מקומי + Excel (מומלץ)</div>
-                                <div class="text-xs text-gray-500">שומר בדפדפן ומוריד קובץ Excel מעודכן למכשיר.</div>
+                                <div class="font-bold text-gray-800">💻 אוטומטי ל-Excel (מומלץ)</div>
+                                <div class="text-xs text-gray-500">שומר בדפדפן ומעדכן אוטומטית את קובץ ה-Excel שלך.</div>
                             </div>
                         </label>
                         <label class="border rounded-lg p-3 cursor-pointer hover:bg-gray-50 flex items-start gap-2">
@@ -645,7 +678,7 @@
                             <input type="radio" name="pref_mode" value="both" class="mt-1">
                             <div>
                                 <div class="font-bold text-emerald-700">🔄 משולב (ענן + Excel)</div>
-                                <div class="text-xs text-gray-500">גם שומר ב-Google Sheets וגם מוריד Excel.</div>
+                                <div class="text-xs text-gray-500">גם שומר ב-Google Sheets וגם מעדכן קובץ Excel.</div>
                             </div>
                         </label>
                     </div>
@@ -685,6 +718,10 @@
     <script>
         const STORAGE_KEY = 'cbt_standalone_records_v1';
         const CLOUD_CONFIG_KEY = 'cbt_cloud_config_v1';
+        const TEMPLATE_URL_KEY = 'cbt_template_copy_url_v1';
+
+        // אם יצרת גיליון מאסטר ב-Google Sheets, ניתן להדביק כאן את קישור ה-/copy שלו כדי שכל המשתמשים יקבלו עותק בלחיצה אחת:
+        const DEFAULT_MASTER_TEMPLATE_COPY_URL = "";
 
         const HEADERS_CH4 = [
             "חותמת זמן שמירה", "תאריך מהטופס", "המצב / הטריגר", "רגשות ותחושות",
@@ -701,7 +738,10 @@
 
         const isNativeGasEnv = (typeof google !== 'undefined' && google.script && google.script.run);
 
-        window.addEventListener('DOMContentLoaded', () => {
+        // ידית קובץ Excel מקומי לסנכרון אוטומטי שקט ברקע (File System Access API)
+        let activeExcelFileHandle = null;
+
+        window.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const paramCloudUrl = urlParams.get('cloudUrl');
             if (paramCloudUrl && paramCloudUrl.startsWith('http')) {
@@ -715,12 +755,181 @@
 
             if (isNativeGasEnv) {
                 syncFromGoogleSheets(true);
+            } else {
+                await checkSavedExcelHandleOnStartup();
             }
         });
 
+        // =========================================================================
+        // מנגנון סנכרון אוטומטי דו-כיווני לקובץ Excel קבוע במחשב (ללא הורדות כפולות!)
+        // =========================================================================
+        function openHandleDb() {
+            return new Promise((resolve, reject) => {
+                const req = indexedDB.open('cbt_excel_sync_db', 1);
+                req.onupgradeneeded = (e) => {
+                    e.target.result.createObjectStore('handles');
+                };
+                req.onsuccess = (e) => resolve(e.target.result);
+                req.onerror = (e) => reject(e.target.error);
+            });
+        }
+
+        async function saveFileHandleToIdb(handle) {
+            try {
+                const db = await openHandleDb();
+                const tx = db.transaction('handles', 'readwrite');
+                tx.objectStore('handles').put(handle, 'primary_excel');
+            } catch (e) {}
+        }
+
+        async function getFileHandleFromIdb() {
+            try {
+                const db = await openHandleDb();
+                return new Promise((resolve) => {
+                    const tx = db.transaction('handles', 'readonly');
+                    const req = tx.objectStore('handles').get('primary_excel');
+                    req.onsuccess = () => resolve(req.result || null);
+                    req.onerror = () => resolve(null);
+                });
+            } catch (e) {
+                return null;
+            }
+        }
+
+        async function checkSavedExcelHandleOnStartup() {
+            const savedHandle = await getFileHandleFromIdb();
+            if (!savedHandle) return;
+            try {
+                const perm = await savedHandle.queryPermission({ mode: 'readwrite' });
+                if (perm === 'granted') {
+                    activeExcelFileHandle = savedHandle;
+                    updateLinkedFileUI(savedHandle.name);
+                    await readFromLinkedExcelHandle(savedHandle, true);
+                } else {
+                    const banner = document.getElementById('reconnectFileBanner');
+                    const txt = document.getElementById('reconnectFileText');
+                    txt.innerText = `נמצא קובץ Excel אישי מחובר ("${savedHandle.name}"). לחץ לסנכרון אוטומטי מלא:`;
+                    banner.classList.remove('hidden');
+                }
+            } catch (e) {}
+        }
+
+        async function resumeSavedFileHandle() {
+            const savedHandle = await getFileHandleFromIdb();
+            if (!savedHandle) return;
+            try {
+                const perm = await savedHandle.requestPermission({ mode: 'readwrite' });
+                if (perm === 'granted') {
+                    activeExcelFileHandle = savedHandle;
+                    document.getElementById('reconnectFileBanner').classList.add('hidden');
+                    updateLinkedFileUI(savedHandle.name);
+                    await readFromLinkedExcelHandle(savedHandle, false);
+                }
+            } catch (e) {}
+        }
+
+        function updateLinkedFileUI(fileName) {
+            const badge = document.getElementById('linkedFileBadge');
+            if (fileName) {
+                badge.innerText = `🔗 מסונכרן אוטומטית: ${fileName}`;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        // פתיחה או חיבור קובץ Excel קיים בלחיצת כפתור
+        async function connectOrLoadExcelAuto() {
+            if (window.showOpenFilePicker) {
+                try {
+                    const [handle] = await window.showOpenFilePicker({
+                        types: [{
+                            description: 'Excel Workbook',
+                            accept: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx', '.xls'] }
+                        }],
+                        multiple: false
+                    });
+                    activeExcelFileHandle = handle;
+                    await saveFileHandleToIdb(handle);
+                    document.getElementById('reconnectFileBanner').classList.add('hidden');
+                    updateLinkedFileUI(handle.name);
+                    await readFromLinkedExcelHandle(handle, false);
+                    return;
+                } catch (err) {
+                    if (err.name === 'AbortError') return;
+                }
+            }
+            // Fallback לדפדפנים שאינם תומכים ב-File System Access API
+            document.getElementById('excelUpload').click();
+        }
+
+        // יצירת קובץ Excel חדש ומקושר שמתעדכן מעצמו בכל שמירה
+        async function createNewLinkedExcelFile() {
+            if (window.showSaveFilePicker) {
+                try {
+                    const handle = await window.showSaveFilePicker({
+                        suggestedName: 'יומן_תרגול_CBT.xlsx',
+                        types: [{
+                            description: 'Excel Workbook',
+                            accept: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'] }
+                        }]
+                    });
+                    activeExcelFileHandle = handle;
+                    await saveFileHandleToIdb(handle);
+                    document.getElementById('reconnectFileBanner').classList.add('hidden');
+                    updateLinkedFileUI(handle.name);
+                    await writeToLinkedExcelHandle(handle);
+                    closeCloudModal();
+                    showAlert(`✓ הקובץ "${handle.name}" נוצר וחובר! מעכשיו כל שמירה תעדכן אותו אוטומטית ברקע.`);
+                    return;
+                } catch (err) {
+                    if (err.name === 'AbortError') return;
+                }
+            }
+            downloadExcelFile(false);
+        }
+
+        async function readFromLinkedExcelHandle(handle, silent = false) {
+            try {
+                const file = await handle.getFile();
+                processExcelFileObject(file, silent);
+            } catch (e) {
+                if (!silent) showAlert('שגיאה בקריאת קובץ ה-Excel המחובר.', 'error');
+            }
+        }
+
+        async function writeToLinkedExcelHandle(handle) {
+            if (!handle || typeof XLSX === 'undefined') return false;
+            const perm = await handle.requestPermission({ mode: 'readwrite' });
+            if (perm !== 'granted') return false;
+
+            const wb = buildWorkbookObject();
+            const wbOut = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+            const writable = await handle.createWritable();
+            await writable.write(new Blob([wbOut], { type: 'application/octet-stream' }));
+            await writable.close();
+            return true;
+        }
+
+        async function saveOrDownloadExcelNow() {
+            if (activeExcelFileHandle) {
+                try {
+                    const ok = await writeToLinkedExcelHandle(activeExcelFileHandle);
+                    if (ok) {
+                        showAlert(`✓ הקובץ "${activeExcelFileHandle.name}" עודכן אוטומטית במחשבך!`);
+                        return;
+                    }
+                } catch (e) {}
+            }
+            if (window.showSaveFilePicker) {
+                await createNewLinkedExcelFile();
+            } else {
+                downloadExcelFile(false);
+            }
+        }
+
         // תמיכה בגרירת קובץ Excel ישירות לדף לנוחות מרבית
         function setupDragAndDropExcel() {
-            const body = document.getElementById('appBody');
             const dropZone = document.getElementById('dropZone');
 
             window.addEventListener('dragover', (e) => {
@@ -734,13 +943,29 @@
                 }
             });
 
-            window.addEventListener('drop', (e) => {
+            window.addEventListener('drop', async (e) => {
                 e.preventDefault();
                 dropZone.classList.remove('drag-over');
+                if (e.dataTransfer && e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+                    const item = e.dataTransfer.items[0];
+                    if (item.getAsFileSystemHandle) {
+                        try {
+                            const handle = await item.getAsFileSystemHandle();
+                            if (handle && handle.kind === 'file' && (handle.name.endsWith('.xlsx') || handle.name.endsWith('.xls'))) {
+                                activeExcelFileHandle = handle;
+                                await saveFileHandleToIdb(handle);
+                                updateLinkedFileUI(handle.name);
+                                const file = await handle.getFile();
+                                processExcelFileObject(file, false);
+                                return;
+                            }
+                        } catch (err) {}
+                    }
+                }
                 if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
                     const file = e.dataTransfer.files[0];
                     if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
-                        processExcelFileObject(file);
+                        processExcelFileObject(file, false);
                     } else {
                         showAlert('נא לגרור קובץ Excel תקין (.xlsx או .xls).', 'error');
                     }
@@ -792,20 +1017,54 @@
                 dot.className = 'w-2 h-2 rounded-full bg-emerald-600';
                 text.innerText = '🔄 שמירה כפולה (Google Sheets + Excel)';
                 badge.className = 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs px-3 py-1 rounded-full font-semibold border border-emerald-300 transition flex items-center gap-1.5';
-                if (document.getElementById('editIndexCh4').value === "-1") btn4.innerText = '🔄 שמור ב-Google Sheets והורד Excel';
-                if (document.getElementById('editIndexCh3').value === "-1") btn3.innerText = '🔄 שמור ב-Google Sheets והורד Excel';
+                if (document.getElementById('editIndexCh4').value === "-1") btn4.innerText = '🔄 שמור ב-Google Sheets ועדכן Excel';
+                if (document.getElementById('editIndexCh3').value === "-1") btn3.innerText = '🔄 שמור ב-Google Sheets ועדכן Excel';
             } else {
                 dot.className = 'w-2 h-2 rounded-full bg-green-600';
-                text.innerText = '🔒 פרטי לגמרי (שמירה מקומית + Excel)';
+                text.innerText = '🔒 שמירה אוטומטית (מקומי + Excel)';
                 badge.className = 'bg-green-50 hover:bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full font-medium border border-green-300 transition flex items-center gap-1.5';
-                if (document.getElementById('editIndexCh4').value === "-1") btn4.innerText = '💾 שמור והורד קובץ Excel מעודכן';
-                if (document.getElementById('editIndexCh3').value === "-1") btn3.innerText = '💾 שמור והורד קובץ Excel מעודכן';
+                if (document.getElementById('editIndexCh4').value === "-1") btn4.innerText = '💾 שמור ועדכן קובץ Excel אוטומטית';
+                if (document.getElementById('editIndexCh3').value === "-1") btn3.innerText = '💾 שמור ועדכן קובץ Excel אוטומטית';
             }
+        }
+
+        function getTemplateCopyUrl() {
+            return localStorage.getItem(TEMPLATE_URL_KEY) || DEFAULT_MASTER_TEMPLATE_COPY_URL || '';
+        }
+
+        function saveTemplateCopyUrl() {
+            const val = document.getElementById('templateCopyUrlInput').value.trim();
+            if (!val.startsWith('https://docs.google.com/spreadsheets/')) {
+                alert('נא להדביק קישור תקין של Google Sheets.');
+                return;
+            }
+            const normalized = val.replace(/\/edit.*$/, '/copy');
+            localStorage.setItem(TEMPLATE_URL_KEY, normalized);
+            document.getElementById('templateCopyUrlInput').value = normalized;
+            showAlert('✓ קישור התבנית נשמר! מעכשיו לחיצה על כפתור Google Sheets תיצור עותק אוטומטי בלחיצה אחת.');
+            closeCloudModal();
+        }
+
+        function handleOneClickGoogleSheetsButton() {
+            const templateUrl = getTemplateCopyUrl();
+            if (templateUrl && templateUrl.startsWith('https://docs.google.com/spreadsheets/')) {
+                window.open(templateUrl, '_blank');
+                return;
+            }
+            openCloudModal();
+        }
+
+        function downloadExcelAndOpenGoogleSheets() {
+            downloadExcelFile(true);
+            window.open('https://docs.google.com/spreadsheets/u/0/', '_blank');
+            closeCloudModal();
+            showAlert('✓ הקובץ ירד למחשבך ו-Google Sheets נפתח! ב-Google Sheets לחץ על סמל התיקייה 📁 ("פתיחת בורר הקבצים" -> "העלאה") ובחר את הקובץ שירד.');
         }
 
         function openCloudModal() {
             const cfg = getCloudConfig();
             document.getElementById('cloudUrlInput').value = cfg.url || '';
+            document.getElementById('templateCopyUrlInput').value = getTemplateCopyUrl();
             const radio = document.querySelector(`input[name="pref_mode"][value="${cfg.mode}"]`);
             if (radio) radio.checked = true;
 
@@ -828,7 +1087,7 @@
             const urlVal = document.getElementById('cloudUrlInput').value.trim();
 
             if ((selectedMode === 'cloud' || selectedMode === 'both') && !isNativeGasEnv && !urlVal.startsWith('https://script.google.com')) {
-                alert('כדי לשמור בענן מתוך קובץ מקומי, יש להדביק קישור Web App תקין או להפעיל את המערכת ישירות מתוך תפריט ה-Google Sheets.');
+                alert('כדי לשמור בענן מתוך קובץ מקומי, יש להדביק קישור Web App תקין או להשתמש בסנכרון Excel האוטומטי.');
                 return;
             }
 
@@ -997,13 +1256,13 @@
             setTimeout(() => { alertBox.classList.add('hidden'); }, 7000);
         }
 
-        // שמירה או עדכון של טופס
+        // שמירה או עדכון אוטומטי של טופס
         async function handleFormSubmit(e, chapter) {
             e.preventDefault();
             const form = e.target;
             const submitBtn = chapter === 'chapter4' ? document.getElementById('submitBtnCh4') : document.getElementById('submitBtnCh3');
             submitBtn.disabled = true;
-            submitBtn.innerText = 'שומר נתונים...';
+            submitBtn.innerText = 'שומר אוטומטית...';
 
             const formData = new FormData(form);
             const payload = Object.fromEntries(formData.entries());
@@ -1069,11 +1328,39 @@
                 if ((cfg.mode === 'cloud' || cfg.mode === 'both') && isCloudReady) {
                     await pushDatabaseToCloud(db);
                 }
+
+                let savedToLinkedFile = false;
                 if (cfg.mode === 'local' || cfg.mode === 'both' || !isCloudReady) {
-                    try {
-                        downloadExcelFile(true);
-                    } catch (err) {
-                        console.warn('Excel export warning:', err);
+                    if (!activeExcelFileHandle && window.showSaveFilePicker) {
+                        try {
+                            const handle = await window.showSaveFilePicker({
+                                suggestedName: 'יומן_תרגול_CBT.xlsx',
+                                types: [{
+                                    description: 'Excel Workbook',
+                                    accept: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'] }
+                                }]
+                            });
+                            activeExcelFileHandle = handle;
+                            await saveFileHandleToIdb(handle);
+                            document.getElementById('reconnectFileBanner').classList.add('hidden');
+                            updateLinkedFileUI(handle.name);
+                        } catch (pickerErr) {
+                            // המשתמש סגר את החלון - נעבור להורדה רגילה
+                        }
+                    }
+                    if (activeExcelFileHandle) {
+                        try {
+                            savedToLinkedFile = await writeToLinkedExcelHandle(activeExcelFileHandle);
+                        } catch (err) {
+                            savedToLinkedFile = false;
+                        }
+                    }
+                    if (!savedToLinkedFile) {
+                        try {
+                            downloadExcelFile(true);
+                        } catch (err) {
+                            console.warn('Excel export warning:', err);
+                        }
                     }
                 }
 
@@ -1081,9 +1368,9 @@
                 refreshTimestamps();
 
                 if (cfg.mode === 'cloud' && isCloudReady) {
-                    showAlert('✓ הנתונים נשמרו בהצלחה ב-Google Sheets האישי שלך!');
-                } else if (cfg.mode === 'both' && isCloudReady) {
-                    showAlert('✓ הנתונים נשמרו גם ב-Google Sheets וגם ירדו כקובץ Excel מעודכן!');
+                    showAlert('✓ הנתונים נשמרו אוטומטית ב-Google Sheets האישי שלך!');
+                } else if (savedToLinkedFile) {
+                    showAlert(`✓ נשמר! קובץ ה-Excel המחובר ("${activeExcelFileHandle.name}") עודכן אוטומטית במחשבך!`);
                 } else {
                     showAlert('✓ הנתונים נשמרו בהצלחה וקובץ ה-Excel המעודכן ירד למכשירך!');
                 }
@@ -1282,25 +1569,20 @@
             saveStoredData(db);
             renderHistoryTable();
 
+            if (activeExcelFileHandle) {
+                try { await writeToLinkedExcelHandle(activeExcelFileHandle); } catch (e) {}
+            }
+
             const cfg = getCloudConfig();
             const isCloudReady = isNativeGasEnv || (cfg.url && cfg.url.startsWith('http'));
             if ((cfg.mode === 'cloud' || cfg.mode === 'both') && isCloudReady) {
                 try { await pushDatabaseToCloud(db); } catch (e) {}
             }
-            showAlert('הרשומה נמחקה בהצלחה.');
+            showAlert('הרשומה נמחקה והקובץ עודכן אוטומטית.');
         }
 
-        // ייצוא כל הנתונים (או תבנית מוכנה למילוי) לקובץ אקסל מעוצב ונוח
-        function downloadExcelFile(silentAlert = false) {
+        function buildWorkbookObject() {
             const db = getStoredData();
-
-            if (typeof XLSX === 'undefined') {
-                if (!silentAlert) {
-                    showAlert('ספריית ה-Excel בטעינה או שאין חיבור לאינטרנט. כל הנתונים נשמרו בבטחה בהיסטוריה בדפדפן!', 'error');
-                }
-                return;
-            }
-
             const wb = XLSX.utils.book_new();
             wb.Workbook = { Views: [{ RTL: true }] };
 
@@ -1314,6 +1596,21 @@
             ws3['!cols'] = HEADERS_CH3.map(() => ({ wch: 24 }));
             XLSX.utils.book_append_sheet(wb, ws3, "פרק_3_טריגרים");
 
+            return wb;
+        }
+
+        // ייצוא כל הנתונים (או תבנית מוכנה למילוי) לקובץ אקסל מעוצב ונוח
+        function downloadExcelFile(silentAlert = false) {
+            const db = getStoredData();
+
+            if (typeof XLSX === 'undefined') {
+                if (!silentAlert) {
+                    showAlert('ספריית ה-Excel בטעינה או שאין חיבור לאינטרנט. כל הנתונים נשמרו בבטחה בהיסטוריה בדפדפן!', 'error');
+                }
+                return;
+            }
+
+            const wb = buildWorkbookObject();
             XLSX.writeFile(wb, "יומן_תרגול_CBT.xlsx");
 
             if (!silentAlert) {
@@ -1329,13 +1626,13 @@
         function importExcelFile(event) {
             const file = event.target.files[0];
             if (!file) return;
-            processExcelFileObject(file);
+            processExcelFileObject(file, false);
             event.target.value = '';
         }
 
-        function processExcelFileObject(file) {
+        function processExcelFileObject(file, silent = false) {
             if (typeof XLSX === 'undefined') {
-                showAlert('לא ניתן לטעון קובץ Excel ללא חיבור לאינטרנט לטעינת רכיב האקסל.', 'error');
+                if (!silent) showAlert('לא ניתן לטעון קובץ Excel ללא חיבור לאינטרנט לטעינת רכיב האקסל.', 'error');
                 return;
             }
 
@@ -1376,7 +1673,7 @@
                     }
 
                     saveStoredData(db);
-                    switchTab('history');
+                    renderHistoryTable();
 
                     const cfg = getCloudConfig();
                     const isCloudReady = isNativeGasEnv || (cfg.url && cfg.url.startsWith('http'));
@@ -1384,9 +1681,12 @@
                         try { await pushDatabaseToCloud(db); } catch (err) {}
                     }
 
-                    showAlert(`✓ קובץ ה-Excel נטען בהצלחה! (${loadedCount} רשומות נמצאות כעת בלשונית ההיסטוריה והעריכה).`);
+                    if (!silent) {
+                        switchTab('history');
+                        showAlert(`✓ קובץ ה-Excel סונכרן בהצלחה! (${loadedCount} רשומות זמינות ומעודכנות).`);
+                    }
                 } catch (err) {
-                    showAlert('שגיאה בטעינת קובץ ה-Excel: ודא שזהו קובץ תקין (.xlsx).', 'error');
+                    if (!silent) showAlert('שגיאה בטעינת קובץ ה-Excel: ודא שזהו קובץ תקין (.xlsx).', 'error');
                 }
             };
             reader.readAsArrayBuffer(file);
@@ -1422,7 +1722,7 @@
                 .replace(/"/g, '&quot;');
         }
 
-        // לחיצת כפתור אחת ליצירת אפליקציית Google Sheets עצמאית (כולל הממשק המלא מוטמע!)
+        // לחיצת כפתור אחת ליצירת אפליקציית Google Sheets עצמאית (עבור מנהל המערכת / הקמת תבנית מאסטר)
         function oneClickCreateGoogleSheetApp() {
             const clone = document.documentElement.cloneNode(true);
             const modalInClone = clone.querySelector('#cloudModal');
@@ -1591,7 +1891,7 @@ var EMBEDDED_CBT_HTML = ${JSON.stringify(fullHtmlSnapshot)};
 `;
             navigator.clipboard.writeText(gasCode).then(() => {
                 window.open('https://sheets.new', '_blank');
-                alert('✓ המערכת הועתקה ללוח וגיליון Google Sheets חדש נפתח!\n\nכל מה שנשאר לעשות בגיליון שנפתח:\n1. לחץ למעלה על "הרחבות" (Extensions) -> "Apps Script"\n2. הדבק (Ctrl+V) ושמור (Ctrl+S)\n3. רענן את הגיליון ותהנה מהמערכת המלאה!');
+                alert('✓ הקוד הועתק ללוח וגיליון המאסטר נפתח!\n\nכדי שהמשתמשים שלך יקבלו הכל בלחיצה אחת בלי להעתיק קוד:\n1. בגיליון שנפתח לחץ הרחבות -> Apps Script, הדבק (Ctrl+V) ושמור.\n2. לחץ על "שתף" (Share) -> "כל מי שקיבל את הקישור יכול לצפות".\n3. העתק את הקישור, החלף את /edit בסוף ב-/copy, ושמור אותו כקישור התבנית!');
             }).catch(() => {
                 alert('לא הצלחנו להעתיק אוטומטית. אנא ודא שהדפדפן מאפשר העתקה ללוח.');
             });
