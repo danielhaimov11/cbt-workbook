@@ -1,14 +1,28 @@
 /**
- * מרחב תרגול CBT | Google Apps Script Backend
+ * מרחב תרגול CBT | Google Apps Script Backend (גרסה 3.0 מאוחדת)
  * 
  * קוד שרת עצמאי עבור Google Sheets.
  * תומך בהפעלה ישירה מתוך הגיליון (לחיצת כפתור אחת!),
+ * יצירה אוטומטית של גליונות פרק 3 ופרק 4 מעוצבים,
  * הרצה כ-Web App באינטרנט, וסנכרון דו-כיווני מול קובץ HTML מקומי.
  */
 
+var HEADERS_CH4 = [
+  "חותמת זמן שמירה", "תאריך מהטופס", "המצב / הטריגר", "רגשות ותחושות",
+  "התחזית החרדתית", "אמצעי זהירות", "ראיות בעד", "ראיות נגד",
+  "התרחיש הכי גרוע", "התרחיש הסביר ביותר", "מחשבה חלופית",
+  "פעולה מתוכננת", "ויתור על אמצעי זהירות", "תוצאות בפועל", "קרדיט עצמי"
+];
+
+var HEADERS_CH3 = [
+  "חותמת זמן שמירה", "תאריך מהטופס", "תיאור המצב", "כלל שהופר",
+  "שורה תחתונה", "ניבויים שליליים", "התנהגות הגנתית",
+  "אישור וביקורת", "דיכאון/מצב רוח", "רפלקציה ותובנות"
+];
+
 /**
  * מופעל אוטומטית בכל פתיחה של גיליון ה-Google Sheets:
- * 1. מוודא שהגליונות פרק 3 ופרק 4 קיימים ומעוצבים.
+ * 1. מוודא שהגליונות פרק 3 ופרק 4 קיימים, מוגדרים מימין לשמאל ומעוצבים.
  * 2. יוצר תפריט ייעודי בראש הגיליון להפעלת האפליקציה בלחיצת כפתור.
  */
 function onOpen() {
@@ -18,6 +32,7 @@ function onOpen() {
     .addItem('🚀 פתח חוברת תרגול (חלון מלא)', 'openCbtDialog')
     .addItem('📱 פתח בסרגל צד (Sidebar)', 'openCbtSidebar')
     .addSeparator()
+    .addItem('🛠️ הקם / רענן טבלאות פרק 3 ופרק 4', 'initSheetsIfMissing')
     .addItem('🔗 קישור להרצה ישירה מהטלפון / מחשב', 'showWebAppUrlDialog')
     .addToUi();
 }
@@ -26,10 +41,11 @@ function onOpen() {
  * פתיחת חוברת התרגול בחלון מודאלי עשיר ישירות בתוך Google Sheets
  */
 function openCbtDialog() {
+  initSheetsIfMissing();
   var html = HtmlService.createHtmlOutputFromFile('index')
     .setWidth(1150)
     .setHeight(820)
-    .setTitle('מרחב תרגול CBT | מערכת עצמאית');
+    .setTitle('מרחב תרגול CBT | מערכת מאוחדת');
   SpreadsheetApp.getUi().showModalDialog(html, 'מרחב תרגול CBT');
 }
 
@@ -37,6 +53,7 @@ function openCbtDialog() {
  * פתיחת חוברת התרגול בסרגל צד (Sidebar) לצד הטבלה
  */
 function openCbtSidebar() {
+  initSheetsIfMissing();
   var html = HtmlService.createHtmlOutputFromFile('index')
     .setTitle('מרחב תרגול CBT');
   SpreadsheetApp.getUi().showSidebar(html);
@@ -60,8 +77,8 @@ function showWebAppUrlDialog() {
     ui.showModalDialog(html, 'קישור ה-Web App האישי שלך');
   } else {
     ui.alert(
-      'פריסה נדרשת לקבלת קישור',
-      'כדי לקבל קישור הפעלה לטלפון, יש לבצע פעם אחת "Deploy" (פריסה) -> "New deployment" -> לבחור "Web app" בעורך ה-Apps Script.',
+      'פריסה חד-פעמית לקבלת קישור לטלפון',
+      'המערכת כבר פועלת במלואה מתוך תפריט הגיליון! אם תרצה גם קישור ישיר לטלפון, לחץ בעורך ה-Apps Script על "Deploy" (פריסה) -> "New deployment" -> בחר "Web app".',
       ui.ButtonSet.OK
     );
   }
@@ -72,23 +89,11 @@ function showWebAppUrlDialog() {
  */
 function initSheetsIfMissing() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var headers4 = [
-    "חותמת זמן שמירה", "תאריך מהטופס", "המצב / הטריגר", "רגשות ותחושות",
-    "התחזית החרדתית", "אמצעי זהירות", "ראיות בעד", "ראיות נגד",
-    "התרחיש הכי גרוע", "התרחיש הסביר ביותר", "מחשבה חלופית",
-    "פעולה מתוכננת", "ויתור על אמצעי זהירות", "תוצאות בפועל", "קרדיט עצמי"
-  ];
-  var headers3 = [
-    "חותמת זמן שמירה", "תאריך מהטופס", "תיאור המצב", "כלל שהופר", 
-    "שורה תחתונה", "ניבויים שליליים", "התנהגות הגנתית", 
-    "אישור וביקורת", "דיכאון/מצב רוח", "רפלקציה ותובנות"
-  ];
-
   if (!ss.getSheetByName("פרק_4_תחזיות")) {
-    writeObjectsToSheet(ss, "פרק_4_תחזיות", headers4, [], "#d0e0e3");
+    writeObjectsToSheet(ss, "פרק_4_תחזיות", HEADERS_CH4, [], "#dbeafe");
   }
   if (!ss.getSheetByName("פרק_3_טריגרים")) {
-    writeObjectsToSheet(ss, "פרק_3_טריגרים", headers3, [], "#c5cae9");
+    writeObjectsToSheet(ss, "פרק_3_טריגרים", HEADERS_CH3, [], "#e0e7ff");
   }
 }
 
@@ -96,6 +101,7 @@ function initSheetsIfMissing() {
  * טיפול בבקשות GET חיצוניות (טעינת כל הנתונים או הצגת ממשק Web App)
  */
 function doGet(e) {
+  initSheetsIfMissing();
   if (e && e.parameter && e.parameter.action === 'loadAll') {
     return ContentService.createTextOutput(JSON.stringify(getAllRecordsForClient()))
       .setMimeType(ContentService.MimeType.JSON);
@@ -133,19 +139,8 @@ function getAllRecordsForClient() {
 
 function syncAllRecordsFromClient(db) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var headers4 = [
-    "חותמת זמן שמירה", "תאריך מהטופס", "המצב / הטריגר", "רגשות ותחושות",
-    "התחזית החרדתית", "אמצעי זהירות", "ראיות בעד", "ראיות נגד",
-    "התרחיש הכי גרוע", "התרחיש הסביר ביותר", "מחשבה חלופית",
-    "פעולה מתוכננת", "ויתור על אמצעי זהירות", "תוצאות בפועל", "קרדיט עצמי"
-  ];
-  var headers3 = [
-    "חותמת זמן שמירה", "תאריך מהטופס", "תיאור המצב", "כלל שהופר", 
-    "שורה תחתונה", "ניבויים שליליים", "התנהגות הגנתית", 
-    "אישור וביקורת", "דיכאון/מצב רוח", "רפלקציה ותובנות"
-  ];
-  writeObjectsToSheet(ss, "פרק_4_תחזיות", headers4, db.chapter4 || [], "#d0e0e3");
-  writeObjectsToSheet(ss, "פרק_3_טריגרים", headers3, db.chapter3 || [], "#c5cae9");
+  writeObjectsToSheet(ss, "פרק_4_תחזיות", HEADERS_CH4, db.chapter4 || [], "#dbeafe");
+  writeObjectsToSheet(ss, "פרק_3_טריגרים", HEADERS_CH3, db.chapter3 || [], "#e0e7ff");
   return { result: "success" };
 }
 
@@ -156,10 +151,13 @@ function readSheetToObjects(sheet) {
   var results = [];
   for (var i = 1; i < data.length; i++) {
     var obj = {};
+    var hasContent = false;
     for (var j = 0; j < headers.length; j++) {
-      obj[headers[j]] = data[i][j] || "";
+      var val = data[i][j] || "";
+      if (val.trim() !== "") hasContent = true;
+      obj[headers[j]] = val;
     }
-    results.push(obj);
+    if (hasContent) results.push(obj);
   }
   return results;
 }
@@ -172,12 +170,17 @@ function writeObjectsToSheet(ss, sheetName, headers, records, headerColor) {
   }
   sheet.clearContents();
   sheet.appendRow(headers);
-  sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold").setBackground(headerColor);
+  var headerRange = sheet.getRange(1, 1, 1, headers.length);
+  headerRange.setFontWeight("bold").setBackground(headerColor).setHorizontalAlignment("right");
   sheet.setFrozenRows(1);
+  for (var c = 1; c <= headers.length; c++) {
+    sheet.setColumnWidth(c, 180);
+  }
   if (records.length > 0) {
     var rows = records.map(function(rec) {
       return headers.map(function(h) { return rec[h] || ""; });
     });
-    sheet.getRange(2, 1, rows.length, headers.length).setValues(rows);
+    var dataRange = sheet.getRange(2, 1, rows.length, headers.length);
+    dataRange.setValues(rows).setWrap(true).setVerticalAlignment("top");
   }
 }

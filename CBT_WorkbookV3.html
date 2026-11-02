@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מרחב תרגול CBT | מערכת היברידית (מקומי + ענן)</title>
+    <title>מרחב תרגול CBT | מערכת מאוחדת (אקסל מקומי + Google Sheets)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- SheetJS for Excel Export/Import -->
@@ -19,19 +19,19 @@
         .tab-active-blue {
             background-color: #eff6ff;
             color: #1d4ed8;
-            border-bottom: 2px solid #2563eb;
+            border-bottom: 3px solid #2563eb;
         }
 
         .tab-active-indigo {
             background-color: #eef2ff;
             color: #4338ca;
-            border-bottom: 2px solid #4f46e5;
+            border-bottom: 3px solid #4f46e5;
         }
 
         .tab-active-emerald {
             background-color: #ecfdf5;
             color: #047857;
-            border-bottom: 2px solid #059669;
+            border-bottom: 3px solid #059669;
         }
 
         .tab-inactive {
@@ -42,23 +42,27 @@
             color: #374151;
             background-color: #f9fafb;
         }
+
+        .drag-over {
+            outline: 3px dashed #10b981;
+            background-color: #ecfdf5 !important;
+        }
     </style>
 </head>
 
-<body class="bg-gray-100 min-h-screen pb-12">
+<body id="appBody" class="bg-gray-100 min-h-screen pb-12 transition-colors">
 
     <!-- תפריט עליון -->
     <nav class="bg-white shadow-md mb-6 sticky top-0 z-40">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-wrap justify-between py-3 items-center gap-4">
                 <div class="flex items-center gap-3">
-                    <span id="brandTitle" class="text-xl font-bold text-blue-600 transition-colors">מרחב תרגול
-                        CBT</span>
-                    <!-- כפתור סטטוס והגדרות ענן -->
+                    <span id="brandTitle" class="text-xl font-bold text-blue-600 transition-colors">🧠 מרחב תרגול CBT</span>
                     <button type="button" onclick="openCloudModal()" id="cloudStatusBadge"
-                        class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-3 py-1 rounded-full font-medium border border-gray-300 transition flex items-center gap-1.5">
-                        <span id="cloudStatusDot" class="w-2 h-2 rounded-full bg-gray-400"></span>
-                        <span id="cloudStatusText">מצב מקומי (לחץ לחיבור ענן)</span>
+                        class="bg-green-50 hover:bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full font-medium border border-green-300 transition flex items-center gap-1.5"
+                        title="לחץ להגדרות שמירה ו-Google Sheets">
+                        <span id="cloudStatusDot" class="w-2 h-2 rounded-full bg-green-600"></span>
+                        <span id="cloudStatusText">🔒 פרטי לגמרי (שמירה מקומית / Excel)</span>
                     </button>
                 </div>
 
@@ -66,11 +70,11 @@
                 <div class="flex flex-wrap gap-1 sm:space-x-2 sm:space-x-reverse">
                     <button type="button" id="tabBtn4" onclick="switchTab('chapter4')"
                         class="tab-active-blue px-3.5 py-2 rounded-md text-sm font-medium transition">
-                        פרק 4: תחזיות חרדתיות
+                        📘 פרק 4: תחזיות חרדתיות
                     </button>
                     <button type="button" id="tabBtn3" onclick="switchTab('chapter3')"
                         class="tab-inactive px-3.5 py-2 rounded-md text-sm font-medium transition">
-                        פרק 3: ניתוח טריגרים
+                        📙 פרק 3: ניתוח טריגרים
                     </button>
                     <button type="button" id="tabBtnHistory" onclick="switchTab('history')"
                         class="tab-inactive px-3.5 py-2 rounded-md text-sm font-medium transition flex items-center gap-1.5">
@@ -83,46 +87,57 @@
         </div>
     </nav>
 
-    <!-- סרגל כלים לניהול נתונים, סנכרון ענן ואקסל -->
+    <!-- סרגל כלים פשוט ונוח למשתמשים לא-טכניים (Excel + Google Sheets בלחיצת כפתור) -->
     <div class="max-w-4xl mx-auto px-4 mb-6">
-        <div
-            class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex flex-wrap items-center justify-between gap-4">
-            <div class="flex items-center gap-2 text-sm text-gray-700">
-                <span>📊 רשומות שמורות:</span>
-                <span class="font-bold text-blue-600" id="countCh4">0</span> (פרק 4) |
-                <span class="font-bold text-indigo-600" id="countCh3">0</span> (פרק 3)
+        <div id="dropZone"
+            class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex flex-wrap items-center justify-between gap-4 transition">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-sm text-gray-700">
+                <div class="flex items-center gap-1.5">
+                    <span>📊 <strong>הרשומות שלי:</strong></span>
+                    <span class="font-bold text-blue-600" id="countCh4">0</span> (פרק 4) |
+                    <span class="font-bold text-indigo-600" id="countCh3">0</span> (פרק 3)
+                </div>
+                <span class="text-xs text-gray-400 hidden md:inline">• ניתן גם לגרור לכאן קובץ Excel לטעינה מהירה</span>
             </div>
-            <div class="flex flex-wrap gap-2">
-                <!-- סנכרון מ-Google Sheets -->
-                <button type="button" onclick="syncFromGoogleSheets()" id="btnSyncCloud"
-                    class="bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-xs font-semibold px-3 py-2 rounded-lg transition flex items-center gap-1.5">
-                    <span>🔄 סנכרן מ-Google Sheets</span>
-                </button>
-                <!-- הגדרות ענן -->
-                <button type="button" onclick="openCloudModal()"
-                    class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-semibold px-3 py-2 rounded-lg transition flex items-center gap-1.5">
-                    <span>☁️ הגדרות ענן</span>
-                </button>
-                <!-- הורדת אקסל יזומה -->
-                <button type="button" onclick="downloadExcelFile()"
-                    class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-sm transition flex items-center gap-1.5">
-                    <span>📥 הורד Excel</span>
-                </button>
-                <!-- ייבוא אקסל קיים -->
+
+            <div class="flex flex-wrap gap-2 items-center">
+                <!-- טעינת אקסל קיים (להמשך עבודה / צפייה) -->
                 <label
-                    class="bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 text-xs font-semibold px-3 py-2 rounded-lg cursor-pointer transition flex items-center gap-1.5">
-                    <span>📂 טען Excel</span>
+                    class="bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 text-xs font-bold px-3.5 py-2 rounded-lg cursor-pointer transition flex items-center gap-1.5 shadow-sm"
+                    title="טען קובץ אקסל ששמרת בעבר או שמילאת ידנית באקסל">
+                    <span>📂 טען קובץ Excel</span>
                     <input type="file" id="excelUpload" accept=".xlsx, .xls" class="hidden"
                         onchange="importExcelFile(event)">
                 </label>
+
+                <!-- הורדת אקסל מרוכז / תבנית מוכנה למילוי -->
+                <button type="button" onclick="downloadExcelFile()"
+                    class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3.5 py-2 rounded-lg shadow-sm transition flex items-center gap-1.5"
+                    title="מוריד קובץ Excel מסודר עם כל הנתונים שלך (או תבנית מוכנה למילוי)">
+                    <span>📥 שמור / הורד Excel</span>
+                </button>
+
+                <!-- יצירת / חיבור Google Sheets בלחיצת כפתור -->
+                <button type="button" onclick="openCloudModal()"
+                    class="bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 text-xs font-bold px-3.5 py-2 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+                    <span>🟢 Google Sheets בלחיצת כפתור</span>
+                </button>
+
+                <!-- כפתור סנכרון מהיר (מוצג כשמחובר לענן) -->
+                <button type="button" onclick="syncFromGoogleSheets()" id="btnSyncCloud"
+                    class="hidden bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 text-xs font-semibold px-3 py-2 rounded-lg transition items-center gap-1">
+                    <span>🔄 סנכרן</span>
+                </button>
+
                 <!-- איפוס נתונים -->
                 <button type="button" onclick="clearLocalData()"
-                    class="text-red-600 hover:bg-red-50 border border-transparent hover:border-red-200 text-xs font-medium px-2.5 py-2 rounded-lg transition">
+                    class="text-red-600 hover:bg-red-50 border border-transparent hover:border-red-200 text-xs font-medium px-2.5 py-2 rounded-lg transition"
+                    title="ניקוי הזיכרון המקומי בדפדפן (לא מוחק קבצי Excel שהורדת)">
                     🗑️ איפוס
                 </button>
             </div>
         </div>
-        <div id="globalAlert" class="hidden mt-3 p-3 text-center text-sm font-semibold rounded-lg"></div>
+        <div id="globalAlert" class="hidden mt-3 p-3.5 text-center text-sm font-semibold rounded-lg shadow-sm"></div>
     </div>
 
     <!-- ========================================== -->
@@ -131,6 +146,7 @@
     <div id="view-chapter4"
         class="max-w-4xl mx-auto bg-white p-6 md:p-10 shadow-lg rounded-xl border-t-8 border-blue-500 mb-8">
 
+        <!-- באנר מצב עריכה (מוסתר כברירת מחדל) -->
         <div id="editBannerCh4"
             class="hidden mb-6 bg-amber-50 border border-amber-300 p-4 rounded-lg flex justify-between items-center">
             <div class="text-amber-800 text-sm font-semibold">
@@ -169,6 +185,7 @@
                         <label class="block text-sm font-semibold text-gray-700 mb-1">המצב / הטריגר (מה קרה או עומד
                             לקרות?):</label>
                         <input type="text" name="trigger"
+                            placeholder="למשל: שיחה עם המנהל, מפגש חברתי, משימה חדשה..."
                             class="w-full border border-gray-300 rounded-md p-2.5 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-400 outline-none"
                             required>
                     </div>
@@ -178,6 +195,7 @@
                     <label class="block text-sm font-semibold text-gray-700 mb-1">רגשות ותחושות גופניות (דרגו עוצמה
                         0–100):</label>
                     <textarea name="feelings" rows="2"
+                        placeholder="למשל: חרדה (80), דופק מהיר, כיווץ בבטן..."
                         class="w-full border border-gray-300 rounded-md p-2.5 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-400 outline-none"></textarea>
                 </div>
 
@@ -185,6 +203,7 @@
                     <label class="block text-sm font-semibold text-gray-700 mb-1">התחזית החרדתית (מה אני חושב/ת שישתבש?
                         ממה אני פוחד/ת?):</label>
                     <textarea name="prediction" rows="2"
+                        placeholder="מה החשש המרכזי שלך שיקרה במצב הזה? (ניתן לציין גם עד כמה את/ה מאמין/ה בזה מ-0 עד 100)"
                         class="w-full border border-gray-300 rounded-md p-2.5 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-400 outline-none"
                         required></textarea>
                 </div>
@@ -193,6 +212,7 @@
                     <label class="block text-sm font-semibold text-gray-700 mb-1">אמצעי זהירות והגנה (מה אני עושה כדי
                         למנוע מזה לקרות?):</label>
                     <textarea name="safety" rows="2"
+                        placeholder="למשל: שותק, מתנצל מראש, מכין הכל אלף פעם, נמנע מלהסתכל בעיניים..."
                         class="w-full border border-gray-300 rounded-md p-2.5 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-400 outline-none"></textarea>
                 </div>
             </div>
@@ -266,6 +286,7 @@
                     <label class="block text-sm font-semibold text-gray-700 mb-1">התוצאות בפועל (מה קרה
                         במציאות?):</label>
                     <textarea name="actual_results" rows="3"
+                        placeholder="אפשר למלא עכשיו או לחזור לערוך את הרשומה אחרי ביצוע הניסוי..."
                         class="w-full border border-gray-300 rounded-md p-2.5 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-purple-400 outline-none"></textarea>
                 </div>
 
@@ -280,8 +301,8 @@
             <!-- כפתור שמירה -->
             <div class="text-center pt-4 border-t">
                 <button type="submit" id="submitBtnCh4"
-                    class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-10 rounded-lg shadow-md transition duration-150 ease-in-out text-lg">
-                    שמור נתונים
+                    class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-10 rounded-lg shadow-md transition duration-150 ease-in-out text-lg">
+                    💾 שמור והורד קובץ Excel מעודכן
                 </button>
             </div>
         </form>
@@ -293,6 +314,7 @@
     <div id="view-chapter3"
         class="hidden max-w-4xl mx-auto bg-white p-6 md:p-10 shadow-lg rounded-xl border-t-8 border-indigo-500 mb-8">
 
+        <!-- באנר מצב עריכה (מוסתר כברירת מחדל) -->
         <div id="editBannerCh3"
             class="hidden mb-6 bg-amber-50 border border-amber-300 p-4 rounded-lg flex justify-between items-center">
             <div class="text-amber-800 text-sm font-semibold">
@@ -345,6 +367,7 @@
                     <label class="block text-sm font-semibold text-gray-700 mb-1">איזה "כלל לחיים" שלך הופר או עמד בסכנת
                         הפרה במצב זה?</label>
                     <textarea name="broken_rule" rows="2"
+                        placeholder="למשל: 'אני חייב תמיד להצליח בפעם הראשונה', 'אסור לי לאכזב אף אחד'..."
                         class="w-full border border-gray-300 rounded-md p-2.5 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-400 outline-none"></textarea>
                 </div>
             </div>
@@ -438,8 +461,8 @@
             <!-- כפתור שמירה -->
             <div class="text-center pt-4 border-t mt-6">
                 <button type="submit" id="submitBtnCh3"
-                    class="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-10 rounded-lg shadow-md transition duration-150 ease-in-out text-lg">
-                    שמור נתונים
+                    class="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-10 rounded-lg shadow-md transition duration-150 ease-in-out text-lg">
+                    💾 שמור והורד קובץ Excel מעודכן
                 </button>
             </div>
         </form>
@@ -453,7 +476,18 @@
         <div class="border-b pb-6 mb-6 flex flex-wrap justify-between items-center gap-4">
             <div>
                 <h1 class="text-3xl font-bold text-gray-800 mb-1">ארכיון והיסטוריית תרגולים</h1>
-                <p class="text-gray-500 text-sm">צפייה, חיפוש, עריכה והשלמה של דפי עבודה קודמים ששמרת</p>
+                <p class="text-gray-500 text-sm">צפייה, חיפוש, עריכה והשלמה של דפי עבודה קודמים ששמרת או שטענת מקובץ Excel</p>
+            </div>
+            <div class="flex gap-2">
+                <label
+                    class="bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 text-xs font-bold px-3.5 py-2 rounded-lg cursor-pointer transition flex items-center gap-1.5">
+                    <span>📂 טען Excel להיסטוריה</span>
+                    <input type="file" accept=".xlsx, .xls" class="hidden" onchange="importExcelFile(event)">
+                </label>
+                <button type="button" onclick="downloadExcelFile()"
+                    class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3.5 py-2 rounded-lg transition flex items-center gap-1.5">
+                    <span>📥 ייצא הכל ל-Excel</span>
+                </button>
             </div>
         </div>
 
@@ -494,7 +528,7 @@
         </div>
 
         <div id="emptyHistoryMsg" class="hidden text-center py-12 text-gray-500">
-            לא נמצאו רשומות תואמות. מלא טופס חדש, טען Excel או סנכרן מ-Google Sheets.
+            לא נמצאו רשומות תואמות. מלא טופס חדש או לחץ על <strong>"📂 טען קובץ Excel"</strong> למעלה.
         </div>
     </div>
 
@@ -523,12 +557,12 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- חלון קופץ (Modal) להגדרות ענן (Google Sheets) -->
+    <!-- חלון קופץ (Modal) ליצירת Google Sheets בלחיצת כפתור והגדרות שמירה -->
     <!-- ========================================== -->
     <div id="cloudModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden">
             <div class="p-4 bg-indigo-700 text-white flex justify-between items-center">
-                <h3 class="text-lg font-bold flex items-center gap-2">☁️ חיבור וסנכרון מול Google Sheets</h3>
+                <h3 class="text-lg font-bold flex items-center gap-2">🟢 עבודה עם Excel ו-Google Sheets (ללא ידע טכני)</h3>
                 <button type="button" onclick="closeCloudModal()"
                     class="text-indigo-200 hover:text-white text-2xl leading-none">&times;</button>
             </div>
@@ -538,95 +572,107 @@
                 <div id="gasNativeBanner" class="hidden bg-emerald-50 border border-emerald-300 p-4 rounded-xl text-emerald-800">
                     <div class="font-bold text-base flex items-center gap-2 mb-1">
                         <span>🎉</span>
-                        <span>המערכת פועלת כעת ישירות בתוך ה-Google Sheets שלך!</span>
+                        <span>המערכת פועלת כעת ישירות בתוך ה-Google Sheets האישי שלך!</span>
                     </div>
                     <p class="text-xs text-emerald-700 leading-relaxed">
-                        כל הנתונים שאתה מזין נשמרים ישירות לתוך גליונות <strong>פרק_4_תחזיות</strong> ו-<strong>פרק_3_טריגרים</strong> בגיליון זה בלחיצת כפתור אחת, ללא צורך בהגדרת קישורים!
+                        כל הנתונים שאת/ה שומר/ת נכתבים אוטומטית לתוך הגליונות <strong>פרק_4_תחזיות</strong> ו-<strong>פרק_3_טריגרים</strong> בגיליון זה.
                     </p>
                 </div>
 
-                <!-- אפשרות 1: הפעלה בלחיצת כפתור אחת מתוך Google Sheets -->
-                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-xl border border-indigo-200">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="font-bold text-indigo-900 text-sm flex items-center gap-1.5">
-                            <span>⭐</span>
-                            <span>הדרך הפשוטה ביותר: הפעלה ישירה ב-Google Sheets (0 הגדרות!)</span>
-                        </span>
+                <!-- דרך 1: הכי פשוטה למשתמשים לא טכניים - אקסל / העלאה ל-Google Sheets בלי קוד -->
+                <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-200">
+                    <div class="font-bold text-emerald-900 text-base mb-1 flex items-center gap-1.5">
+                        <span>1️⃣</span>
+                        <span>אפשרות א': עבודה עם קובץ Excel או Google Sheets (בלי שום הגדרות!)</span>
                     </div>
-                    <p class="text-xs text-indigo-800 leading-relaxed mb-3">
-                        בכל פעם שאתה פותח את גיליון ה-Google Sheets שלך, מופיע למעלה תפריט מובנה:
-                        <br>
-                        <strong>🧠 מרחב תרגול CBT &larr; 🚀 פתח חוברת תרגול (חלון מלא)</strong>
-                        <br>
-                        לחיצה אחת פותחת את כל האפליקציה ישירות בתוך הגיליון, בלי להעתיק שום קישור ובלי שום הגדרות טכניות!
+                    <p class="text-xs text-emerald-800 leading-relaxed mb-3">
+                        הורד קובץ Excel מוכן ומעוצב עם כל העמודות. תוכל למלא אותו דרך דף זה (ולטעון אותו חזרה בכל עת באמצעות <strong>"📂 טען קובץ Excel"</strong>), או לגרור אותו ל-Google Drive שלך ולפתוח אותו כטבלת Google Sheets פרטית!
                     </p>
                     <div class="flex flex-wrap gap-2">
-                        <button type="button" onclick="copyGasScript()"
-                            class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition flex items-center gap-1.5 shadow-sm">
-                            <span>📋 העתק קוד שרת (Code.gs) לגיליון שלך</span>
+                        <button type="button" onclick="downloadExcelFile()"
+                            class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition shadow-sm">
+                            📥 הורד קובץ Excel מוכן עכשיו
                         </button>
+                        <a href="https://docs.google.com/spreadsheets/u/0/" target="_blank" rel="noopener noreferrer"
+                            class="bg-white hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-bold px-4 py-2.5 rounded-lg transition">
+                            🌐 פתח את Google Sheets שלי
+                        </a>
                     </div>
                 </div>
 
-                <!-- בחירת מצב עבודה (מקומי / ענן / משולב) -->
-                <div>
-                    <label class="block font-bold text-gray-800 mb-2">בחר איך לשמור את הנתונים שלך כברירת מחדל:</label>
+                <!-- דרך 2: יצירת אפליקציית Google Sheets אוטומטית בלחיצת כפתור -->
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-xl border border-indigo-200">
+                    <div class="font-bold text-indigo-900 text-base mb-1 flex items-center gap-1.5">
+                        <span>2️⃣</span>
+                        <span>אפשרות ב': הפיכת Google Sheets לאפליקציה בלחיצת כפתור!</span>
+                    </div>
+                    <p class="text-xs text-indigo-800 leading-relaxed mb-3">
+                        רוצה שהחוברת המעוצבת הזו תיפתח ישירות מתוך כפתור קבוע בתוך ה-Google Sheets הפרטי שלך?
+                    </p>
+                    <div class="mb-3">
+                        <button type="button" onclick="oneClickCreateGoogleSheetApp()"
+                            class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-5 py-3 rounded-lg transition flex items-center justify-center gap-2 shadow-md">
+                            <span>⚡ לחץ כאן: העתק מערכת ופתח Google Sheets חדש</span>
+                        </button>
+                    </div>
+                    <ol class="list-decimal list-inside space-y-1 text-xs text-indigo-900 bg-white/80 p-3 rounded-lg border border-indigo-100">
+                        <li>לחץ על הכפתור הסגול למעלה (המערכת מעתיקה את הקוד האוטומטי ופותחת לך גיליון Google Sheets חדש).</li>
+                        <li>בגיליון שנפתח, לחץ בתפריט העליון על: <strong>הרחבות (Extensions) &larr; Apps Script</strong>.</li>
+                        <li>מחק את הטקסט הקצר שמופיע שם, הדבק (<strong>Ctrl+V</strong>) ולחץ על סמל השמירה 💾 (<strong>Ctrl+S</strong>).</li>
+                        <li>רענן את הגיליון — יופיע לך למעלה תפריט <strong>🧠 מרחב תרגול CBT</strong> שמקים את הטבלאות ופותח את האפליקציה בלחיצה אחת!</li>
+                    </ol>
+                </div>
+
+                <!-- בחירת מצב שמירה כברירת מחדל -->
+                <div class="border-t pt-4">
+                    <label class="block font-bold text-gray-800 mb-2">איך תרצה שכפתור ה"שמירה" בטפסים יעבוד?</label>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <label class="border rounded-lg p-3 cursor-pointer hover:bg-gray-50 flex items-start gap-2">
                             <input type="radio" name="pref_mode" value="local" class="mt-1">
                             <div>
-                                <div class="font-bold text-gray-800">💻 מקומי (Excel)</div>
-                                <div class="text-xs text-gray-500">שמירה בדפדפן והורדת קובץ אקסל למכשיר.</div>
+                                <div class="font-bold text-gray-800">💻 מקומי + Excel (מומלץ)</div>
+                                <div class="text-xs text-gray-500">שומר בדפדפן ומוריד קובץ Excel מעודכן למכשיר.</div>
                             </div>
                         </label>
                         <label class="border rounded-lg p-3 cursor-pointer hover:bg-gray-50 flex items-start gap-2">
                             <input type="radio" name="pref_mode" value="cloud" class="mt-1">
                             <div>
-                                <div class="font-bold text-indigo-700">☁️ ענן (Google Sheets)</div>
-                                <div class="text-xs text-gray-500">שמירה ישירות לגיליון הפרטי שלך בדרייב.</div>
+                                <div class="font-bold text-indigo-700">☁️ Google Sheets בלבד</div>
+                                <div class="text-xs text-gray-500">שומר ישירות לגיליון הפרטי שלך בענן.</div>
                             </div>
                         </label>
                         <label class="border rounded-lg p-3 cursor-pointer hover:bg-gray-50 flex items-start gap-2">
                             <input type="radio" name="pref_mode" value="both" class="mt-1">
                             <div>
                                 <div class="font-bold text-emerald-700">🔄 משולב (ענן + Excel)</div>
-                                <div class="text-xs text-gray-500">גם שולח ל-Google Sheets וגם מוריד אקסל.</div>
+                                <div class="text-xs text-gray-500">גם שומר ב-Google Sheets וגם מוריד Excel.</div>
                             </div>
                         </label>
                     </div>
                 </div>
 
-                <!-- הזנת כתובת Web App (לעבודה מקובץ HTML מקומי) -->
-                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                    <label class="block font-bold text-gray-800 mb-1">🔗 כתובת ה-Web App של ה-Google Sheets שלך (לעבודה מקובץ מקומי):</label>
-                    <p class="text-xs text-gray-500 mb-2">אם אתה מריץ קובץ HTML זה מתוך המחשב/טלפון ורוצה שיסנכרן לגיליון שלך, הדבק כאן את כתובת ה-Web App (מסתיים ב-<code>/exec</code>):</p>
-                    <div class="flex gap-2">
-                        <input type="url" id="cloudUrlInput" dir="ltr"
-                            placeholder="https://script.google.com/macros/s/.../exec"
-                            class="flex-grow border border-gray-300 rounded-md p-2 text-xs bg-white focus:ring-2 focus:ring-indigo-400 outline-none">
-                        <button type="button" onclick="testAndSyncCloud()"
-                            class="bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-semibold px-3 py-2 rounded-md text-xs whitespace-nowrap transition">
-                            בדוק חיבור וסנכרן
-                        </button>
+                <!-- הזנת כתובת Web App (למתקדמים שרוצים סנכרון מרחוק) -->
+                <details class="bg-gray-50 p-3.5 rounded-lg border border-gray-200 text-xs">
+                    <summary class="font-bold text-gray-700 cursor-pointer">🔗 הגדרת קישור סנכרון ישיר (אופציונלי - למי שפרסם Web App ב-Google Sheets)</summary>
+                    <div class="mt-3 space-y-2">
+                        <p class="text-gray-500">אם פרסמת את ה-Apps Script כ-Web App, הדבק כאן את הקישור (מסתיים ב-<code>/exec</code>) כדי לסנכרן ישירות מתוך קובץ מקומי:</p>
+                        <div class="flex gap-2">
+                            <input type="url" id="cloudUrlInput" dir="ltr"
+                                placeholder="https://script.google.com/macros/s/.../exec"
+                                class="flex-grow border border-gray-300 rounded-md p-2 text-xs bg-white focus:ring-2 focus:ring-indigo-400 outline-none">
+                            <button type="button" onclick="testAndSyncCloud()"
+                                class="bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-semibold px-3 py-2 rounded-md text-xs whitespace-nowrap transition">
+                                בדוק וסנכרן
+                            </button>
+                        </div>
                     </div>
-                </div>
-
-                <!-- מדריך הגדרה מהיר ב-3 שלבים -->
-                <div class="border-t pt-4">
-                    <span class="font-bold text-gray-800 block mb-2">🛠️ איך להגדיר את הגיליון בפעם הראשונה (ב-2 דקות):</span>
-                    <ol class="list-decimal list-inside space-y-1.5 text-xs text-gray-600 bg-gray-50 p-3.5 rounded-lg border border-gray-200">
-                        <li>פתח גיליון <strong>Google Sheets</strong> חדש ב-Google Drive האישי שלך.</li>
-                        <li>לחץ בתפריט למעלה על <strong>הרחבות (Extensions) &larr; Apps Script</strong>.</li>
-                        <li>מחק את מה שרשום שם, לחץ על הכפתור הסגול למעלה <strong>"העתק קוד שרת"</strong> והדבק בעורך.</li>
-                        <li>שמור (Ctrl+S) ורענן את הגיליון — מיד יופיע לך תפריט עליון חדש: <strong>🧠 מרחב תרגול CBT</strong> שממנו אפשר להפעיל את המערכת בלחיצת כפתור אחת!</li>
-                    </ol>
-                </div>
+                </details>
 
             </div>
             <div class="p-4 bg-gray-50 border-t flex justify-end gap-3">
                 <button type="button" onclick="saveCloudSettings()"
                     class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2 rounded-lg text-sm transition">
-                    שמור הגדרות
+                    שמור העדפות
                 </button>
                 <button type="button" onclick="closeCloudModal()"
                     class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold px-4 py-2 rounded-lg text-sm transition">
@@ -640,23 +686,67 @@
         const STORAGE_KEY = 'cbt_standalone_records_v1';
         const CLOUD_CONFIG_KEY = 'cbt_cloud_config_v1';
 
+        const HEADERS_CH4 = [
+            "חותמת זמן שמירה", "תאריך מהטופס", "המצב / הטריגר", "רגשות ותחושות",
+            "התחזית החרדתית", "אמצעי זהירות", "ראיות בעד", "ראיות נגד",
+            "התרחיש הכי גרוע", "התרחיש הסביר ביותר", "מחשבה חלופית",
+            "פעולה מתוכננת", "ויתור על אמצעי זהירות", "תוצאות בפועל", "קרדיט עצמי"
+        ];
+
+        const HEADERS_CH3 = [
+            "חותמת זמן שמירה", "תאריך מהטופס", "תיאור המצב", "כלל שהופר",
+            "שורה תחתונה", "ניבויים שליליים", "התנהגות הגנתית",
+            "אישור וביקורת", "דיכאון/מצב רוח", "רפלקציה ותובנות"
+        ];
+
         const isNativeGasEnv = (typeof google !== 'undefined' && google.script && google.script.run);
 
         window.addEventListener('DOMContentLoaded', () => {
-            // זיהוי אוטומטי של כתובת ענן מפרמטר ב-URL
             const urlParams = new URLSearchParams(window.location.search);
             const paramCloudUrl = urlParams.get('cloudUrl');
             if (paramCloudUrl && paramCloudUrl.startsWith('http')) {
                 saveCloudConfigObj({ mode: 'cloud', url: paramCloudUrl });
             }
 
+            setupDragAndDropExcel();
             refreshTimestamps();
             updateRecordCounters();
             updateCloudStatusUI();
+
             if (isNativeGasEnv) {
                 syncFromGoogleSheets(true);
             }
         });
+
+        // תמיכה בגרירת קובץ Excel ישירות לדף לנוחות מרבית
+        function setupDragAndDropExcel() {
+            const body = document.getElementById('appBody');
+            const dropZone = document.getElementById('dropZone');
+
+            window.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('drag-over');
+            });
+
+            window.addEventListener('dragleave', (e) => {
+                if (!e.relatedTarget || e.relatedTarget.nodeName === 'HTML') {
+                    dropZone.classList.remove('drag-over');
+                }
+            });
+
+            window.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('drag-over');
+                if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    const file = e.dataTransfer.files[0];
+                    if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+                        processExcelFileObject(file);
+                    } else {
+                        showAlert('נא לגרור קובץ Excel תקין (.xlsx או .xls).', 'error');
+                    }
+                }
+            });
+        }
 
         function getCloudConfig() {
             try {
@@ -678,29 +768,38 @@
             const dot = document.getElementById('cloudStatusDot');
             const text = document.getElementById('cloudStatusText');
             const badge = document.getElementById('cloudStatusBadge');
+            const btnSync = document.getElementById('btnSyncCloud');
             const btn4 = document.getElementById('submitBtnCh4');
             const btn3 = document.getElementById('submitBtnCh3');
 
             const isCloudConfigured = isNativeGasEnv || (cfg.url && cfg.url.startsWith('http'));
 
+            if (isCloudConfigured) {
+                btnSync.classList.remove('hidden');
+                btnSync.classList.add('flex');
+            } else {
+                btnSync.classList.add('hidden');
+                btnSync.classList.remove('flex');
+            }
+
             if (cfg.mode === 'cloud' && isCloudConfigured) {
                 dot.className = 'w-2 h-2 rounded-full bg-indigo-600';
-                text.innerText = isNativeGasEnv ? '☁️ מחובר לגיליון זה (ישיר)' : '☁️ מחובר ל-Google Sheets';
+                text.innerText = isNativeGasEnv ? '☁️ מחובר ישירות ל-Google Sheets זה' : '☁️ מחובר ל-Google Sheets';
                 badge.className = 'bg-indigo-50 hover:bg-indigo-100 text-indigo-800 text-xs px-3 py-1 rounded-full font-semibold border border-indigo-300 transition flex items-center gap-1.5';
-                if (document.getElementById('editIndexCh4').value === "-1") btn4.innerText = 'שמור ב-Google Sheets ☁️';
-                if (document.getElementById('editIndexCh3').value === "-1") btn3.innerText = 'שמור ב-Google Sheets ☁️';
+                if (document.getElementById('editIndexCh4').value === "-1") btn4.innerText = '☁️ שמור ב-Google Sheets';
+                if (document.getElementById('editIndexCh3').value === "-1") btn3.innerText = '☁️ שמור ב-Google Sheets';
             } else if (cfg.mode === 'both' && isCloudConfigured) {
                 dot.className = 'w-2 h-2 rounded-full bg-emerald-600';
-                text.innerText = '🔄 שמירה כפולה (ענן + Excel)';
+                text.innerText = '🔄 שמירה כפולה (Google Sheets + Excel)';
                 badge.className = 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs px-3 py-1 rounded-full font-semibold border border-emerald-300 transition flex items-center gap-1.5';
-                if (document.getElementById('editIndexCh4').value === "-1") btn4.innerText = 'שמור בענן והורד Excel 🔄';
-                if (document.getElementById('editIndexCh3').value === "-1") btn3.innerText = 'שמור בענן והורד Excel 🔄';
+                if (document.getElementById('editIndexCh4').value === "-1") btn4.innerText = '🔄 שמור ב-Google Sheets והורד Excel';
+                if (document.getElementById('editIndexCh3').value === "-1") btn3.innerText = '🔄 שמור ב-Google Sheets והורד Excel';
             } else {
-                dot.className = 'w-2 h-2 rounded-full bg-gray-500';
-                text.innerText = '💻 מצב מקומי (Excel)';
-                badge.className = 'bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-3 py-1 rounded-full font-medium border border-gray-300 transition flex items-center gap-1.5';
-                if (document.getElementById('editIndexCh4').value === "-1") btn4.innerText = 'שמור והורד קובץ Excel 📥';
-                if (document.getElementById('editIndexCh3').value === "-1") btn3.innerText = 'שמור והורד קובץ Excel 📥';
+                dot.className = 'w-2 h-2 rounded-full bg-green-600';
+                text.innerText = '🔒 פרטי לגמרי (שמירה מקומית + Excel)';
+                badge.className = 'bg-green-50 hover:bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full font-medium border border-green-300 transition flex items-center gap-1.5';
+                if (document.getElementById('editIndexCh4').value === "-1") btn4.innerText = '💾 שמור והורד קובץ Excel מעודכן';
+                if (document.getElementById('editIndexCh3').value === "-1") btn3.innerText = '💾 שמור והורד קובץ Excel מעודכן';
             }
         }
 
@@ -729,13 +828,13 @@
             const urlVal = document.getElementById('cloudUrlInput').value.trim();
 
             if ((selectedMode === 'cloud' || selectedMode === 'both') && !isNativeGasEnv && !urlVal.startsWith('https://script.google.com')) {
-                alert('כדי לשמור בענן מתוך קובץ מקומי, חובה להדביק כתובת Web App תקינה של Google Apps Script.');
+                alert('כדי לשמור בענן מתוך קובץ מקומי, יש להדביק קישור Web App תקין או להפעיל את המערכת ישירות מתוך תפריט ה-Google Sheets.');
                 return;
             }
 
             saveCloudConfigObj({ mode: selectedMode, url: urlVal });
             closeCloudModal();
-            showAlert('✓ הגדרות השמירה והענן עודכנו בהצלחה!');
+            showAlert('✓ העדפות השמירה עודכנו בהצלחה!');
         }
 
         async function testAndSyncCloud() {
@@ -750,7 +849,6 @@
             await syncFromGoogleSheets();
         }
 
-        // סנכרון מלא מ-Google Sheets או אל Google Sheets
         async function pushDatabaseToCloud(db) {
             const cfg = getCloudConfig();
             if (isNativeGasEnv) {
@@ -807,7 +905,7 @@
                     if (!silent) showAlert('✓ הנתונים סונכרנו בהצלחה מ-Google Sheets!');
                 }
             } catch (err) {
-                if (!silent) showAlert('שגיאה בסנכרון מול Google Sheets: ודא שהכתובת תקינה וההרשאות מוגדרות ל-Anyone.', 'error');
+                if (!silent) showAlert('שגיאה בסנכרון מול Google Sheets. ניתן תמיד לשמור ולטעון באמצעות קובץ Excel.', 'error');
             } finally {
                 btn.innerHTML = origText;
                 btn.disabled = false;
@@ -890,21 +988,20 @@
         function showAlert(message, type = 'success') {
             const alertBox = document.getElementById('globalAlert');
             if (type === 'success') {
-                alertBox.className = 'mt-3 p-3 text-center text-sm font-semibold rounded-lg bg-green-100 text-green-800 border border-green-300 block';
+                alertBox.className = 'mt-3 p-3.5 text-center text-sm font-semibold rounded-lg bg-green-100 text-green-800 border border-green-300 block shadow-sm';
             } else {
-                alertBox.className = 'mt-3 p-3 text-center text-sm font-semibold rounded-lg bg-red-100 text-red-800 border border-red-300 block';
+                alertBox.className = 'mt-3 p-3.5 text-center text-sm font-semibold rounded-lg bg-red-100 text-red-800 border border-red-300 block shadow-sm';
             }
             alertBox.innerText = message;
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            setTimeout(() => { alertBox.classList.add('hidden'); }, 6000);
+            setTimeout(() => { alertBox.classList.add('hidden'); }, 7000);
         }
 
-        // שמירה או עדכון של טופס (מקומי / ענן / שניהם)
+        // שמירה או עדכון של טופס
         async function handleFormSubmit(e, chapter) {
             e.preventDefault();
             const form = e.target;
             const submitBtn = chapter === 'chapter4' ? document.getElementById('submitBtnCh4') : document.getElementById('submitBtnCh3');
-            const origBtnText = submitBtn.innerText;
             submitBtn.disabled = true;
             submitBtn.innerText = 'שומר נתונים...';
 
@@ -963,7 +1060,6 @@
                 }
             }
 
-            // תמיד שומרים גם ב-LocalStorage לגיבוי מהיר
             saveStoredData(db);
 
             const cfg = getCloudConfig();
@@ -974,28 +1070,33 @@
                     await pushDatabaseToCloud(db);
                 }
                 if (cfg.mode === 'local' || cfg.mode === 'both' || !isCloudReady) {
-                    downloadExcelFile();
+                    try {
+                        downloadExcelFile(true);
+                    } catch (err) {
+                        console.warn('Excel export warning:', err);
+                    }
                 }
 
                 form.reset();
                 refreshTimestamps();
 
                 if (cfg.mode === 'cloud' && isCloudReady) {
-                    showAlert('✓ הנתונים נשמרו וסונכרנו בהצלחה ל-Google Sheets שלך בענן!');
+                    showAlert('✓ הנתונים נשמרו בהצלחה ב-Google Sheets האישי שלך!');
                 } else if (cfg.mode === 'both' && isCloudReady) {
-                    showAlert('✓ הנתונים נשמרו גם ב-Google Sheets בענן וגם ירדו כקובץ Excel!');
+                    showAlert('✓ הנתונים נשמרו גם ב-Google Sheets וגם ירדו כקובץ Excel מעודכן!');
                 } else {
                     showAlert('✓ הנתונים נשמרו בהצלחה וקובץ ה-Excel המעודכן ירד למכשירך!');
                 }
             } catch (err) {
-                downloadExcelFile();
-                showAlert('השמירה לענן נכשלה, אך הנתונים נשמרו מקומית וקובץ Excel ירד למכשירך לגיבוי.', 'error');
+                try { downloadExcelFile(true); } catch (e) {}
+                showAlert('הנתונים נשמרו מקומית וקובץ ה-Excel המעודכן ירד למכשירך לגיבוי.', 'success');
             } finally {
                 submitBtn.disabled = false;
                 updateCloudStatusUI();
             }
         }
 
+        // רינדור טבלת ההיסטוריה והחיפוש
         function renderHistoryTable() {
             const db = getStoredData();
             const query = (document.getElementById('searchInput').value || '').trim().toLowerCase();
@@ -1062,13 +1163,13 @@
                     <td class="py-3 px-4 text-gray-600 max-w-[180px] truncate" title="${escapeHtml(item.outcome)}">${escapeHtml(item.outcome || '—')}</td>
                     <td class="py-3 px-4 whitespace-nowrap text-center">
                         <div class="flex items-center justify-center gap-1.5">
-                            <button onclick="viewRecord('${item.chapter}', ${item.index})" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded text-xs font-medium transition">
+                            <button onclick="viewRecord('${item.chapter}', ${item.index})" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded text-xs font-medium transition" title="צפייה מלאה">
                                 👁️ צפייה
                             </button>
-                            <button onclick="loadRecordForEdit('${item.chapter}', ${item.index})" class="bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 px-2.5 py-1 rounded text-xs font-medium transition">
+                            <button onclick="loadRecordForEdit('${item.chapter}', ${item.index})" class="bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 px-2.5 py-1 rounded text-xs font-medium transition" title="עריכה / השלמה">
                                 ✏️ ערוך
                             </button>
-                            <button onclick="deleteSingleRecord('${item.chapter}', ${item.index})" class="bg-red-50 hover:bg-red-100 text-red-600 px-2 py-1 rounded text-xs font-medium transition">
+                            <button onclick="deleteSingleRecord('${item.chapter}', ${item.index})" class="bg-red-50 hover:bg-red-100 text-red-600 px-2 py-1 rounded text-xs font-medium transition" title="מחיקה">
                                 🗑️
                             </button>
                         </div>
@@ -1123,7 +1224,7 @@
                 const form = document.getElementById('formChapter4');
                 document.getElementById('editIndexCh4').value = index;
                 document.getElementById('editBannerCh4').classList.remove('hidden');
-                document.getElementById('submitBtnCh4').innerText = '💾 שמור שינויים ועדכן';
+                document.getElementById('submitBtnCh4').innerText = '💾 שמור שינויים ועדכן רשומה';
 
                 form.elements['datetime'].value = record["תאריך מהטופס"] || '';
                 form.elements['trigger'].value = record["המצב / הטריגר"] || '';
@@ -1144,7 +1245,7 @@
                 const form = document.getElementById('formChapter3');
                 document.getElementById('editIndexCh3').value = index;
                 document.getElementById('editBannerCh3').classList.remove('hidden');
-                document.getElementById('submitBtnCh3').innerText = '💾 שמור שינויים ועדכן';
+                document.getElementById('submitBtnCh3').innerText = '💾 שמור שינויים ועדכן רשומה';
 
                 form.elements['datetime'].value = record["תאריך מהטופס"] || '';
                 form.elements['situation'].value = record["תיאור המצב"] || '';
@@ -1184,37 +1285,59 @@
             const cfg = getCloudConfig();
             const isCloudReady = isNativeGasEnv || (cfg.url && cfg.url.startsWith('http'));
             if ((cfg.mode === 'cloud' || cfg.mode === 'both') && isCloudReady) {
-                try { await pushDatabaseToCloud(db); } catch (e) { }
+                try { await pushDatabaseToCloud(db); } catch (e) {}
             }
             showAlert('הרשומה נמחקה בהצלחה.');
         }
 
-        function downloadExcelFile() {
+        // ייצוא כל הנתונים (או תבנית מוכנה למילוי) לקובץ אקסל מעוצב ונוח
+        function downloadExcelFile(silentAlert = false) {
             const db = getStoredData();
-            if (db.chapter4.length === 0 && db.chapter3.length === 0) {
-                showAlert('אין עדיין רשומות שמורות לייצוא. מלא טופס תחילה.', 'error');
+
+            if (typeof XLSX === 'undefined') {
+                if (!silentAlert) {
+                    showAlert('ספריית ה-Excel בטעינה או שאין חיבור לאינטרנט. כל הנתונים נשמרו בבטחה בהיסטוריה בדפדפן!', 'error');
+                }
                 return;
             }
 
             const wb = XLSX.utils.book_new();
             wb.Workbook = { Views: [{ RTL: true }] };
 
-            const ws4Data = db.chapter4.length > 0 ? db.chapter4 : [{ "הודעה": "טרם הוזנו נתונים לפרק 4" }];
-            const ws4 = XLSX.utils.json_to_sheet(ws4Data);
+            const ws4 = XLSX.utils.json_to_sheet(db.chapter4, { header: HEADERS_CH4 });
             ws4['!views'] = [{ rightToLeft: true }];
+            ws4['!cols'] = HEADERS_CH4.map(() => ({ wch: 24 }));
             XLSX.utils.book_append_sheet(wb, ws4, "פרק_4_תחזיות");
 
-            const ws3Data = db.chapter3.length > 0 ? db.chapter3 : [{ "הודעה": "טרם הוזנו נתונים לפרק 3" }];
-            const ws3 = XLSX.utils.json_to_sheet(ws3Data);
+            const ws3 = XLSX.utils.json_to_sheet(db.chapter3, { header: HEADERS_CH3 });
             ws3['!views'] = [{ rightToLeft: true }];
+            ws3['!cols'] = HEADERS_CH3.map(() => ({ wch: 24 }));
             XLSX.utils.book_append_sheet(wb, ws3, "פרק_3_טריגרים");
 
             XLSX.writeFile(wb, "יומן_תרגול_CBT.xlsx");
+
+            if (!silentAlert) {
+                if (db.chapter4.length === 0 && db.chapter3.length === 0) {
+                    showAlert('✓ קובץ תבנית Excel מוכן למילוי ירד למכשירך! תוכל למלא אותו באקסל או ב-Google Sheets ולטעון אותו לכאן בכל עת.');
+                } else {
+                    showAlert('✓ קובץ ה-Excel המרוכז (יומן_תרגול_CBT.xlsx) ירד למכשירך בהצלחה!');
+                }
+            }
         }
 
+        // ייבוא ומיזוג חכם של קובץ אקסל (תומך גם בקבצים שמולאו ידנית ב-Excel או ב-Google Sheets)
         function importExcelFile(event) {
             const file = event.target.files[0];
             if (!file) return;
+            processExcelFileObject(file);
+            event.target.value = '';
+        }
+
+        function processExcelFileObject(file) {
+            if (typeof XLSX === 'undefined') {
+                showAlert('לא ניתן לטעון קובץ Excel ללא חיבור לאינטרנט לטעינת רכיב האקסל.', 'error');
+                return;
+            }
 
             const reader = new FileReader();
             reader.onload = async function (e) {
@@ -1222,37 +1345,68 @@
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
                     const db = getStoredData();
+                    let loadedCount = 0;
 
                     if (workbook.SheetNames.includes("פרק_4_תחזיות")) {
-                        const imported4 = XLSX.utils.sheet_to_json(workbook.Sheets["פרק_4_תחזיות"]);
-                        db.chapter4 = imported4.filter(row => !row["הודעה"]);
+                        const raw4 = XLSX.utils.sheet_to_json(workbook.Sheets["פרק_4_תחזיות"], { defval: "" });
+                        const valid4 = raw4.filter(row => {
+                            if (row["הודעה"]) return false;
+                            return Object.values(row).some(val => String(val).trim() !== "");
+                        }).map(row => {
+                            const normalized = {};
+                            HEADERS_CH4.forEach(h => { normalized[h] = row[h] !== undefined ? String(row[h]) : ""; });
+                            return normalized;
+                        });
+                        db.chapter4 = mergeUniqueRecords(db.chapter4, valid4);
+                        loadedCount += valid4.length;
                     }
 
                     if (workbook.SheetNames.includes("פרק_3_טריגרים")) {
-                        const imported3 = XLSX.utils.sheet_to_json(workbook.Sheets["פרק_3_טריגרים"]);
-                        db.chapter3 = imported3.filter(row => !row["הודעה"]);
+                        const raw3 = XLSX.utils.sheet_to_json(workbook.Sheets["פרק_3_טריגרים"], { defval: "" });
+                        const valid3 = raw3.filter(row => {
+                            if (row["הודעה"]) return false;
+                            return Object.values(row).some(val => String(val).trim() !== "");
+                        }).map(row => {
+                            const normalized = {};
+                            HEADERS_CH3.forEach(h => { normalized[h] = row[h] !== undefined ? String(row[h]) : ""; });
+                            return normalized;
+                        });
+                        db.chapter3 = mergeUniqueRecords(db.chapter3, valid3);
+                        loadedCount += valid3.length;
                     }
 
                     saveStoredData(db);
-                    renderHistoryTable();
+                    switchTab('history');
 
                     const cfg = getCloudConfig();
                     const isCloudReady = isNativeGasEnv || (cfg.url && cfg.url.startsWith('http'));
                     if ((cfg.mode === 'cloud' || cfg.mode === 'both') && isCloudReady) {
-                        await pushDatabaseToCloud(db);
+                        try { await pushDatabaseToCloud(db); } catch (err) {}
                     }
 
-                    showAlert('✓ קובץ האקסל נטען בהצלחה!');
+                    showAlert(`✓ קובץ ה-Excel נטען בהצלחה! (${loadedCount} רשומות נמצאות כעת בלשונית ההיסטוריה והעריכה).`);
                 } catch (err) {
-                    showAlert('שגיאה בטעינת קובץ האקסל: ודא שזהו קובץ תקין שנוצר על ידי המערכת.', 'error');
+                    showAlert('שגיאה בטעינת קובץ ה-Excel: ודא שזהו קובץ תקין (.xlsx).', 'error');
                 }
-                event.target.value = '';
             };
             reader.readAsArrayBuffer(file);
         }
 
+        function mergeUniqueRecords(existingArr, incomingArr) {
+            const seen = new Set(existingArr.map(r => JSON.stringify(r)));
+            const merged = [...existingArr];
+            incomingArr.forEach(item => {
+                const sig = JSON.stringify(item);
+                if (!seen.has(sig)) {
+                    seen.add(sig);
+                    merged.push(item);
+                }
+            });
+            return merged;
+        }
+
         function clearLocalData() {
-            if (confirm('האם אתה בטוח שברצונך למחוק את כל הרשומות השמורות בדפדפן זה?')) {
+            if (confirm('האם אתה בטוח שברצונך למחוק את כל הרשומות השמורות בדפדפן זה? (קבצי Excel שכבר הורדת למחשב לא יימחקו)')) {
                 localStorage.removeItem(STORAGE_KEY);
                 updateRecordCounters();
                 renderHistoryTable();
@@ -1268,10 +1422,19 @@
                 .replace(/"/g, '&quot;');
         }
 
-        // העתקת קוד ה-Apps Script ללוח של המשתמש בלחיצת כפתור
-        function copyGasScript() {
+        // לחיצת כפתור אחת ליצירת אפליקציית Google Sheets עצמאית (כולל הממשק המלא מוטמע!)
+        function oneClickCreateGoogleSheetApp() {
+            const clone = document.documentElement.cloneNode(true);
+            const modalInClone = clone.querySelector('#cloudModal');
+            if (modalInClone) modalInClone.classList.add('hidden');
+            const recModalInClone = clone.querySelector('#recordModal');
+            if (recModalInClone) recModalInClone.classList.add('hidden');
+            const alertInClone = clone.querySelector('#globalAlert');
+            if (alertInClone) alertInClone.classList.add('hidden');
+            const fullHtmlSnapshot = '<!DOCTYPE html>\n' + clone.outerHTML;
             const gasCode = `/**
- * מרחב תרגול CBT | Google Apps Script Backend
+ * מרחב תרגול CBT | מערכת עצמאית מלאה בתוך Google Sheets (ללא צורך בקבצים נוספים!)
+ * פשוט שמור קובץ זה (Ctrl+S) ורענן את גיליון ה-Google Sheets שלך.
  */
 
 function onOpen() {
@@ -1281,20 +1444,31 @@ function onOpen() {
     .addItem('🚀 פתח חוברת תרגול (חלון מלא)', 'openCbtDialog')
     .addItem('📱 פתח בסרגל צד (Sidebar)', 'openCbtSidebar')
     .addSeparator()
+    .addItem('🛠️ הקם / תקן טבלאות פרק 3 ופרק 4', 'initSheetsIfMissing')
     .addItem('🔗 קישור להרצה ישירה מהטלפון / מחשב', 'showWebAppUrlDialog')
     .addToUi();
 }
 
+function getAppHtmlOutput() {
+  try {
+    return HtmlService.createHtmlOutputFromFile('index');
+  } catch (e) {
+    return HtmlService.createHtmlOutput( EMBEDDED_CBT_HTML );
+  }
+}
+
 function openCbtDialog() {
-  var html = HtmlService.createHtmlOutputFromFile('index')
+  initSheetsIfMissing();
+  var html = getAppHtmlOutput()
     .setWidth(1150)
     .setHeight(820)
-    .setTitle('מרחב תרגול CBT | מערכת עצמאית');
+    .setTitle('מרחב תרגול CBT | מערכת אישית');
   SpreadsheetApp.getUi().showModalDialog(html, 'מרחב תרגול CBT');
 }
 
 function openCbtSidebar() {
-  var html = HtmlService.createHtmlOutputFromFile('index')
+  initSheetsIfMissing();
+  var html = getAppHtmlOutput()
     .setTitle('מרחב תרגול CBT');
   SpreadsheetApp.getUi().showSidebar(html);
 }
@@ -1314,8 +1488,8 @@ function showWebAppUrlDialog() {
     ui.showModalDialog(html, 'קישור ה-Web App האישי שלך');
   } else {
     ui.alert(
-      'פריסה נדרשת לקבלת קישור',
-      'כדי לקבל קישור הפעלה לטלפון, יש לבצע פעם אחת Deploy -> New deployment -> לבחור Web app בעורך ה-Apps Script.',
+      'פריסה חד-פעמית לקבלת קישור לטלפון',
+      'המערכת כבר עובדת במלואה מתוך תפריט הגיליון! אם תרצה גם קישור ישיר לטלפון, לחץ בעורך ה-Apps Script על Deploy -> New deployment -> בחר Web app.',
       ui.ButtonSet.OK
     );
   }
@@ -1323,27 +1497,19 @@ function showWebAppUrlDialog() {
 
 function initSheetsIfMissing() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var headers4 = [
-    "חותמת זמן שמירה", "תאריך מהטופס", "המצב / הטריגר", "רגשות ותחושות",
-    "התחזית החרדתית", "אמצעי זהירות", "ראיות בעד", "ראיות נגד",
-    "התרחיש הכי גרוע", "התרחיש הסביר ביותר", "מחשבה חלופית",
-    "פעולה מתוכננת", "ויתור על אמצעי זהירות", "תוצאות בפועל", "קרדיט עצמי"
-  ];
-  var headers3 = [
-    "חותמת זמן שמירה", "תאריך מהטופס", "תיאור המצב", "כלל שהופר", 
-    "שורה תחתונה", "ניבויים שליליים", "התנהגות הגנתית", 
-    "אישור וביקורת", "דיכאון/מצב רוח", "רפלקציה ותובנות"
-  ];
-  if (!ss.getSheetByName("פרק_4_תחזיות")) writeObjectsToSheet(ss, "פרק_4_תחזיות", headers4, [], "#d0e0e3");
-  if (!ss.getSheetByName("פרק_3_טריגרים")) writeObjectsToSheet(ss, "פרק_3_טריגרים", headers3, [], "#c5cae9");
+  var headers4 = ${JSON.stringify(HEADERS_CH4)};
+  var headers3 = ${JSON.stringify(HEADERS_CH3)};
+  if (!ss.getSheetByName("פרק_4_תחזיות")) writeObjectsToSheet(ss, "פרק_4_תחזיות", headers4, [], "#dbeafe");
+  if (!ss.getSheetByName("פרק_3_טריגרים")) writeObjectsToSheet(ss, "פרק_3_טריגרים", headers3, [], "#e0e7ff");
 }
 
 function doGet(e) {
+  initSheetsIfMissing();
   if (e && e.parameter && e.parameter.action === 'loadAll') {
     return ContentService.createTextOutput(JSON.stringify(getAllRecordsForClient()))
       .setMimeType(ContentService.MimeType.JSON);
   }
-  return HtmlService.createHtmlOutputFromFile('index')
+  return getAppHtmlOutput()
     .setTitle('מרחב תרגול CBT')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
@@ -1373,19 +1539,10 @@ function getAllRecordsForClient() {
 
 function syncAllRecordsFromClient(db) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var headers4 = [
-    "חותמת זמן שמירה", "תאריך מהטופס", "המצב / הטריגר", "רגשות ותחושות",
-    "התחזית החרדתית", "אמצעי זהירות", "ראיות בעד", "ראיות נגד",
-    "התרחיש הכי גרוע", "התרחיש הסביר ביותר", "מחשבה חלופית",
-    "פעולה מתוכננת", "ויתור על אמצעי זהירות", "תוצאות בפועל", "קרדיט עצמי"
-  ];
-  var headers3 = [
-    "חותמת זמן שמירה", "תאריך מהטופס", "תיאור המצב", "כלל שהופר", 
-    "שורה תחתונה", "ניבויים שליליים", "התנהגות הגנתית", 
-    "אישור וביקורת", "דיכאון/מצב רוח", "רפלקציה ותובנות"
-  ];
-  writeObjectsToSheet(ss, "פרק_4_תחזיות", headers4, db.chapter4 || [], "#d0e0e3");
-  writeObjectsToSheet(ss, "פרק_3_טריגרים", headers3, db.chapter3 || [], "#c5cae9");
+  var headers4 = ${JSON.stringify(HEADERS_CH4)};
+  var headers3 = ${JSON.stringify(HEADERS_CH3)};
+  writeObjectsToSheet(ss, "פרק_4_תחזיות", headers4, db.chapter4 || [], "#dbeafe");
+  writeObjectsToSheet(ss, "פרק_3_טריגרים", headers3, db.chapter3 || [], "#e0e7ff");
   return { result: "success" };
 }
 
@@ -1396,10 +1553,13 @@ function readSheetToObjects(sheet) {
   var results = [];
   for (var i = 1; i < data.length; i++) {
     var obj = {};
+    var hasContent = false;
     for (var j = 0; j < headers.length; j++) {
-      obj[headers[j]] = data[i][j] || "";
+      var val = data[i][j] || "";
+      if (val.trim() !== "") hasContent = true;
+      obj[headers[j]] = val;
     }
-    results.push(obj);
+    if (hasContent) results.push(obj);
   }
   return results;
 }
@@ -1412,17 +1572,28 @@ function writeObjectsToSheet(ss, sheetName, headers, records, headerColor) {
   }
   sheet.clearContents();
   sheet.appendRow(headers);
-  sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold").setBackground(headerColor);
+  var headerRange = sheet.getRange(1, 1, 1, headers.length);
+  headerRange.setFontWeight("bold").setBackground(headerColor).setHorizontalAlignment("right");
   sheet.setFrozenRows(1);
+  for (var c = 1; c <= headers.length; c++) {
+    sheet.setColumnWidth(c, 180);
+  }
   if (records.length > 0) {
     var rows = records.map(function(rec) {
       return headers.map(function(h) { return rec[h] || ""; });
     });
-    sheet.getRange(2, 1, rows.length, headers.length).setValues(rows);
+    var dataRange = sheet.getRange(2, 1, rows.length, headers.length);
+    dataRange.setValues(rows).setWrap(true).setVerticalAlignment("top");
   }
-}`;
+}
+
+var EMBEDDED_CBT_HTML = ${JSON.stringify(fullHtmlSnapshot)};
+`;
             navigator.clipboard.writeText(gasCode).then(() => {
-                alert('✓ קוד השרת (Code.gs) הועתק ללוח! הדבק אותו בעורך ה-Apps Script של גיליון ה-Google Sheets שלך.');
+                window.open('https://sheets.new', '_blank');
+                alert('✓ המערכת הועתקה ללוח וגיליון Google Sheets חדש נפתח!\n\nכל מה שנשאר לעשות בגיליון שנפתח:\n1. לחץ למעלה על "הרחבות" (Extensions) -> "Apps Script"\n2. הדבק (Ctrl+V) ושמור (Ctrl+S)\n3. רענן את הגיליון ותהנה מהמערכת המלאה!');
+            }).catch(() => {
+                alert('לא הצלחנו להעתיק אוטומטית. אנא ודא שהדפדפן מאפשר העתקה ללוח.');
             });
         }
     </script>
