@@ -79,7 +79,6 @@
   .quote { background:#eff6ff; border-right:5px solid var(--blue); border-radius:12px; padding:14px 16px; font-size:21px; font-weight:700; color:var(--blue-d); text-align:center; margin:10px 0; }
   .exs { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; font-size:14px; } .ex { border-radius:12px; padding:10px; } .ex b { display:block; margin-bottom:4px; } .ex div { margin-bottom:4px; }
   .ex.ok { background:#f0fdf4; border:1px solid #bbf7d0; color:#166534; } .ex.no { background:#fef2f2; border:1px solid #fecaca; color:#991b1b; } .ex.no div { text-decoration:line-through; text-decoration-color:#fca5a5; }
-  .timer { display:flex; align-items:center; gap:14px; background:#f8fafc; border:1px solid var(--line); border-radius:14px; padding:10px 14px; margin-top:14px; } .ttxt { font-size:22px; font-weight:700; color:var(--blue-d); }
   .mnav { display:grid; grid-template-columns:1fr 2fr; gap:10px; } .mnav .btn { margin-top:16px; }
   small.mut { color:var(--mut); display:block; margin-top:6px; font-size:14px; }
 </style>
@@ -402,15 +401,14 @@ const ART = {
   prep: () => svgWrap(`${mirror()}
     <circle cx="45" cy="112" r="16" fill="#bfdbfe" opacity=".7"><animate attributeName="r" values="12;28;12" dur="6s" repeatCount="indefinite"/><animate attributeName="opacity" values=".8;.25;.8" dur="6s" repeatCount="indefinite"/></circle>
     <text x="45" y="160" text-anchor="middle" font-size="13" fill="#1d4ed8">נשימה</text>
-    <circle cx="255" cy="80" r="24" fill="#fff" stroke="#93c5fd" stroke-width="3"/>
-    <path d="M255 80 L255 64 M255 80 L266 86" stroke="#1d4ed8" stroke-width="3" stroke-linecap="round"/>
-    <text x="255" y="130" text-anchor="middle" font-size="13" fill="#1d4ed8" direction="rtl">5 עד 7 דק׳</text>`),
+    <text x="242" y="96" font-size="34">🌿</text>
+    <text x="255" y="130" text-anchor="middle" font-size="13" fill="#1d4ed8" direction="rtl">בקצב שלך</text>`),
   wide: () => svgWrap(`${mirror()}
     <rect x="106" y="40" width="88" height="170" rx="22" fill="none" stroke="#2563eb" stroke-width="3" stroke-dasharray="8 6"><animate attributeName="stroke-dashoffset" values="0;-28" dur="1.2s" repeatCount="indefinite"/></rect>
     ${pill(250, 60, 'הכל יחד')}<path d="M38 110 Q60 92 82 110 Q60 128 38 110Z" fill="#fff" stroke="#2563eb" stroke-width="2.5"/><circle cx="60" cy="110" r="7" fill="#2563eb"/>`),
   facePleasant: () => svgWrap(`${bigFace()}
     <rect x="106" y="98" width="88" height="30" rx="15" fill="none" stroke="${GOLD}" stroke-width="3.5"><animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/></rect>
-    <text x="222" y="92" font-size="20">✨</text><text x="62" y="92" font-size="16">✨</text>${pill(250, 190, 'דקה אחת')}`, '#fffbeb'),
+    <text x="222" y="92" font-size="20">✨</text><text x="62" y="92" font-size="16">✨</text>${pill(250, 190, 'בנחת')}`, '#fffbeb'),
   faceScan: () => svgWrap(`${bigFace()}
     <g><rect x="78" y="0" width="144" height="8" fill="#3b82f6" opacity=".18"/><line x1="78" y1="4" x2="222" y2="4" stroke="#2563eb" stroke-width="2.5"/>
     <animateTransform attributeName="transform" type="translate" values="0,50;0,182;0,50" dur="7s" repeatCount="indefinite"/></g>
@@ -418,7 +416,7 @@ const ART = {
   torsoPleasant: () => svgWrap(`${mirror(figure(true))}
     <ellipse cx="150" cy="150" rx="50" ry="44" fill="url(#glow)"><animate attributeName="opacity" values="1;.4;1" dur="2.4s" repeatCount="indefinite"/></ellipse>
     <ellipse cx="150" cy="150" rx="50" ry="44" fill="none" stroke="${GOLD}" stroke-width="3" stroke-dasharray="7 6"/>
-    <text x="214" y="120" font-size="18">✨</text>${pill(255, 190, 'עד דקה')}`, '#fffbeb'),
+    <text x="214" y="120" font-size="18">✨</text>${pill(255, 190, 'בנחת')}`, '#fffbeb'),
   torsoScan: () => svgWrap(`${mirror(figure(true))}
     <g clip-path="url(#clipGlass)"><g><rect x="100" y="0" width="100" height="8" fill="#3b82f6" opacity=".2"/><line x1="100" y1="4" x2="200" y2="4" stroke="#2563eb" stroke-width="2.5"/>
     <animateTransform attributeName="transform" type="translate" values="0,98;0,206;0,98" dur="6s" repeatCount="indefinite"/></g></g>
@@ -430,33 +428,33 @@ const ART = {
     <text x="40" y="150" font-size="18">💛</text>`, '#fdf4ec'),
   done: () => svgWrap(`<ellipse cx="150" cy="110" rx="110" ry="90" fill="url(#glow)"/>
     <circle cx="150" cy="100" r="48" fill="#16a34a"/><path d="M127 100 L144 117 L175 84" stroke="#fff" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-    <text x="150" y="182" text-anchor="middle" font-size="15" fill="#166534" direction="rtl">3 עד 4 פעמים בשבוע</text>`, '#f0fdf4')
+    <text x="150" y="182" text-anchor="middle" font-size="15" fill="#166534" direction="rtl">בלי לחץ, בקצב שלך 💚</text>`, '#f0fdf4')
 };
 
 const MIRROR_STEPS = [
-  { art: 'prep', title: 'הכנה', sec: 0,
-    items: ['עמוד/י מול מראה גדולה, שרואים בה לפחות את פלג הגוף העליון (עדיף את כל הגוף).', 'מקום שקט, בלי הפרעות, ל־5–7 דקות.', 'נשימה עמוקה אחת או שתיים — ולהירגע.'],
+  { art: 'prep', title: 'הכנה',
+    items: ['עמוד/י מול מראה גדולה, שרואים בה לפחות את פלג הגוף העליון (עדיף את כל הגוף).', 'מקום שקט, בלי הפרעות, לכמה דקות.', 'נשימה עמוקה אחת או שתיים — ולהירגע.'],
     tip: 'הרעיון: להסתכל כמו שמסתכלים על נוף — רק לראות. בלי "יפה/מכוער", בלי "טוב/רע".' },
-  { art: 'wide', title: 'שלב 1 · המבט הרחב', sec: 30,
+  { art: 'wide', title: 'שלב 1 · המבט הרחב',
     items: ['מסתכלים על כל הדמות במראה כיחידה אחת שלמה.', 'לא מתמקדים בשום פרט ולא מנתחים כלום.', 'פשוט קולטים: הנה אני, עומד/ת בחדר.'] },
-  { art: 'facePleasant', title: 'שלב 2 · הפנים — מתחילים מהנעים', sec: 60,
-    items: ['מעבירים את המבט לראש, לפנים ולשיער.', 'בוחרים את החלק שהכי נעים או קל להסתכל עליו — למשל צבע העיניים או השיער.', 'נשארים עליו דקה שלמה.'],
-    tip: 'דקה על אותו מקום יכולה להרגיש מוזרה. זה בסדר — זה חלק מהתרגול.' },
-  { art: 'faceScan', title: 'שלב 2 · סריקה איטית של הפנים', sec: 90,
+  { art: 'facePleasant', title: 'שלב 2 · הפנים — מתחילים מהנעים',
+    items: ['מעבירים את המבט לראש, לפנים ולשיער.', 'בוחרים את החלק שהכי נעים או קל להסתכל עליו — למשל צבע העיניים או השיער.', 'נשארים עליו קצת — בלי למהר ובלי לספור.'],
+    tip: 'להישאר על אותו מקום יכול להרגיש מוזר. זה בסדר — זה חלק מהתרגול.' },
+  { art: 'faceScan', title: 'שלב 2 · סריקה איטית של הפנים',
     items: ['עוברים לאט על שאר החלקים: עיניים, אף, פה, לחיים, קו לסת, שיער.', 'מתארים לעצמך בראש רק עובדות: צורה, צבע, מרקם, סימטריה.', 'עלתה מחשבה ביקורתית? שמים לב אליה — ומחזירים את המבט למה שהעין רואה.'],
     ex: [['העיניים חומות, בצורת שקד', 'העיניים שלי קטנות מדי'], ['השיער כהה ומתולתל בקצוות', 'השיער שלי נראה נורא']] },
-  { art: 'torsoPleasant', title: 'שלב 3 · פלג הגוף העליון — מתחילים מהנוח', sec: 60,
-    items: ['מורידים את המבט: צוואר, כתפיים, חזה, בטן, זרועות.', 'מתחילים באזור שהכי נוח או נעים להתבונן בו.', 'נשארים בו עד דקה.'] },
-  { art: 'torsoScan', title: 'שלב 3 · סריקה עניינית', sec: 60,
+  { art: 'torsoPleasant', title: 'שלב 3 · פלג הגוף העליון — מתחילים מהנוח',
+    items: ['מורידים את המבט: צוואר, כתפיים, חזה, בטן, זרועות.', 'מתחילים באזור שהכי נוח או נעים להתבונן בו.', 'נשארים בו כמה רגעים, בנחת.'] },
+  { art: 'torsoScan', title: 'שלב 3 · סריקה עניינית',
     items: ['סורקים לאט את שאר פלג הגוף העליון — בשקט ובעובדות.', 'שוב: רק מה שהעין רואה. מחשבה שיפוטית? שמים לב, וחוזרים לראות.'],
     ex: [['הכתפיים ישרות, החולצה כחולה', 'הבטן שלי מכוערת'], ['על הזרוע יש נקודת חן קטנה', 'הזרועות שלי שמנות']] },
-  { art: 'accept', title: 'שלב 4 · מה שיש זה מה שיש', sec: 30,
+  { art: 'accept', title: 'שלב 4 · מה שיש זה מה שיש',
     items: ['מרחיבים שוב את המבט: כל הגוף והפנים, וגם החדר שמסביב.', 'משחררים את הצורך לשנות, לתקן או לשפר משהו — ברגע הזה.', 'אומרים לעצמך, בלב או בקול:'],
-    quote: 'ככה אני נראה/ית כרגע.<br>מה שיש — זה מה שיש.', after: 'נשארים בתחושה הזו עוד חצי דקה, ומסיימים.' },
-  { art: 'done', title: 'כל הכבוד! 🌱', sec: 0, done: true,
-    items: ['רוב האנשים מסתכלים במראה כדי <b>לתקן</b> — לסדר, לבדוק פגמים. כאן המוח מתאמן להסתכל כדי <b>לראות</b>.', 'כדי שזה ישפיע באמת: 3–4 פעמים בשבוע, במשך 2–3 שבועות.', 'בהתחלה זה עלול להרגיש מוזר או לא נוח — וזה לגמרי חלק מהתהליך.'] }
+    quote: 'ככה אני נראה/ית כרגע.<br>מה שיש — זה מה שיש.', after: 'נשארים בתחושה הזו עוד רגע, ומסיימים כשמרגיש נכון.' },
+  { art: 'done', title: 'כל הכבוד! 🌱', done: true,
+    items: ['רוב האנשים מסתכלים במראה כדי <b>לתקן</b> — לסדר, לבדוק פגמים. כאן המוח מתאמן להסתכל כדי <b>לראות</b>.', 'מה שעוזר הוא לחזור על זה מדי פעם — בערך 3–4 פעמים בשבוע, כמה שבועות. גם פחות זה בסדר.', 'בהתחלה זה עלול להרגיש מוזר או לא נוח — וזה לגמרי חלק מהתהליך.'] }
 ];
-let mStep = 0, mTimer = null, mLeft = 0;
+let mStep = 0;
 function mirrorCount() {
   const list = read(META, {}).mirror || [], weekAgo = Date.now() - 7 * 864e5;
   return list.filter(t => t > weekAgo).length;
@@ -465,36 +463,21 @@ function openMirror() {
   go('new'); $('picker').classList.add('hide'); $('formWrap').classList.add('hide'); $('mirrorWrap').classList.remove('hide');
   mStep = 0; renderMirror();
 }
-function closeMirror() { stopTimer(); $('mirrorWrap').classList.add('hide'); $('picker').classList.remove('hide'); window.scrollTo(0, 0); }
-function mirrorGo(d) { stopTimer(); mStep = Math.max(0, Math.min(MIRROR_STEPS.length - 1, mStep + d)); renderMirror(); }
+function closeMirror() { $('mirrorWrap').classList.add('hide'); $('picker').classList.remove('hide'); window.scrollTo(0, 0); }
+function mirrorGo(d) { mStep = Math.max(0, Math.min(MIRROR_STEPS.length - 1, mStep + d)); renderMirror(); }
 function renderMirror() {
   const s = MIRROR_STEPS[mStep], n = MIRROR_STEPS.length;
   let h = `<div class="dots">${MIRROR_STEPS.map((_, i) => `<span class="${i === mStep ? 'on' : i < mStep ? 'past' : ''}"></span>`).join('')}</div>`;
   h += ART[s.art]() + `<h2 style="margin-top:12px">${s.title}</h2>`;
-  if (mStep === 0) { const c = mirrorCount(); h += `<p class="sub">${c ? `השבוע תרגלת ${c} ${c === 1 ? 'פעם' : 'פעמים'} 👏 (המלצה: 3–4 בשבוע)` : 'תרגיל מודרך, בלי לכתוב כלום. כ־5–7 דקות.'}</p>`; }
+  if (mStep === 0) { const c = mirrorCount(); h += `<p class="sub">${c ? `השבוע תרגלת ${c} ${c === 1 ? 'פעם' : 'פעמים'} 👏` : 'תרגיל מודרך, בלי לכתוב כלום. בקצב שלך — אין שעון ואין מבחן.'}</p>`; }
   h += `<ul class="msteps">${s.items.map(t => `<li>${t}</li>`).join('')}</ul>`;
   if (s.quote) h += `<div class="quote">״${s.quote}״</div>`;
   if (s.after) h += `<p style="margin:6px 0 0">${s.after}</p>`;
   if (s.ex) h += `<div class="exs"><div class="ex ok"><b>✓ ככה (עובדות)</b>${s.ex.map(e => `<div>"${e[0]}"</div>`).join('')}</div><div class="ex no"><b>✗ לא ככה (שיפוט)</b>${s.ex.map(e => `<div>"${e[1]}"</div>`).join('')}</div></div>`;
   if (s.tip) h += `<div class="banner warn" style="margin:12px 0 0">💡 ${s.tip}</div>`;
-  if (s.sec) h += `<div class="timer"><svg viewBox="0 0 64 64" width="64" height="64"><circle cx="32" cy="32" r="28" fill="none" stroke="#e5e7eb" stroke-width="6"/><circle id="tRing" cx="32" cy="32" r="28" fill="none" stroke="#2563eb" stroke-width="6" stroke-linecap="round" stroke-dasharray="175.9" stroke-dashoffset="0" transform="rotate(-90 32 32)"/></svg>
-    <div><div id="tTxt" class="ttxt">${fmt(s.sec)}</div><button class="btn ghost" id="tBtn" style="margin:4px 0 0;padding:9px 14px;width:auto" onclick="toggleTimer()">▶️ הפעל טיימר</button></div></div>`;
   if (s.done) h += `<button class="btn green" onclick="finishMirror()">✓ סיימתי — לסמן שתרגלתי</button>`;
   else h += `<div class="mnav"><button class="btn ghost" onclick="mirrorGo(-1)" ${mStep ? '' : 'style="visibility:hidden"'}>→ הקודם</button><button class="btn" onclick="mirrorGo(1)">${mStep === n - 2 ? 'סיום' : mStep === 0 ? 'מתחילים ←' : 'הבא ←'}</button></div>`;
-  $('mirrorCard').innerHTML = h; mLeft = s.sec; window.scrollTo(0, 0);
-}
-function fmt(t) { return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`; }
-function stopTimer() { clearInterval(mTimer); mTimer = null; }
-function toggleTimer() {
-  const s = MIRROR_STEPS[mStep];
-  if (mTimer) { stopTimer(); $('tBtn').textContent = '▶️ המשך'; return; }
-  if (mLeft <= 0) mLeft = s.sec;
-  $('tBtn').textContent = '⏸️ השהה';
-  mTimer = setInterval(() => {
-    mLeft--; $('tTxt').textContent = fmt(Math.max(mLeft, 0));
-    $('tRing').setAttribute('stroke-dashoffset', (175.9 * (1 - mLeft / s.sec)).toFixed(1));
-    if (mLeft <= 0) { stopTimer(); $('tTxt').textContent = '✓ הזמן עבר'; $('tBtn').textContent = '↺ שוב'; try { navigator.vibrate && navigator.vibrate(250); } catch (e) {} }
-  }, 1000);
+  $('mirrorCard').innerHTML = h; window.scrollTo(0, 0);
 }
 function finishMirror() {
   const m = read(META, {}); m.mirror = (m.mirror || []).concat(Date.now()).slice(-100); write(META, m);
