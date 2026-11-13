@@ -72,6 +72,14 @@
   .fld { margin-bottom:12px; } .fld b { display:block; color:var(--blue-d); font-size:14px; } .fld div { white-space:pre-wrap; }
   .steps { padding-right:20px; margin:8px 0; } .steps li { margin-bottom:6px; }
   footer { text-align:center; color:var(--mut); font-size:13px; padding:20px 14px 0; }
+  .mirror-pick { background:linear-gradient(135deg,#fffbeb,#fff); border-color:#fde68a; }
+  svg.art { width:100%; height:auto; max-height:260px; display:block; border-radius:16px; }
+  .dots { display:flex; gap:6px; justify-content:center; margin-bottom:12px; } .dots span { width:9px; height:9px; border-radius:99px; background:#e5e7eb; } .dots span.past { background:#93c5fd; } .dots span.on { background:var(--blue); width:24px; }
+  .msteps { padding-right:20px; margin:10px 0; } .msteps li { margin-bottom:8px; }
+  .quote { background:#eff6ff; border-right:5px solid var(--blue); border-radius:12px; padding:14px 16px; font-size:21px; font-weight:700; color:var(--blue-d); text-align:center; margin:10px 0; }
+  .exs { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; font-size:14px; } .ex { border-radius:12px; padding:10px; } .ex b { display:block; margin-bottom:4px; } .ex div { margin-bottom:4px; }
+  .ex.ok { background:#f0fdf4; border:1px solid #bbf7d0; color:#166534; } .ex.no { background:#fef2f2; border:1px solid #fecaca; color:#991b1b; } .ex.no div { text-decoration:line-through; text-decoration-color:#fca5a5; }
+  .mnav { display:grid; grid-template-columns:1fr 2fr; gap:10px; } .mnav .btn { margin-top:16px; }
   small.mut { color:var(--mut); display:block; margin-top:6px; font-size:14px; }
 </style>
 </head>
@@ -99,8 +107,9 @@
   <section id="v-new">
     <div id="picker">
       <p class="sub" style="font-size:17px;margin-bottom:14px">מה תרצה/י לתרגל עכשיו? כל מה שנכתב נשמר אוטומטית — אצלך במכשיר בלבד.</p>
-      <button class="pick" onclick="openForm('chapter4')"><b>😟 יש לי חשש / חרדה ממשהו</b><span>בדיקת התחזית ותכנון ניסוי קטן (פרק 4)</span></button>
       <button class="pick" onclick="openForm('chapter3')"><b>🔄 קרה משהו והרגשתי רע</b><span>להבין את מעגל הקסמים והטריגר (פרק 3)</span></button>
+      <button class="pick" onclick="openForm('chapter4')"><b>😟 יש לי חשש / חרדה ממשהו</b><span>בדיקת התחזית ותכנון ניסוי קטן (פרק 4)</span></button>
+      <button class="pick mirror-pick" onclick="openMirror()"><b>🪞 תרגיל המראה</b><span>תרגיל מודרך עם איורים — להסתכל על עצמי בלי שיפוטיות. בלי לכתוב כלום.</span></button>
     </div>
 
     <div id="formWrap" class="hide">
@@ -112,6 +121,11 @@
         <form id="form" onsubmit="save(event)"></form>
         <button class="btn" type="submit" form="form" id="saveBtn">💾 שמור</button>
       </div>
+    </div>
+
+    <div id="mirrorWrap" class="hide">
+      <button class="back" onclick="closeMirror()">← חזרה</button>
+      <div class="card" id="mirrorCard"></div>
     </div>
   </section>
 
@@ -337,6 +351,139 @@ function deleteFromModal() {
   closeModal(); renderDiary(); updateCount(); toast('הרשומה נמחקה');
 }
 
+/* ---------- 🪞 תרגיל המראה (מודרך, בלי מילוי) ---------- */
+/* ⛔ שום מידע לא נאסף ולא נשלח, המפתח לא רואה כלום. — האיורים מצוירים כאן בקוד (SVG), בלי תמונות מבחוץ. נשמר רק מונה תרגולים מקומי. */
+const SKIN = '#f2c7a0', HAIR = '#5b4636', SHIRT = '#7cb3f7', SHIRT_D = '#3b82f6', GOLD = '#f59e0b';
+const MIRROR_GLASS = 'M100 214 L100 68 A50 50 0 0 1 200 68 L200 214Z';
+function svgWrap(inner, bg = '#f8fafc') {
+  return `<svg viewBox="0 0 300 220" class="art" role="img" aria-hidden="true">
+  <defs>
+    <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e0f2fe"/><stop offset="1" stop-color="#f8fafc"/></linearGradient>
+    <radialGradient id="glow"><stop offset="0" stop-color="#fde68a" stop-opacity=".9"/><stop offset="1" stop-color="#fde68a" stop-opacity="0"/></radialGradient>
+    <clipPath id="clipGlass"><path d="${MIRROR_GLASS}"/></clipPath>
+  </defs>
+  <rect width="300" height="220" rx="18" fill="${bg}"/>${inner}</svg>`;
+}
+function figure(dimHead = false) {
+  const h = dimHead ? ' opacity=".35"' : '';
+  return `<g clip-path="url(#clipGlass)">
+    <path d="M112 214 L112 142 Q112 108 150 102 Q188 108 188 142 L188 214Z" fill="${SHIRT}"/>
+    <path d="M126 140 L126 214 M174 140 L174 214" stroke="${SHIRT_D}" stroke-width="2" opacity=".5"/>
+    <g${h}><rect x="143" y="88" width="14" height="16" fill="${SKIN}"/>
+    <path d="M141 102 L150 114 L159 102Z" fill="${SKIN}"/>
+    <circle cx="150" cy="72" r="21" fill="${SKIN}"/>
+    <path d="M129 72 Q126 46 150 44 Q174 46 171 72 Q165 56 150 56 Q135 56 129 72Z" fill="${HAIR}"/>
+    <circle cx="143" cy="73" r="2.2" fill="#374151"/><circle cx="157" cy="73" r="2.2" fill="#374151"/>
+    <path d="M144 82 Q150 86 156 82" stroke="#9f1239" stroke-width="2" fill="none" stroke-linecap="round"/></g>
+  </g>`;
+}
+function mirror(inner = figure()) {
+  return `<path d="M90 216 L90 66 A60 60 0 0 1 210 66 L210 216Z" fill="#c08a52"/>
+  <path d="${MIRROR_GLASS}" fill="url(#glass)"/>${inner}
+  <path d="M112 200 L170 40 M126 205 L184 60" stroke="#fff" stroke-width="5" opacity=".45" clip-path="url(#clipGlass)"/>`;
+}
+function bigFace() {
+  return `<ellipse cx="150" cy="104" rx="64" ry="60" fill="${HAIR}"/>
+  <ellipse cx="97" cy="122" rx="9" ry="14" fill="${SKIN}"/><ellipse cx="203" cy="122" rx="9" ry="14" fill="${SKIN}"/>
+  <ellipse cx="150" cy="122" rx="54" ry="64" fill="${SKIN}"/>
+  <path d="M96 112 Q92 54 150 50 Q208 54 204 112 Q190 76 150 74 Q110 76 96 112Z" fill="${HAIR}"/>
+  <path d="M114 100 Q128 92 142 99 M158 99 Q172 92 186 100" stroke="${HAIR}" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <ellipse cx="128" cy="113" rx="13" ry="8" fill="#fff"/><ellipse cx="172" cy="113" rx="13" ry="8" fill="#fff"/>
+  <circle cx="128" cy="113" r="6" fill="#8b5a2b"/><circle cx="172" cy="113" r="6" fill="#8b5a2b"/>
+  <circle cx="128" cy="113" r="3" fill="#111"/><circle cx="172" cy="113" r="3" fill="#111"/>
+  <circle cx="130" cy="111" r="1.5" fill="#fff"/><circle cx="174" cy="111" r="1.5" fill="#fff"/>
+  <path d="M150 116 Q145 136 150 140 Q155 141 158 138" stroke="#c2410c" stroke-width="2" fill="none" opacity=".6" stroke-linecap="round"/>
+  <circle cx="116" cy="140" r="9" fill="#fb7185" opacity=".22"/><circle cx="184" cy="140" r="9" fill="#fb7185" opacity=".22"/>
+  <path d="M134 156 Q150 166 166 156" stroke="#be123c" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+}
+function pill(x, y, t) { return `<g><rect x="${x - 26}" y="${y - 12}" width="52" height="24" rx="12" fill="#fff" stroke="#bfdbfe"/><text x="${x}" y="${y + 5}" text-anchor="middle" font-size="13" fill="#1d4ed8" direction="rtl">${t}</text></g>`; }
+const ART = {
+  prep: () => svgWrap(`${mirror()}
+    <circle cx="45" cy="112" r="16" fill="#bfdbfe" opacity=".7"><animate attributeName="r" values="12;28;12" dur="6s" repeatCount="indefinite"/><animate attributeName="opacity" values=".8;.25;.8" dur="6s" repeatCount="indefinite"/></circle>
+    <text x="45" y="160" text-anchor="middle" font-size="13" fill="#1d4ed8">נשימה</text>
+    <text x="242" y="96" font-size="34">🌿</text>
+    <text x="255" y="130" text-anchor="middle" font-size="13" fill="#1d4ed8" direction="rtl">בקצב שלך</text>`),
+  wide: () => svgWrap(`${mirror()}
+    <rect x="106" y="40" width="88" height="170" rx="22" fill="none" stroke="#2563eb" stroke-width="3" stroke-dasharray="8 6"><animate attributeName="stroke-dashoffset" values="0;-28" dur="1.2s" repeatCount="indefinite"/></rect>
+    ${pill(250, 60, 'הכל יחד')}<path d="M38 110 Q60 92 82 110 Q60 128 38 110Z" fill="#fff" stroke="#2563eb" stroke-width="2.5"/><circle cx="60" cy="110" r="7" fill="#2563eb"/>`),
+  facePleasant: () => svgWrap(`${bigFace()}
+    <rect x="106" y="98" width="88" height="30" rx="15" fill="none" stroke="${GOLD}" stroke-width="3.5"><animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/></rect>
+    <text x="222" y="92" font-size="20">✨</text><text x="62" y="92" font-size="16">✨</text>${pill(250, 190, 'בנחת')}`, '#fffbeb'),
+  faceScan: () => svgWrap(`${bigFace()}
+    <g><rect x="78" y="0" width="144" height="8" fill="#3b82f6" opacity=".18"/><line x1="78" y1="4" x2="222" y2="4" stroke="#2563eb" stroke-width="2.5"/>
+    <animateTransform attributeName="transform" type="translate" values="0,50;0,182;0,50" dur="7s" repeatCount="indefinite"/></g>
+    ${pill(258, 70, 'צורה')}${pill(258, 115, 'צבע')}${pill(258, 160, 'מרקם')}${pill(42, 115, 'סימטריה')}`),
+  torsoPleasant: () => svgWrap(`${mirror(figure(true))}
+    <ellipse cx="150" cy="150" rx="50" ry="44" fill="url(#glow)"><animate attributeName="opacity" values="1;.4;1" dur="2.4s" repeatCount="indefinite"/></ellipse>
+    <ellipse cx="150" cy="150" rx="50" ry="44" fill="none" stroke="${GOLD}" stroke-width="3" stroke-dasharray="7 6"/>
+    <text x="214" y="120" font-size="18">✨</text>${pill(255, 190, 'בנחת')}`, '#fffbeb'),
+  torsoScan: () => svgWrap(`${mirror(figure(true))}
+    <g clip-path="url(#clipGlass)"><g><rect x="100" y="0" width="100" height="8" fill="#3b82f6" opacity=".2"/><line x1="100" y1="4" x2="200" y2="4" stroke="#2563eb" stroke-width="2.5"/>
+    <animateTransform attributeName="transform" type="translate" values="0,98;0,206;0,98" dur="6s" repeatCount="indefinite"/></g></g>
+    ${pill(255, 110, 'צוואר')}${pill(255, 145, 'כתפיים')}${pill(45, 145, 'זרועות')}${pill(45, 180, 'בטן')}`),
+  accept: () => svgWrap(`<rect x="0" y="196" width="300" height="24" fill="#e7d3bd"/>
+    <rect x="18" y="34" width="56" height="66" rx="6" fill="#dbeafe" stroke="#fff" stroke-width="5"/><path d="M46 34 L46 100 M18 67 L74 67" stroke="#fff" stroke-width="4"/>
+    <path d="M250 196 L244 168 L276 168 L270 196Z" fill="#c2410c" opacity=".8"/><path d="M260 168 Q246 136 236 130 M260 168 Q262 132 270 120 M260 168 Q276 146 288 142" stroke="#16a34a" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <ellipse cx="150" cy="120" rx="95" ry="105" fill="url(#glow)" opacity=".6"/>${mirror()}
+    <text x="40" y="150" font-size="18">💛</text>`, '#fdf4ec'),
+  done: () => svgWrap(`<ellipse cx="150" cy="110" rx="110" ry="90" fill="url(#glow)"/>
+    <circle cx="150" cy="100" r="48" fill="#16a34a"/><path d="M127 100 L144 117 L175 84" stroke="#fff" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="150" y="182" text-anchor="middle" font-size="15" fill="#166534" direction="rtl">בלי לחץ, בקצב שלך 💚</text>`, '#f0fdf4')
+};
+
+const MIRROR_STEPS = [
+  { art: 'prep', title: 'הכנה',
+    items: ['עמוד/י מול מראה גדולה, שרואים בה לפחות את פלג הגוף העליון (עדיף את כל הגוף).', 'מקום שקט, בלי הפרעות, לכמה דקות.', 'נשימה עמוקה אחת או שתיים — ולהירגע.'],
+    tip: 'הרעיון: להסתכל כמו שמסתכלים על נוף — רק לראות. בלי "יפה/מכוער", בלי "טוב/רע".' },
+  { art: 'wide', title: 'שלב 1 · המבט הרחב',
+    items: ['מסתכלים על כל הדמות במראה כיחידה אחת שלמה.', 'לא מתמקדים בשום פרט ולא מנתחים כלום.', 'פשוט קולטים: הנה אני, עומד/ת בחדר.'] },
+  { art: 'facePleasant', title: 'שלב 2 · הפנים — מתחילים מהנעים',
+    items: ['מעבירים את המבט לראש, לפנים ולשיער.', 'בוחרים את החלק שהכי נעים או קל להסתכל עליו — למשל צבע העיניים או השיער.', 'נשארים עליו קצת — בלי למהר ובלי לספור.'],
+    tip: 'להישאר על אותו מקום יכול להרגיש מוזר. זה בסדר — זה חלק מהתרגול.' },
+  { art: 'faceScan', title: 'שלב 2 · סריקה איטית של הפנים',
+    items: ['עוברים לאט על שאר החלקים: עיניים, אף, פה, לחיים, קו לסת, שיער.', 'מתארים לעצמך בראש רק עובדות: צורה, צבע, מרקם, סימטריה.', 'עלתה מחשבה ביקורתית? שמים לב אליה — ומחזירים את המבט למה שהעין רואה.'],
+    ex: [['העיניים חומות, בצורת שקד', 'העיניים שלי קטנות מדי'], ['השיער כהה ומתולתל בקצוות', 'השיער שלי נראה נורא']] },
+  { art: 'torsoPleasant', title: 'שלב 3 · פלג הגוף העליון — מתחילים מהנוח',
+    items: ['מורידים את המבט: צוואר, כתפיים, חזה, בטן, זרועות.', 'מתחילים באזור שהכי נוח או נעים להתבונן בו.', 'נשארים בו כמה רגעים, בנחת.'] },
+  { art: 'torsoScan', title: 'שלב 3 · סריקה עניינית',
+    items: ['סורקים לאט את שאר פלג הגוף העליון — בשקט ובעובדות.', 'שוב: רק מה שהעין רואה. מחשבה שיפוטית? שמים לב, וחוזרים לראות.'],
+    ex: [['הכתפיים ישרות, החולצה כחולה', 'הבטן שלי מכוערת'], ['על הזרוע יש נקודת חן קטנה', 'הזרועות שלי שמנות']] },
+  { art: 'accept', title: 'שלב 4 · מה שיש זה מה שיש',
+    items: ['מרחיבים שוב את המבט: כל הגוף והפנים, וגם החדר שמסביב.', 'משחררים את הצורך לשנות, לתקן או לשפר משהו — ברגע הזה.', 'אומרים לעצמך, בלב או בקול:'],
+    quote: 'ככה אני נראה/ית כרגע.<br>מה שיש — זה מה שיש.', after: 'נשארים בתחושה הזו עוד רגע, ומסיימים כשמרגיש נכון.' },
+  { art: 'done', title: 'כל הכבוד! 🌱', done: true,
+    items: ['רוב האנשים מסתכלים במראה כדי <b>לתקן</b> — לסדר, לבדוק פגמים. כאן המוח מתאמן להסתכל כדי <b>לראות</b>.', 'מה שעוזר הוא לחזור על זה מדי פעם — בערך 3–4 פעמים בשבוע, כמה שבועות. גם פחות זה בסדר.', 'בהתחלה זה עלול להרגיש מוזר או לא נוח — וזה לגמרי חלק מהתהליך.'] }
+];
+let mStep = 0;
+function mirrorCount() {
+  const list = read(META, {}).mirror || [], weekAgo = Date.now() - 7 * 864e5;
+  return list.filter(t => t > weekAgo).length;
+}
+function openMirror() {
+  go('new'); $('picker').classList.add('hide'); $('formWrap').classList.add('hide'); $('mirrorWrap').classList.remove('hide');
+  mStep = 0; renderMirror();
+}
+function closeMirror() { $('mirrorWrap').classList.add('hide'); $('picker').classList.remove('hide'); window.scrollTo(0, 0); }
+function mirrorGo(d) { mStep = Math.max(0, Math.min(MIRROR_STEPS.length - 1, mStep + d)); renderMirror(); }
+function renderMirror() {
+  const s = MIRROR_STEPS[mStep], n = MIRROR_STEPS.length;
+  let h = `<div class="dots">${MIRROR_STEPS.map((_, i) => `<span class="${i === mStep ? 'on' : i < mStep ? 'past' : ''}"></span>`).join('')}</div>`;
+  h += ART[s.art]() + `<h2 style="margin-top:12px">${s.title}</h2>`;
+  if (mStep === 0) { const c = mirrorCount(); h += `<p class="sub">${c ? `השבוע תרגלת ${c} ${c === 1 ? 'פעם' : 'פעמים'} 👏` : 'תרגיל מודרך, בלי לכתוב כלום. בקצב שלך — אין שעון ואין מבחן.'}</p>`; }
+  h += `<ul class="msteps">${s.items.map(t => `<li>${t}</li>`).join('')}</ul>`;
+  if (s.quote) h += `<div class="quote">״${s.quote}״</div>`;
+  if (s.after) h += `<p style="margin:6px 0 0">${s.after}</p>`;
+  if (s.ex) h += `<div class="exs"><div class="ex ok"><b>✓ ככה (עובדות)</b>${s.ex.map(e => `<div>"${e[0]}"</div>`).join('')}</div><div class="ex no"><b>✗ לא ככה (שיפוט)</b>${s.ex.map(e => `<div>"${e[1]}"</div>`).join('')}</div></div>`;
+  if (s.tip) h += `<div class="banner warn" style="margin:12px 0 0">💡 ${s.tip}</div>`;
+  if (s.done) h += `<button class="btn green" onclick="finishMirror()">✓ סיימתי — לסמן שתרגלתי</button>`;
+  else h += `<div class="mnav"><button class="btn ghost" onclick="mirrorGo(-1)" ${mStep ? '' : 'style="visibility:hidden"'}>→ הקודם</button><button class="btn" onclick="mirrorGo(1)">${mStep === n - 2 ? 'סיום' : mStep === 0 ? 'מתחילים ←' : 'הבא ←'}</button></div>`;
+  $('mirrorCard').innerHTML = h; window.scrollTo(0, 0);
+}
+function finishMirror() {
+  const m = read(META, {}); m.mirror = (m.mirror || []).concat(Date.now()).slice(-100); write(META, m);
+  closeMirror(); toast(`✓ כל הכבוד! השבוע תרגלת ${mirrorCount()} ${mirrorCount() === 1 ? 'פעם' : 'פעמים'}`);
+}
+
 /* ---------- גיבוי ושחזור ---------- */
 /* ⛔ שום מידע לא נאסף ולא נשלח, המפתח לא רואה כלום. — הגיבוי נוצר במכשיר ונמסר רק למשתמש (הורדה / תפריט שיתוף). אסור להעלות אותו לשום מקום. */
 function renderBackupInfo() {
@@ -389,7 +536,7 @@ function wipe() {
   if (!total(getDb())) { toast('אין נתונים למחוק'); return; }
   if (!confirm('למחוק את כל היומן ממכשיר זה? מומלץ קודם לשמור גיבוי.')) return;
   if (!confirm('בטוח/ה? הפעולה אי אפשרית לביטול.')) return;
-  try { localStorage.removeItem(KEY); localStorage.removeItem(DRAFT); } catch (e) {}
+  try { localStorage.removeItem(KEY); localStorage.removeItem(DRAFT); const m = read(META, {}); delete m.mirror; write(META, m); } catch (e) {}
   updateCount(); updateNudge(); renderBackupInfo(); toast('כל הנתונים נמחקו');
 }
 
