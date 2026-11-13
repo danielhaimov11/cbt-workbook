@@ -51,8 +51,12 @@
   .empty { text-align:center; color:var(--mut); padding:30px 10px; }
   #toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#166534; color:#fff; padding:13px 20px; border-radius:12px; font-weight:600; z-index:50; max-width:92%; text-align:center; box-shadow:0 4px 14px rgba(0,0,0,.25); }
   #toast.err { background:var(--bad); }
-  #modal { position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:30; display:flex; align-items:flex-end; justify-content:center; }
-  #modal .box { background:#fff; width:100%; max-width:720px; max-height:90vh; overflow:auto; border-radius:18px 18px 0 0; padding:18px; }
+  #modal, #welcome { position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:30; display:flex; align-items:flex-end; justify-content:center; }
+  #welcome { z-index:40; }
+  .top { display:flex; align-items:center; justify-content:space-between; }
+  .help { border:1.5px solid var(--line); background:#fff; border-radius:99px; font:inherit; font-size:14px; font-weight:600; color:var(--blue-d); padding:5px 12px; cursor:pointer; margin-top:6px; }
+  .how { list-style:none; padding:0; margin:12px 0; } .how li { margin-bottom:12px; padding-right:2px; } .how b { display:block; font-size:17px; }
+  #modal .box, #welcome .box { background:#fff; width:100%; max-width:720px; max-height:90vh; overflow:auto; border-radius:18px 18px 0 0; padding:18px; }
   .fld { margin-bottom:12px; } .fld b { display:block; color:var(--blue-d); font-size:14px; } .fld div { white-space:pre-wrap; }
   .steps { padding-right:20px; margin:8px 0; } .steps li { margin-bottom:6px; }
   small.mut { color:var(--mut); display:block; margin-top:6px; font-size:14px; }
@@ -62,7 +66,7 @@
 
 <header>
   <div class="wrap">
-    <h1>🧠 יומן CBT</h1>
+    <div class="top"><h1>🧠 יומן CBT</h1><button class="help" onclick="showWelcome()">❓ איך זה עובד?</button></div>
     <nav>
       <button id="nav-new" class="on" onclick="go('new')">✍️ תרגול חדש</button>
       <button id="nav-diary" onclick="go('diary')">📋 היומן שלי <span id="count"></span></button>
@@ -133,6 +137,22 @@
   </section>
 
 </main>
+
+<div id="welcome" class="hide">
+  <div class="box">
+    <h2>👋 ברוך/ה הבא/ה ליומן שלך</h2>
+    <p class="sub">ככה זה עובד — בפשטות:</p>
+    <ol class="how">
+      <li><b>✍️ כותבים</b>לוחצים "תרגול חדש", בוחרים מה קרה וכותבים במילים שלך. אפשר למלא רק חלק ולהשלים אחר כך.</li>
+      <li><b>💾 נשמר לבד</b>כל מה שנכתב נשמר אוטומטית בטלפון הזה — גם תוך כדי כתיבה. אין הרשמה, ושום דבר לא נשלח לאף אחד.</li>
+      <li><b>📋 חוזרים לקרוא</b>ב"היומן שלי" רואים את כל מה שכתבת, ואפשר לערוך או להשלים.</li>
+      <li><b>🛟 גיבוי פעם בשבוע</b>לוחצים "💾 גיבוי" ← "שמור גיבוי" ושולחים את הקובץ לעצמך בוואטסאפ. כך גם אם הטלפון יוחלף — כלום לא הולך לאיבוד.</li>
+    </ol>
+    <div class="banner warn" style="margin:0">⚠️ חשוב: לפתוח תמיד מאותו טלפון ומאותו דפדפן, ולא למחוק "היסטוריית גלישה / נתוני אתרים" — זה מוחק את היומן.<br>
+      💡 טיפ: "הוסף למסך הבית" (באייפון דרך כפתור השיתוף ⬆️, באנדרואיד דרך ⋮) — ויהיה לך אייקון כמו אפליקציה.</div>
+    <button class="btn" onclick="closeWelcome()">הבנתי, בוא/י נתחיל 👍</button>
+  </div>
+</div>
 
 <div id="modal" class="hide" onclick="if(event.target===this)closeModal()">
   <div class="box">
@@ -343,8 +363,12 @@ function wipe() {
 
 /* ---------- התחלה ---------- */
 try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
+function showWelcome() { $('welcome').classList.remove('hide'); }
+function closeWelcome() { $('welcome').classList.add('hide'); const m = read(META, {}); m.welcomed = true; write(META, m); }
+
 updateCount(); updateNudge();
 if (total(getDb())) go('diary');
+if (!read(META, {}).welcomed) showWelcome();   // הסבר קצר רק בכניסה הראשונה
 </script>
 </body>
 </html>
