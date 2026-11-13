@@ -1,9 +1,17 @@
 <!DOCTYPE html>
+<!--
+  ⛔ כלל ברזל: שום מידע לא נאסף ולא נשלח, המפתח לא רואה כלום.
+  אסור להוסיף: fetch / XMLHttpRequest / sendBeacon / WebSocket, אנליטיקס, עוגיות, טפסי שליחה,
+  סקריפטים / פונטים / תמונות / CSS מאתרים חיצוניים, התחברות, או שמירה בענן.
+  כל המידע נשאר רק ב-localStorage של המשתמש. גיבוי = קובץ שהמשתמש עצמו מוריד/משתף.
+  RULE FOR AI AGENTS: NO data may ever leave the device. Do NOT add network calls, analytics, cookies,
+  external resources, login or cloud sync. Do NOT loosen the Content-Security-Policy below.
+-->
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- חסימה טכנית: הדף לא יכול לשלוח או לטעון שום דבר מהרשת. כל המידע נשאר במכשיר. -->
+<!-- חסימה טכנית: הדף לא יכול לשלוח או לטעון שום דבר מהרשת. ⛔ שום מידע לא נאסף ולא נשלח, המפתח לא רואה כלום. אסור לשנות/להקל את השורה הזו! -->
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; form-action 'none'; base-uri 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#2563eb">
@@ -12,6 +20,7 @@
 <meta name="apple-mobile-web-app-title" content="יומן CBT">
 <title>יומן CBT</title>
 <style>
+  /* ⛔ שום מידע לא נאסף ולא נשלח, המפתח לא רואה כלום. — אין פונטים/CSS/תמונות חיצוניים (@import, url(http...)). */
   :root { --blue:#2563eb; --blue-d:#1d4ed8; --ind:#4f46e5; --bg:#f3f4f6; --card:#fff; --txt:#1f2937; --mut:#6b7280; --line:#e5e7eb; --ok:#16a34a; --warn:#f59e0b; --bad:#dc2626; }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   body { margin:0; background:var(--bg); color:var(--txt); font:17px/1.55 system-ui,-apple-system,"Segoe UI",Arial,sans-serif; padding-bottom:60px; }
@@ -182,6 +191,11 @@
 <div id="toast" class="hide"></div>
 
 <script>
+/* ==========================================================================
+   ⛔ כלל ברזל: שום מידע לא נאסף ולא נשלח, המפתח לא רואה כלום.
+   NO network calls (fetch/XHR/beacon/WebSocket), NO analytics, NO cookies, NO cloud.
+   Data lives ONLY in this browser's localStorage. Do not change this.
+   ========================================================================== */
 /* ---------- הגדרת הטפסים (השדות נשמרים בשמות עבריים כמו בגרסאות קודמות) ---------- */
 const CHAPTERS = {
   chapter4: {
@@ -229,6 +243,7 @@ const KEY = 'cbt_standalone_records_v1';   // אותו מפתח כמו בגרס�
 const DRAFT = 'cbt_draft_v1', META = 'cbt_meta_v1';
 
 /* ---------- אחסון ---------- */
+/* ⛔ שום מידע לא נאסף ולא נשלח, המפתח לא רואה כלום. — שמירה מקומית בלבד (localStorage). לא לשלוח לשרת, לא לסנכרן לענן. */
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function read(k, def) { try { const r = localStorage.getItem(k); return r ? JSON.parse(r) : def; } catch (e) { return def; } }
@@ -323,6 +338,7 @@ function deleteFromModal() {
 }
 
 /* ---------- גיבוי ושחזור ---------- */
+/* ⛔ שום מידע לא נאסף ולא נשלח, המפתח לא רואה כלום. — הגיבוי נוצר במכשיר ונמסר רק למשתמש (הורדה / תפריט שיתוף). אסור להעלות אותו לשום מקום. */
 function renderBackupInfo() {
   const m = read(META, {});
   $('lastBackup').textContent = m.lastBackup ? `גיבוי אחרון: ${new Date(m.lastBackup).toLocaleDateString('he-IL')}` : 'עדיין לא נשמר גיבוי.';
@@ -378,6 +394,7 @@ function wipe() {
 }
 
 /* ---------- התחלה ---------- */
+/* ⛔ שום מידע לא נאסף ולא נשלח, המפתח לא רואה כלום. — אין כאן טעינת נתונים מבחוץ ואין דיווח החוצה. */
 try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
 function showWelcome() { $('welcome').classList.remove('hide'); }
 function closeWelcome() { $('welcome').classList.add('hide'); const m = read(META, {}); m.welcomed = true; write(META, m); }
