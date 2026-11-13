@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- חסימה טכנית: הדף לא יכול לשלוח או לטעון שום דבר מהרשת. כל המידע נשאר במכשיר. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#2563eb">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -59,6 +62,7 @@
   #modal .box, #welcome .box { background:#fff; width:100%; max-width:720px; max-height:90vh; overflow:auto; border-radius:18px 18px 0 0; padding:18px; }
   .fld { margin-bottom:12px; } .fld b { display:block; color:var(--blue-d); font-size:14px; } .fld div { white-space:pre-wrap; }
   .steps { padding-right:20px; margin:8px 0; } .steps li { margin-bottom:6px; }
+  footer { text-align:center; color:var(--mut); font-size:13px; padding:20px 14px 0; }
   small.mut { color:var(--mut); display:block; margin-top:6px; font-size:14px; }
 </style>
 </head>
@@ -133,10 +137,21 @@
       </ol>
       <small class="mut">כך היומן נפתח כמו אפליקציה, ואייפון לא ימחק את הנתונים אם לא נכנסים זמן רב.</small>
     </div>
+    <div class="card">
+      <h2>📜 פרטיות ואחריות</h2>
+      <ul class="steps">
+        <li><b>אין איסוף מידע:</b> אין שרת, אין הרשמה, אין עוגיות, אין סטטיסטיקות. מפתח האפליקציה לא רואה ולא מקבל שום דבר ממה שנכתב.</li>
+        <li>המידע נשמר רק בדפדפן של המכשיר הזה. קובץ גיבוי נשלח רק לאן שאת/ה בוחר/ת.</li>
+        <li><b>זה לא טיפול:</b> היומן הוא כלי עזר לתרגול עצמי, ואינו מחליף ייעוץ או טיפול של איש מקצוע.</li>
+        <li><b>במצוקה?</b> ער״ן — 1201 (24/7), מד״א — 101.</li>
+      </ul>
+    </div>
     <button class="btn red" onclick="wipe()">🗑️ מחיקת כל הנתונים ממכשיר זה</button>
   </section>
 
 </main>
+
+<footer>🔒 שום מידע לא נאסף ולא נשלח · אינו תחליף לטיפול מקצועי · במצוקה: ער״ן 1201</footer>
 
 <div id="welcome" class="hide">
   <div class="box">
@@ -149,6 +164,7 @@
       <li><b>🛟 גיבוי פעם בשבוע</b>לוחצים "💾 גיבוי" ← "שמור גיבוי" ושולחים את הקובץ לעצמך בוואטסאפ. כך גם אם הטלפון יוחלף — כלום לא הולך לאיבוד.</li>
     </ol>
     <div class="banner warn" style="margin:0">⚠️ חשוב: לפתוח תמיד מאותו טלפון ומאותו דפדפן, ולא למחוק "היסטוריית גלישה / נתוני אתרים" — זה מוחק את היומן.<br>
+      ℹ️ היומן הוא כלי עזר לתרגול ואינו מחליף טיפול מקצועי. במצוקה: ער״ן 1201.<br>
       💡 טיפ: "הוסף למסך הבית" (באייפון דרך כפתור השיתוף ⬆️, באנדרואיד דרך ⋮) — ויהיה לך אייקון כמו אפליקציה.</div>
     <button class="btn" onclick="closeWelcome()">הבנתי, בוא/י נתחיל 👍</button>
   </div>
