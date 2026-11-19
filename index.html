@@ -63,7 +63,15 @@
   .item .t { font-weight:700; }
   .item .d { color:var(--mut); font-size:14px; }
   .tag { display:inline-block; font-size:12px; font-weight:700; padding:1px 8px; border-radius:99px; margin-left:6px; }
-  .tag.c4 { background:#dbeafe; color:#1d4ed8; } .tag.c3 { background:#e0e7ff; color:#4338ca; }
+  .tag.c4 { background:#dbeafe; color:#1d4ed8; } .tag.c3 { background:#e0e7ff; color:#4338ca; } .tag.c5 { background:#fce7f3; color:#9d174d; }
+  .credit { font-size:13px; color:#6b7280; margin:-6px 0 12px; }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; } .chip { border:1.5px solid #d1d5db; background:#fff; border-radius:99px; padding:7px 14px; font:inherit; font-size:15px; cursor:pointer; } .chip.on { background:#fce7f3; border-color:#f472b6; color:#9d174d; font-weight:700; }
+  .emo { display:grid; grid-template-columns:70px 1fr 38px; align-items:center; gap:10px; background:#fdf2f8; border-radius:12px; padding:8px 12px; margin-top:8px; } .emo input { width:100%; accent-color:#db2777; } .emo .v { font-weight:700; color:#9d174d; text-align:center; }
+  .chain .step { position:relative; background:#f8fafc; border:1px solid var(--line); border-radius:14px; padding:4px 14px 12px 14px; } .chain .step label { margin-top:8px; padding-right:30px; } .chain .n { position:absolute; right:12px; top:10px; width:22px; height:22px; border-radius:99px; background:var(--blue); color:#fff; font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+  .chain .arr { text-align:center; color:#93c5fd; font-size:22px; line-height:1; margin:4px 0; }
+  .dists { display:grid; grid-template-columns:1fr; gap:8px; } .dist { border:1.5px solid var(--line); border-radius:14px; background:#fff; overflow:hidden; } .dist.sel { grid-column:1 / -1; border-color:#f472b6; background:#fff7fb; }
+  .dhead { display:flex; gap:8px; align-items:flex-start; width:100%; text-align:right; background:none; border:0; font:inherit; padding:10px; cursor:pointer; } .dhead .ic { font-size:22px; line-height:1.2; } .dhead b { display:block; font-size:15px; } .dhead small { display:block; color:var(--mut); font-size:13px; line-height:1.35; } .dhead .ck { margin-right:auto; width:22px; height:22px; flex:none; border-radius:99px; border:1.5px solid #d1d5db; color:transparent; font-size:13px; display:flex; align-items:center; justify-content:center; } .dist.sel .ck { background:#db2777; border-color:#db2777; color:#fff; }
+  .dbody { display:none; padding:0 12px 12px; } .dist.sel .dbody { display:block; } .dbody label { margin-top:6px; color:#166534; } .eg { background:#f3f4f6; border-radius:10px; padding:7px 10px; font-size:14px; color:#4b5563; }
   .banner { border-radius:12px; padding:12px 14px; margin-bottom:14px; font-size:15px; }
   .banner.warn { background:#fffbeb; border:1px solid #fcd34d; color:#92400e; }
   .banner.edit { background:#fef3c7; border:1px solid #fcd34d; color:#92400e; font-weight:600; }
@@ -117,6 +125,7 @@
       <p class="sub" style="font-size:17px;margin-bottom:14px">מה תרצה/י לתרגל עכשיו? כל מה שנכתב נשמר אוטומטית — אצלך במכשיר בלבד.</p>
       <button class="pick" onclick="openForm('chapter3')"><b>🔄 קרה משהו והרגשתי רע</b><span>להבין את מעגל הקסמים והטריגר (פרק 3)</span></button>
       <button class="pick" onclick="openForm('chapter4')"><b>😟 יש לי חשש / חרדה ממשהו</b><span>בדיקת התחזית ותכנון ניסוי קטן (פרק 4)</span></button>
+      <button class="pick" onclick="openForm('errors')"><b>🧩 זיהוי טעויות חשיבה</b><span>לזהות מחשבות "מטעות" ולמצוא להן מענה מאוזן</span></button>
       <button class="pick mirror-pick" onclick="openMirror()"><b>🪞 תרגיל המראה</b><span>תרגיל מודרך עם איורים — להסתכל על עצמי בלי שיפוטיות. בלי לכתוב כלום.</span></button>
     </div>
 
@@ -126,6 +135,7 @@
       <div class="card">
         <h2 id="formTitle"></h2>
         <p class="sub" id="formSub"></p>
+        <p class="credit" id="formCredit"></p>
         <form id="form" onsubmit="save(event)"></form>
         <button class="btn" type="submit" form="form" id="saveBtn">💾 שמור</button>
       </div>
@@ -169,6 +179,14 @@
       <small class="mut">כך היומן נפתח כמו אפליקציה, ואייפון לא ימחק את הנתונים אם לא נכנסים זמן רב.</small>
     </div>
     <div class="card">
+      <h2>🙏 קרדיטים</h2>
+      <ul class="steps">
+        <li>הפרויקט נבנה <b>בהובלת הילי עשירי</b>.</li>
+        <li>"קרה משהו והרגשתי רע" (פרק 3) ו"יש לי חשש" (פרק 4) — על פי שיטתה של <b>ד״ר מלאני פנל</b> (Melanie Fennell).</li>
+        <li>"זיהוי טעויות חשיבה" — על פי <b>ד״ר ניר עישר, מכון פסגות לטיפול והכשרה</b>.</li>
+      </ul>
+    </div>
+    <div class="card">
       <h2>📜 פרטיות ואחריות</h2>
       <ul class="steps">
         <li><b>אין איסוף מידע:</b> אין שרת, אין הרשמה, אין עוגיות, אין סטטיסטיקות. מפתח האפליקציה לא רואה ולא מקבל שום דבר ממה שנכתב.</li>
@@ -198,6 +216,7 @@
     <div class="banner warn" style="margin:0">⚠️ חשוב: לפתוח תמיד מאותו טלפון ומאותו דפדפן, ולא למחוק "היסטוריית גלישה / נתוני אתרים" — זה מוחק את היומן.<br>
       ℹ️ היומן הוא כלי עזר לתרגול ואינו מחליף טיפול מקצועי. במצוקה: ער״ן 1201.<br>
       💡 טיפ: "הוסף למסך הבית" (באייפון דרך כפתור השיתוף ⬆️, באנדרואיד דרך ⋮) — ויהיה לך אייקון כמו אפליקציה.</div>
+    <p class="credit" style="text-align:center;margin:12px 0 0">נבנה בהובלת הילי עשירי 🙏</p>
     <button class="btn" onclick="closeWelcome()">הבנתי, בוא/י נתחיל 👍</button>
   </div>
 </div>
@@ -222,7 +241,7 @@
 /* ---------- הגדרת הטפסים (השדות נשמרים בשמות עבריים כמו בגרסאות קודמות) ---------- */
 const CHAPTERS = {
   chapter4: {
-    tag: 'פרק 4', cls: 'c4', title: '😟 בדיקת חשש', sub: 'כתוב/י במילים שלך. אפשר למלא רק חלק מהשדות, ולחזור להשלים אחר כך.',
+    tag: 'פרק 4', cls: 'c4', title: '😟 בדיקת חשש', sub: 'כתוב/י במילים שלך. אפשר למלא רק חלק מהשדות, ולחזור להשלים אחר כך.', credit: 'על פי ד״ר מלאני פנל (Melanie Fennell)',
     main: 'המצב / הטריגר',
     sections: [
       ['א׳ · מה קורה עכשיו', [
@@ -244,7 +263,7 @@ const CHAPTERS = {
     ]
   },
   chapter3: {
-    tag: 'פרק 3', cls: 'c3', title: '🔄 מה קרה לי', sub: 'כתוב/י במילים שלך. אפשר למלא רק חלק מהשדות.',
+    tag: 'פרק 3', cls: 'c3', title: '🔄 מה קרה לי', sub: 'כתוב/י במילים שלך. אפשר למלא רק חלק מהשדות.', credit: 'על פי ד״ר מלאני פנל (Melanie Fennell)',
     main: 'תיאור המצב',
     sections: [
       ['1 · מה קרה', [
@@ -259,8 +278,14 @@ const CHAPTERS = {
       ['3 · מסקנות', [
         ['רפלקציה ותובנות', 'מה אפשר ללמוד מזה? אילו דפוסים חוזרים?', '']]]
     ]
+  },
+  errors: {
+    tag: 'טעויות חשיבה', cls: 'c5', title: '🧩 זיהוי טעויות חשיבה', custom: true,
+    sub: 'מזהים את המחשבה שהכאיבה, בודקים אותה, ומוצאים לה מענה מאוזן. אפשר למלא רק חלק.',
+    credit: 'על פי ד״ר ניר עישר, מכון פסגות לטיפול והכשרה', main: 'נושא הבעיה'
   }
 };
+const CH_KEYS = ['chapter3', 'chapter4', 'errors'];
 const STAMP = 'חותמת זמן שמירה', DATE = 'תאריך מהטופס';
 const KEY = 'cbt_standalone_records_v1';   // אותו מפתח כמו בגרסאות קודמות — נתונים קיימים נשמרים
 const DRAFT = 'cbt_draft_v1', META = 'cbt_meta_v1';
@@ -271,8 +296,8 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function read(k, def) { try { const r = localStorage.getItem(k); return r ? JSON.parse(r) : def; } catch (e) { return def; } }
 function write(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
-function getDb() { const d = read(KEY, {}); return { chapter4: Array.isArray(d.chapter4) ? d.chapter4 : [], chapter3: Array.isArray(d.chapter3) ? d.chapter3 : [] }; }
-function total(db) { return db.chapter4.length + db.chapter3.length; }
+function getDb() { const d = read(KEY, {}), o = {}; CH_KEYS.forEach(k => o[k] = Array.isArray(d[k]) ? d[k] : []); return o; }
+function total(db) { return CH_KEYS.reduce((n, k) => n + db[k].length, 0); }
 
 let cur = null, editIdx = -1, modalRef = null;
 
@@ -292,22 +317,25 @@ function toast(msg, err) {
 /* ---------- טופס ---------- */
 function openForm(ch, idx = -1, rec = null) {
   cur = ch; editIdx = idx; const c = CHAPTERS[ch];
-  $('formTitle').textContent = c.title; $('formSub').textContent = c.sub;
+  $('formTitle').textContent = c.title; $('formSub').textContent = c.sub; $('formCredit').textContent = c.credit || '';
+  const draft = idx < 0 ? (read(DRAFT, {})[ch] || {}) : (rec || {});
+  if (c.custom) renderErrorsForm(draft); else {
   let html = '';
   c.sections.forEach(([h, fields]) => {
     html += `<h3>${esc(h)}</h3>`;
     fields.forEach(([key, label, ph], i) => { html += `<label for="f_${esc(key)}">${esc(label)}</label><textarea id="f_${esc(key)}" data-k="${esc(key)}" rows="2" placeholder="${esc(ph)}"></textarea>`; });
   });
   $('form').innerHTML = html;
-  const draft = idx < 0 ? (read(DRAFT, {})[ch] || {}) : (rec || {});
-  $('form').querySelectorAll('textarea').forEach(el => { el.value = draft[el.dataset.k] || ''; el.addEventListener('input', saveDraft); });
+  $('form').querySelectorAll('textarea').forEach(el => { el.value = draft[el.dataset.k] || ''; });
+  }
+  $('form').querySelectorAll('textarea').forEach(el => el.addEventListener('input', saveDraft));
   $('editBanner').classList.toggle('hide', idx < 0);
   $('saveBtn').textContent = idx < 0 ? '💾 שמור' : '💾 שמור שינויים';
   $('picker').classList.add('hide'); $('formWrap').classList.remove('hide');
   go('new'); $('picker').classList.add('hide');
 }
 function closeForm() { cur = null; editIdx = -1; $('formWrap').classList.add('hide'); $('picker').classList.remove('hide'); window.scrollTo(0, 0); }
-function formValues() { const o = {}; $('form').querySelectorAll('textarea').forEach(el => o[el.dataset.k] = el.value.trim()); return o; }
+function formValues() { const o = {}; $('form').querySelectorAll('[data-k]').forEach(el => { if (!el.closest('.dist:not(.sel)')) o[el.dataset.k] = el.value.trim(); }); return o; }
 function saveDraft() { if (editIdx >= 0 || !cur) return; const d = read(DRAFT, {}); d[cur] = formValues(); write(DRAFT, d); }
 function clearDraft(ch) { const d = read(DRAFT, {}); delete d[ch]; write(DRAFT, d); }
 
@@ -328,8 +356,8 @@ function save(e) {
 /* ---------- יומן ---------- */
 function allRecords() {
   const db = getDb(), out = [];
-  ['chapter4', 'chapter3'].forEach(ch => db[ch].forEach((r, i) => out.push({ ch, i, r })));
-  return out.reverse();   // החדשות למעלה (פרק 4 ואז 3 — ממוין בהמשך)
+  CH_KEYS.forEach(ch => db[ch].forEach((r, i) => out.push({ ch, i, r })));
+  return out;   // ממוין לפי תאריך ב-renderDiary
 }
 function sortKey(r) { const m = String(r[STAMP] || '').match(/(\d+)\.(\d+)\.(\d+),?\s*(\d+):(\d+)/); return m ? new Date(+m[3], +m[2] - 1, +m[1], +m[4], +m[5]).getTime() : 0; }
 function renderDiary() {
@@ -348,7 +376,7 @@ function openModal(ch, i) {
   const c = CHAPTERS[ch], r = getDb()[ch][i]; if (!r) return;
   modalRef = { ch, i };
   $('mTitle').textContent = `${c.title} · ${r[DATE] || ''}`;
-  const keys = c.sections.flatMap(s => s[1].map(f => [f[0], f[1]]));
+  const keys = c.sections ? c.sections.flatMap(s => s[1].map(f => [f[0], f[1]])) : Object.keys(r).filter(k => k !== STAMP && k !== DATE).map(k => [k]);
   $('mBody').innerHTML = keys.filter(([k]) => r[k]).map(([k]) => `<div class="fld"><b>${esc(k)}</b><div>${esc(r[k])}</div></div>`).join('') || '<p class="sub">הרשומה ריקה.</p>';
   $('modal').classList.remove('hide');
 }
@@ -359,6 +387,74 @@ function deleteFromModal() {
   const { ch, i } = modalRef, db = getDb(); db[ch].splice(i, 1); write(KEY, db);
   closeModal(); renderDiary(); updateCount(); toast('הרשומה נמחקה');
 }
+
+/* ---------- 🧩 זיהוי טעויות חשיבה (על פי ד״ר ניר עישר, מכון פסגות) ---------- */
+/* ⛔ שום מידע לא נאסף ולא נשלח, המפתח לא רואה כלום. — הכל נשמר רק ב-localStorage, כמו שאר התרגילים. */
+const EMOTIONS = ['עצב', 'חרדה', 'כעס', 'שנאה', 'קנאה', 'בושה', 'אשמה', 'בדידות'];
+const DISTORTIONS = [
+  ['הכל או לא כלום', '⚫', 'רואים רק שחור או לבן, בלי אמצע.', 'אם זה לא מושלם — זה כישלון.'],
+  ['הכללה מוגזמת', '🔁', 'מאירוע אחד מסיקים "תמיד" או "אף פעם".', 'אף פעם שום דבר לא מצליח לי.'],
+  ['פילטר שכלי', '🔍', 'רואים רק את הפרט השלילי, ומפספסים את כל השאר.', 'מכל הערב אני זוכר/ת רק את ההערה העוקצנית.'],
+  ['האדרה של השלילי', '🌋', 'מגדילים משהו רע עד שהוא נהיה אסון.', 'זה נורא, אני לא אעמוד בזה.'],
+  ['פסילת החיובי', '🚫', 'מבטלים דברים טובים — "זה לא נחשב".', 'הצלחתי רק כי היה לי מזל.'],
+  ['שאלת קושיה', '❓', 'שאלה בלי תשובה, שמשאירה אותי תקוע/ה.', 'למה זה תמיד קורה דווקא לי?'],
+  ['אם... אז...', '➡️', 'חוק נוקשה שמחבר בין שני דברים בלי הוכחה.', 'אם אטעה — אז כולם יבינו שאני לא שווה.'],
+  ['מסקנות מוטעות', '🦘', 'קופצים למסקנה בלי מספיק ראיות.', 'היא לא ענתה — בטח היא כועסת עליי.'],
+  ['ניבוי העתיד', '🔮', 'בטוחים שיודעים מה יקרה — ושזה יהיה רע.', 'זה בטוח ייגמר רע.'],
+  ['קריאת מחשבות', '💭', 'בטוחים שיודעים מה אחרים חושבים עלינו.', 'כולם חושבים שאני משעמם/ת.'],
+  ['העצמה ומזעור', '🔭', 'מגדילים את החסרונות ומקטינים את היתרונות.', 'הטעות שלי ענקית, וההצלחה — שטות.'],
+  ['חשיבה רגשית', '💓', '"אני מרגיש/ה את זה — אז זה נכון."', 'אני מרגיש/ה טיפש/ה, אז אני טיפש/ה.'],
+  ['צריך ואסור', '☝️', 'חוקים של "חייב" ו"אסור" שיוצרים לחץ ואשמה.', 'אסור לי לבקש עזרה.'],
+  ['הצמדת תוויות', '🏷️', 'מדביקים תווית לכל האדם בגלל דבר אחד.', 'אני לוזר/ית.'],
+  ['העברה לפסים אישיים', '🎯', 'לוקחים אשמה על דברים שלא בשליטתנו.', 'הוא במצב רוח רע — בטח בגללי.'],
+  ['טעות אחרת', '✏️', 'משהו שלא מופיע כאן — אפשר לתאר במילים שלך.', '']
+];
+const ERR_PICKED = 'טעויות חשיבה שזוהו', ANS = n => 'מענה – ' + n, EMO_KEY = 'רגשות ועוצמה';
+
+function renderErrorsForm(draft) {
+  const ta = (k, label, ph = '', rows = 2) => `<label for="f_${esc(k)}">${esc(label)}</label><textarea id="f_${esc(k)}" data-k="${esc(k)}" rows="${rows}" placeholder="${esc(ph)}"></textarea>`;
+  const chain = [['מחשבה מכאיבה', 'איזו מחשבה מכאיבה עלתה מייד?'], ['משמעות', 'איזו משמעות נתתי לזה?'], ['הוכחה למשמעות', 'איזו הוכחה יש לי שזה נכון?'],
+    ['מה זה אומר עליי', 'מה זה אומר עליי?'], ['הוכחה לגביי', 'איזו הוכחה יש לי שזה נכון?'],
+    ['מה אני עושה כדי שזה לא יקרה', 'מה אני עושה כדי שזה לא יקרה?'], ['ממה אני נמנע/ת', 'ממה אני נמנע/ת כדי שזה לא יקרה?']];
+  let h = `<h3>1 · מה קרה</h3>${ta('נושא הבעיה', 'על מה זה? (במשפט אחד)', 'למשל: ויכוח עם חבר, הערה בעבודה...', 1)}
+    ${ta('תיאור עובדתי', 'מה קרה בפועל? רק עובדות — כמו מצלמה, בלי פרשנות', '')}
+    <h3>2 · מה הרגשתי</h3><label>אילו רגשות? (לוחצים, ואז מסמנים עוצמה)</label>
+    <div class="chips" id="emoChips">${EMOTIONS.map(e => `<button type="button" class="chip" data-e="${e}">${e}</button>`).join('')}</div>
+    <div id="emoRows"></div><textarea class="hide" data-k="${EMO_KEY}" id="emoField"></textarea>
+    ${ta('תחושות גופניות', 'מה הרגשתי בגוף? (ועוצמה 1–100)', 'למשל: מועקה בחזה (60), דופק מהיר...')}
+    ${ta('מה עשיתי בעקבות זה', 'מה עשיתי בעקבות זה?', '')}
+    <h3>3 · המחשבות — יורדים צעד אחרי צעד</h3><p class="sub">עונים רק על מה שמתאים. כל שאלה יורדת שכבה אחת עמוק יותר.</p>
+    <div class="chain">${chain.map(([k, l], i) => `<div class="step"><span class="n">${i + 1}</span>${ta(k, l)}</div>`).join('<div class="arr">↓</div>')}</div>
+    <h3>4 · איזו טעות חשיבה יש כאן?</h3><p class="sub">קרא/י את המחשבות שכתבת. לוחצים על כרטיס שמתאים (אפשר כמה), וכותבים לו מענה נכון — מחשבה מאוזנת יותר.</p>
+    <input type="hidden" data-k="${ERR_PICKED}" id="errPicked">
+    <div class="dists">${DISTORTIONS.map(([n, ic, ex, eg]) => `<div class="dist" data-n="${esc(n)}">
+      <button type="button" class="dhead"><span class="ic">${ic}</span><span><b>${esc(n)}</b><small>${esc(ex)}</small></span><span class="ck">✓</span></button>
+      <div class="dbody">${eg ? `<div class="eg">למשל: "${esc(eg)}"</div>` : ''}<label>✅ המענה הנכון:</label><textarea data-k="${esc(ANS(n))}" rows="2" placeholder="איך אפשר לראות את זה אחרת, בצורה מאוזנת?"></textarea></div></div>`).join('')}</div>
+    <h3>5 · הערות</h3>${ta('הערות', 'משהו נוסף שחשוב לי לזכור?', '')}`;
+  $('form').innerHTML = h;
+  // מילוי מטיוטה / עריכה
+  $('form').querySelectorAll('[data-k]').forEach(el => { el.value = draft[el.dataset.k] || ''; });
+  String(draft[EMO_KEY] || '').split(',').map(s => s.trim()).filter(Boolean).forEach(s => {
+    const m = s.match(/^(.*?)\s*(\d+)?$/); addEmo(m[1], m[2] ? +m[2] : 50, true);
+  });
+  String(draft[ERR_PICKED] || '').split(',').map(s => s.trim()).filter(Boolean).forEach(n => { const d = $('form').querySelector(`.dist[data-n="${CSS.escape(n)}"]`); if (d) d.classList.add('sel'); });
+  $('emoChips').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; if (b.classList.contains('on')) removeEmo(b.dataset.e); else addEmo(b.dataset.e, 50); });
+  $('form').querySelectorAll('.dhead').forEach(b => b.addEventListener('click', () => { b.parentElement.classList.toggle('sel'); syncPicked(); }));
+}
+function addEmo(name, val, silent) {
+  if (!name || $('emoRows').querySelector(`[data-e="${CSS.escape(name)}"]`)) return;
+  const chip = $('emoChips').querySelector(`.chip[data-e="${CSS.escape(name)}"]`); if (chip) chip.classList.add('on');
+  const row = document.createElement('div'); row.className = 'emo'; row.dataset.e = name;
+  row.innerHTML = `<b>${esc(name)}</b><input type="range" min="1" max="100" value="${val}" aria-label="עוצמה"><span class="v">${val}</span>`;
+  row.querySelector('input').addEventListener('input', ev => { row.querySelector('.v').textContent = ev.target.value; syncEmo(); });
+  $('emoRows').appendChild(row); if (!silent) syncEmo();
+}
+function removeEmo(name) {
+  const r = $('emoRows').querySelector(`[data-e="${CSS.escape(name)}"]`); if (r) r.remove();
+  const chip = $('emoChips').querySelector(`.chip[data-e="${CSS.escape(name)}"]`); if (chip) chip.classList.remove('on'); syncEmo();
+}
+function syncEmo() { $('emoField').value = [...$('emoRows').children].map(r => `${r.dataset.e} ${r.querySelector('input').value}`).join(', '); saveDraft(); }
+function syncPicked() { $('errPicked').value = [...$('form').querySelectorAll('.dist.sel')].map(d => d.dataset.n).join(', '); saveDraft(); }
 
 /* ---------- 🪞 תרגיל המראה (מודרך, בלי מילוי) ---------- */
 /* ⛔ שום מידע לא נאסף ולא נשלח, המפתח לא רואה כלום. — האיורים מצוירים כאן בקוד (SVG), בלי תמונות מבחוץ. נשמר רק מונה תרגולים מקומי. */
@@ -507,7 +603,7 @@ function updateNudge() {
 async function backup() {
   const db = getDb();
   if (!total(db)) { toast('עדיין אין מה לגבות', true); return; }
-  const payload = { app: 'cbt-workbook', version: 4, exportedAt: new Date().toISOString(), chapter4: db.chapter4, chapter3: db.chapter3 };
+  const payload = Object.assign({ app: 'cbt-workbook', version: 5, exportedAt: new Date().toISOString() }, db);
   const name = `CBT-backup-${new Date().toISOString().slice(0, 10)}.json`;
   const file = new File([JSON.stringify(payload, null, 1)], name, { type: 'application/json' });
   let done = false;
@@ -528,9 +624,9 @@ function restore(ev) {
   rd.onload = () => {
     try {
       const d = JSON.parse(rd.result);
-      if (!Array.isArray(d.chapter4) && !Array.isArray(d.chapter3)) throw 0;
+      if (!CH_KEYS.some(k => Array.isArray(d[k]))) throw 0;
       const db = getDb(); let added = 0;
-      ['chapter4', 'chapter3'].forEach(ch => {
+      CH_KEYS.forEach(ch => {
         const have = new Set(db[ch].map(r => JSON.stringify(r)));
         (d[ch] || []).forEach(r => { if (r && typeof r === 'object' && !have.has(JSON.stringify(r))) { db[ch].push(r); added++; } });
       });
