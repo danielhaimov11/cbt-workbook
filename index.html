@@ -66,7 +66,8 @@
   .tag.c4 { background:#dbeafe; color:#1d4ed8; } .tag.c3 { background:#e0e7ff; color:#4338ca; } .tag.c5 { background:#fce7f3; color:#9d174d; }
   .credit { font-size:13px; color:#6b7280; margin:-6px 0 12px; }
   .chips { display:flex; flex-wrap:wrap; gap:8px; } .chip { border:1.5px solid #d1d5db; background:#fff; border-radius:99px; padding:7px 14px; font:inherit; font-size:15px; cursor:pointer; } .chip.on { background:#fce7f3; border-color:#f472b6; color:#9d174d; font-weight:700; }
-  .emo { display:grid; grid-template-columns:70px 1fr 38px; align-items:center; gap:10px; background:#fdf2f8; border-radius:12px; padding:8px 12px; margin-top:8px; } .emo input { width:100%; accent-color:#db2777; } .emo .v { font-weight:700; color:#9d174d; text-align:center; }
+  .emo { display:grid; grid-template-columns:minmax(60px,auto) 1fr 34px 28px; align-items:center; gap:10px; background:#fdf2f8; border-radius:12px; padding:8px 12px; margin-top:8px; } .emo input { width:100%; accent-color:#db2777; } .emo .v { font-weight:700; color:#9d174d; text-align:center; } .emo .x { border:0; background:none; color:#9d174d; font-size:15px; cursor:pointer; padding:4px; }
+  .chip.add { border-style:dashed; color:#6b7280; } .other { display:flex; gap:8px; margin-top:8px; } .other input { flex:1; min-width:0; font:inherit; font-size:16px; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:10px; } .other .btn { width:auto; margin:0; padding:9px 16px; font-size:16px; }
   .chain .step { position:relative; background:#f8fafc; border:1px solid var(--line); border-radius:14px; padding:4px 14px 12px 14px; } .chain .step label { margin-top:8px; padding-right:30px; } .chain .n { position:absolute; right:12px; top:10px; width:22px; height:22px; border-radius:99px; background:var(--blue); color:#fff; font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; }
   .chain .arr { text-align:center; color:#93c5fd; font-size:22px; line-height:1; margin:4px 0; }
   .dists { display:grid; grid-template-columns:1fr; gap:8px; } .dist { border:1.5px solid var(--line); border-radius:14px; background:#fff; overflow:hidden; } .dist.sel { grid-column:1 / -1; border-color:#f472b6; background:#fff7fb; }
@@ -94,7 +95,7 @@
   .msteps { padding-right:20px; margin:10px 0; } .msteps li { margin-bottom:8px; }
   .quote { background:#eff6ff; border-right:5px solid var(--blue); border-radius:12px; padding:14px 16px; font-size:21px; font-weight:700; color:var(--blue-d); text-align:center; margin:10px 0; }
   .exs { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; font-size:14px; } .ex { border-radius:12px; padding:10px; } .ex b { display:block; margin-bottom:4px; } .ex div { margin-bottom:4px; }
-  .ex.ok { background:#f0fdf4; border:1px solid #bbf7d0; color:#166534; } .ex.no { background:#fef2f2; border:1px solid #fecaca; color:#991b1b; } .ex.no div { text-decoration:line-through; text-decoration-color:#fca5a5; }
+  .ex.ok { background:#f0fdf4; border:1px solid #bbf7d0; color:#166534; } .ex.no { background:#fef2f2; border:1px solid #fecaca; color:#991b1b; } .ex.no div { }
   .mnav { display:grid; grid-template-columns:1fr 2fr; gap:10px; } .mnav .btn { margin-top:16px; }
   small.mut { color:var(--mut); display:block; margin-top:6px; font-size:14px; }
 </style>
@@ -245,10 +246,10 @@ const CHAPTERS = {
     main: 'המצב / הטריגר',
     sections: [
       ['א׳ · מה קורה עכשיו', [
-        ['המצב / הטריגר', 'מה קרה או עומד לקרות?', 'למשל: שיחה עם המנהל, מפגש חברתי...'],
-        ['רגשות ותחושות', 'מה אני מרגיש/ה? (עוצמה 0–100)', 'למשל: חרדה (80), דופק מהיר...'],
+        ['המצב / הטריגר', 'מה קרה או עומד לקרות?', ''],
+        ['רגשות ותחושות', 'מה אני מרגיש/ה? (עוצמה 0–100)', ''],
         ['התחזית החרדתית', 'ממה אני חושש/ת? מה יישתבש?', ''],
-        ['אמצעי זהירות', 'מה אני עושה כדי למנוע את זה?', 'למשל: שותק, מתנצל מראש, נמנע...']]],
+        ['אמצעי זהירות', 'מה אני עושה כדי למנוע את זה?', '']]],
       ['ב׳ · בדיקה מחדש', [
         ['ראיות בעד', 'מה מראה שהחשש יקרה?', ''],
         ['ראיות נגד', 'מה מראה שהחשש לא יקרה?', ''],
@@ -268,7 +269,7 @@ const CHAPTERS = {
     sections: [
       ['1 · מה קרה', [
         ['תיאור המצב', 'מה קרה? איפה? עם מי?', ''],
-        ['כלל שהופר', 'איזה "כלל לחיים" שלי הופר או היה בסכנה?', "למשל: 'אסור לי לאכזב אף אחד'"]]],
+        ['כלל שהופר', 'איזה "כלל לחיים" שלי הופר או היה בסכנה?', '']]],
       ['2 · מעגל הקסמים', [
         ['שורה תחתונה', 'איזו אמונה שלילית על עצמי התעוררה?', ''],
         ['ניבויים שליליים', 'ממה חששתי? אילו תחושות גופניות היו לי?', ''],
@@ -416,12 +417,13 @@ function renderErrorsForm(draft) {
   const chain = [['מחשבה מכאיבה', 'איזו מחשבה מכאיבה עלתה מייד?'], ['משמעות', 'איזו משמעות נתתי לזה?'], ['הוכחה למשמעות', 'איזו הוכחה יש לי שזה נכון?'],
     ['מה זה אומר עליי', 'מה זה אומר עליי?'], ['הוכחה לגביי', 'איזו הוכחה יש לי שזה נכון?'],
     ['מה אני עושה כדי שזה לא יקרה', 'מה אני עושה כדי שזה לא יקרה?'], ['ממה אני נמנע/ת', 'ממה אני נמנע/ת כדי שזה לא יקרה?']];
-  let h = `<h3>1 · מה קרה</h3>${ta('נושא הבעיה', 'על מה זה? (במשפט אחד)', 'למשל: ויכוח עם חבר, הערה בעבודה...', 1)}
+  let h = `<h3>1 · מה קרה</h3>${ta('נושא הבעיה', 'על מה זה? (במשפט אחד)', '', 1)}
     ${ta('תיאור עובדתי', 'מה קרה בפועל? רק עובדות — כמו מצלמה, בלי פרשנות', '')}
     <h3>2 · מה הרגשתי</h3><label>אילו רגשות? (לוחצים, ואז מסמנים עוצמה)</label>
-    <div class="chips" id="emoChips">${EMOTIONS.map(e => `<button type="button" class="chip" data-e="${e}">${e}</button>`).join('')}</div>
+    <div class="chips" id="emoChips">${EMOTIONS.map(e => `<button type="button" class="chip" data-e="${e}">${e}</button>`).join('')}<button type="button" class="chip add" id="emoOtherBtn">➕ רגש אחר</button></div>
+    <div class="other hide" id="emoOther"><input type="text" id="emoOtherIn" placeholder="איך קוראים לרגש?" aria-label="רגש אחר"><button type="button" class="btn" id="emoOtherAdd">הוספה</button></div>
     <div id="emoRows"></div><textarea class="hide" data-k="${EMO_KEY}" id="emoField"></textarea>
-    ${ta('תחושות גופניות', 'מה הרגשתי בגוף? (ועוצמה 1–100)', 'למשל: מועקה בחזה (60), דופק מהיר...')}
+    ${ta('תחושות גופניות', 'מה הרגשתי בגוף? (ועוצמה 1–100)', '')}
     ${ta('מה עשיתי בעקבות זה', 'מה עשיתי בעקבות זה?', '')}
     <h3>3 · המחשבות — יורדים צעד אחרי צעד</h3><p class="sub">עונים רק על מה שמתאים. כל שאלה יורדת שכבה אחת עמוק יותר.</p>
     <div class="chain">${chain.map(([k, l], i) => `<div class="step"><span class="n">${i + 1}</span>${ta(k, l)}</div>`).join('<div class="arr">↓</div>')}</div>
@@ -429,7 +431,7 @@ function renderErrorsForm(draft) {
     <input type="hidden" data-k="${ERR_PICKED}" id="errPicked">
     <div class="dists">${DISTORTIONS.map(([n, ic, ex, eg]) => `<div class="dist" data-n="${esc(n)}">
       <button type="button" class="dhead"><span class="ic">${ic}</span><span><b>${esc(n)}</b><small>${esc(ex)}</small></span><span class="ck">✓</span></button>
-      <div class="dbody">${eg ? `<div class="eg">למשל: "${esc(eg)}"</div>` : ''}<label>✅ המענה הנכון:</label><textarea data-k="${esc(ANS(n))}" rows="2" placeholder="איך אפשר לראות את זה אחרת, בצורה מאוזנת?"></textarea></div></div>`).join('')}</div>
+      <div class="dbody">${eg ? `<div class="eg">דוגמה כללית למחשבה כזו: "${esc(eg)}"</div>` : ''}<label>✅ המענה הנכון:</label><textarea data-k="${esc(ANS(n))}" rows="2" placeholder="איך אפשר לראות את זה אחרת, בצורה מאוזנת?"></textarea></div></div>`).join('')}</div>
     <h3>5 · הערות</h3>${ta('הערות', 'משהו נוסף שחשוב לי לזכור?', '')}`;
   $('form').innerHTML = h;
   // מילוי מטיוטה / עריכה
@@ -438,14 +440,20 @@ function renderErrorsForm(draft) {
     const m = s.match(/^(.*?)\s*(\d+)?$/); addEmo(m[1], m[2] ? +m[2] : 50, true);
   });
   String(draft[ERR_PICKED] || '').split(',').map(s => s.trim()).filter(Boolean).forEach(n => { const d = $('form').querySelector(`.dist[data-n="${CSS.escape(n)}"]`); if (d) d.classList.add('sel'); });
-  $('emoChips').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; if (b.classList.contains('on')) removeEmo(b.dataset.e); else addEmo(b.dataset.e, 50); });
+  $('emoChips').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return;
+    if (b.id === 'emoOtherBtn') { $('emoOther').classList.toggle('hide'); $('emoOtherIn').focus(); return; }
+    if (b.classList.contains('on')) removeEmo(b.dataset.e); else addEmo(b.dataset.e, 50); });
+  const addOther = () => { const v = $('emoOtherIn').value.replace(/[,\d]/g, '').trim(); if (!v) return; addEmo(v, 50); $('emoOtherIn').value = ''; $('emoOther').classList.add('hide'); };
+  $('emoOtherAdd').addEventListener('click', addOther);
+  $('emoOtherIn').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addOther(); } });
+  $('emoRows').addEventListener('click', e => { const x = e.target.closest('.x'); if (x) removeEmo(x.parentElement.dataset.e); });
   $('form').querySelectorAll('.dhead').forEach(b => b.addEventListener('click', () => { b.parentElement.classList.toggle('sel'); syncPicked(); }));
 }
 function addEmo(name, val, silent) {
   if (!name || $('emoRows').querySelector(`[data-e="${CSS.escape(name)}"]`)) return;
   const chip = $('emoChips').querySelector(`.chip[data-e="${CSS.escape(name)}"]`); if (chip) chip.classList.add('on');
   const row = document.createElement('div'); row.className = 'emo'; row.dataset.e = name;
-  row.innerHTML = `<b>${esc(name)}</b><input type="range" min="1" max="100" value="${val}" aria-label="עוצמה"><span class="v">${val}</span>`;
+  row.innerHTML = `<b>${esc(name)}</b><input type="range" min="1" max="100" value="${val}" aria-label="עוצמה"><span class="v">${val}</span><button type="button" class="x" aria-label="הסרה">✕</button>`;
   row.querySelector('input').addEventListener('input', ev => { row.querySelector('.v').textContent = ev.target.value; syncEmo(); });
   $('emoRows').appendChild(row); if (!silent) syncEmo();
 }
@@ -547,12 +555,12 @@ const MIRROR_STEPS = [
     tip: 'להישאר על אותו מקום יכול להרגיש מוזר. זה בסדר — זה חלק מהתרגול.' },
   { art: 'faceScan', title: 'שלב 2 · סריקה איטית של הפנים',
     items: ['עוברים לאט על שאר החלקים: עיניים, אף, פה, לחיים, קו לסת, שיער.', 'מתארים לעצמך בראש רק עובדות: צורה, צבע, מרקם, סימטריה.', 'עלתה מחשבה ביקורתית? שמים לב אליה — ומחזירים את המבט למה שהעין רואה.'],
-    ex: [['העיניים חומות, בצורת שקד', 'העיניים שלי קטנות מדי'], ['השיער כהה ומתולתל בקצוות', 'השיער שלי נראה נורא']] },
+    ex: { ok: ['"העיניים בצבע ___, בצורת ___"', '"השיער ___, באורך ___"'], no: ['מילים כמו יפה / מכוער', 'טוב / רע, "יותר מדי", "לא מספיק"'] } },
   { art: 'torsoPleasant', title: 'שלב 3 · פלג הגוף העליון — מתחילים מהנוח',
     items: ['מורידים את המבט: צוואר, כתפיים, חזה, בטן, זרועות.', 'מתחילים באזור שהכי נוח או נעים להתבונן בו.', 'נשארים בו כמה רגעים, בנחת.'] },
   { art: 'torsoScan', title: 'שלב 3 · סריקה עניינית',
     items: ['סורקים לאט את שאר פלג הגוף העליון — בשקט ובעובדות.', 'שוב: רק מה שהעין רואה. מחשבה שיפוטית? שמים לב, וחוזרים לראות.'],
-    ex: [['הכתפיים ישרות, החולצה כחולה', 'הבטן שלי מכוערת'], ['על הזרוע יש נקודת חן קטנה', 'הזרועות שלי שמנות']] },
+    ex: { ok: ['"הכתפיים ___, החולצה בצבע ___"', '"על הזרוע יש ___"'], no: ['השוואות לאחרים או לעבר', 'מילים של שיפוט או תיקון'] } },
   { art: 'accept', title: 'שלב 4 · מה שיש זה מה שיש',
     items: ['מרחיבים שוב את המבט: כל הגוף והפנים, וגם החדר שמסביב.', 'משחררים את הצורך לשנות, לתקן או לשפר משהו — ברגע הזה.', 'אומרים לעצמך, בלב או בקול:'],
     quote: 'ככה אני נראה/ית כרגע.<br>מה שיש — זה מה שיש.', after: 'נשארים בתחושה הזו עוד רגע, ומסיימים כשמרגיש נכון.' },
@@ -578,7 +586,7 @@ function renderMirror() {
   h += `<ul class="msteps">${s.items.map(t => `<li>${t}</li>`).join('')}</ul>`;
   if (s.quote) h += `<div class="quote">״${s.quote}״</div>`;
   if (s.after) h += `<p style="margin:6px 0 0">${s.after}</p>`;
-  if (s.ex) h += `<div class="exs"><div class="ex ok"><b>✓ ככה (עובדות)</b>${s.ex.map(e => `<div>"${e[0]}"</div>`).join('')}</div><div class="ex no"><b>✗ לא ככה (שיפוט)</b>${s.ex.map(e => `<div>"${e[1]}"</div>`).join('')}</div></div>`;
+  if (s.ex) h += `<div class="exs"><div class="ex ok"><b>✓ מתארים (עובדות)</b>${s.ex.ok.map(e => `<div>${esc(e)}</div>`).join('')}</div><div class="ex no"><b>✗ משחררים (שיפוט)</b>${s.ex.no.map(e => `<div>${esc(e)}</div>`).join('')}</div></div><p class="sub" style="margin-top:6px">משלימים את המקום הריק במה שהעין רואה.</p>`;
   if (s.tip) h += `<div class="banner warn" style="margin:12px 0 0">💡 ${s.tip}</div>`;
   if (s.done) h += `<button class="btn green" onclick="finishMirror()">✓ סיימתי — לסמן שתרגלתי</button>`;
   else h += `<div class="mnav"><button class="btn ghost" onclick="mirrorGo(-1)" ${mStep ? '' : 'style="visibility:hidden"'}>→ הקודם</button><button class="btn" onclick="mirrorGo(1)">${mStep === n - 2 ? 'סיום' : mStep === 0 ? 'מתחילים ←' : 'הבא ←'}</button></div>`;
