@@ -63,7 +63,20 @@
   .item .t { font-weight:700; }
   .item .d { color:var(--mut); font-size:14px; }
   .tag { display:inline-block; font-size:12px; font-weight:700; padding:1px 8px; border-radius:99px; margin-left:6px; }
-  .tag.c4 { background:#dbeafe; color:#1d4ed8; } .tag.c3 { background:#e0e7ff; color:#4338ca; } .tag.c5 { background:#fce7f3; color:#9d174d; }
+  .tag.c4 { background:#dbeafe; color:#1d4ed8; } .tag.c3 { background:#e0e7ff; color:#4338ca; } .tag.c5 { background:#fce7f3; color:#9d174d; } .tag.c6 { background:#dcfce7; color:#166534; }
+  .bhead { display:flex; align-items:center; justify-content:space-between; } .saved { color:#16a34a; font-size:14px; font-weight:600; }
+  .bsec { border:1.5px solid var(--line); border-radius:14px; margin-top:10px; background:#fff; } .bsec[open] { border-color:#86efac; }
+  .bsec summary { list-style:none; cursor:pointer; padding:13px 14px; font-weight:700; display:flex; justify-content:space-between; align-items:center; gap:8px; } .bsec summary::-webkit-details-marker { display:none; }
+  .bsec summary::after { content:"▾"; color:#9ca3af; } .bsec[open] summary::after { content:"▴"; } .bsec summary span:first-child { flex:1; }
+  .cnt { background:#dcfce7; color:#166534; border-radius:99px; font-size:13px; padding:1px 9px; } .bbody { padding:0 14px 14px; }
+  .chip.on.g { background:#dcfce7; border-color:#4ade80; color:#166534; } .emo.g { background:#f0fdf4; } .emo.g input { accent-color:#16a34a; } .emo.g .v { color:#166534; }
+  .addrow { display:flex; gap:8px; align-items:flex-end; } .addrow textarea { flex:1; min-width:0; } .addrow .btn { width:auto; margin:0; padding:11px 14px; font-size:16px; }
+  .blist { list-style:none; padding:0; margin:10px 0 0; display:grid; gap:6px; } .blist li { display:flex; gap:8px; align-items:flex-start; background:#f8fafc; border-radius:10px; padding:8px 10px; }
+  .blist .bd { color:var(--mut); font-size:13px; white-space:nowrap; padding-top:2px; } .blist .bt { flex:1; min-width:0; white-space:pre-wrap; } .blist .x, .expc .x { border:0; background:none; color:#9ca3af; cursor:pointer; font-size:14px; padding:2px 4px; }
+  .bar { display:block; height:6px; background:#e5e7eb; border-radius:99px; margin:5px 0 2px; overflow:hidden; } .bar span { display:block; height:100%; background:#16a34a; }
+  svg.chart { width:100%; height:auto; display:block; margin-top:12px; background:#f8fafc; border-radius:12px; }
+  .expc { position:relative; border:1px solid var(--line); border-radius:12px; padding:2px 12px 12px; margin-top:10px; background:#fafafa; } .expc .x { position:absolute; left:6px; top:6px; }
+  .tin { width:100%; font:inherit; font-size:16px; padding:11px 12px; border:1.5px solid #d1d5db; border-radius:10px; background:#fafafa; }
   .credit { font-size:13px; color:#6b7280; margin:-6px 0 12px; }
   .chips { display:flex; flex-wrap:wrap; gap:8px; } .chip { border:1.5px solid #d1d5db; background:#fff; border-radius:99px; padding:7px 14px; font:inherit; font-size:15px; cursor:pointer; } .chip.on { background:#fce7f3; border-color:#f472b6; color:#9d174d; font-weight:700; }
   .emo { display:grid; grid-template-columns:minmax(60px,auto) 1fr 34px 28px; align-items:center; gap:10px; background:#fdf2f8; border-radius:12px; padding:8px 12px; margin-top:8px; } .emo input { width:100%; accent-color:#db2777; } .emo .v { font-weight:700; color:#9d174d; text-align:center; } .emo .x { border:0; background:none; color:#9d174d; font-size:15px; cursor:pointer; padding:4px; }
@@ -127,6 +140,7 @@
       <button class="pick" onclick="openForm('chapter3')"><b>🔄 קרה משהו והרגשתי רע</b><span>להבין את מעגל הקסמים והטריגר (פרק 3)</span></button>
       <button class="pick" onclick="openForm('chapter4')"><b>😟 יש לי חשש / חרדה ממשהו</b><span>בדיקת התחזית ותכנון ניסוי קטן (פרק 4)</span></button>
       <button class="pick" onclick="openForm('errors')"><b>🧩 זיהוי טעויות חשיבה</b><span>לזהות מחשבות "מטעות" ולמצוא להן מענה מאוזן</span></button>
+      <button class="pick" onclick="openBelief()"><b>🌱 תיק אמונה</b><span>לזהות אמונה שורשית ולבדוק אותה לאורך זמן — ראיות, סולם, ניסויים</span></button>
       <button class="pick mirror-pick" onclick="openMirror()"><b>🪞 תרגיל המראה</b><span>תרגיל מודרך עם איורים — להסתכל על עצמי בלי שיפוטיות. בלי לכתוב כלום.</span></button>
     </div>
 
@@ -140,6 +154,11 @@
         <form id="form" onsubmit="save(event)"></form>
         <button class="btn" type="submit" form="form" id="saveBtn">💾 שמור</button>
       </div>
+    </div>
+
+    <div id="beliefWrap" class="hide">
+      <button class="back" onclick="closeBelief()">← חזרה</button>
+      <div class="card" id="beliefCard"></div>
     </div>
 
     <div id="mirrorWrap" class="hide">
@@ -185,6 +204,7 @@
         <li>הפרויקט נבנה <b>בהובלת הילי עשירי</b>.</li>
         <li>"קרה משהו והרגשתי רע" (פרק 3) ו"יש לי חשש" (פרק 4) — על פי שיטתה של <b>ד״ר מלאני פנל</b> (Melanie Fennell).</li>
         <li>"זיהוי טעויות חשיבה" — על פי <b>ד״ר ניר עישר, מכון פסגות לטיפול והכשרה</b>.</li>
+        <li>"תיק אמונה" — על פי <b>דניס גרינברגר וכריסטין א. פדסקי</b>, "להתמודד עם מצבי רוח".</li>
       </ul>
     </div>
     <div class="card">
@@ -284,9 +304,14 @@ const CHAPTERS = {
     tag: 'טעויות חשיבה', cls: 'c5', title: '🧩 זיהוי טעויות חשיבה', custom: true,
     sub: 'מזהים את המחשבה שהכאיבה, בודקים אותה, ומוצאים לה מענה מאוזן. אפשר למלא רק חלק.',
     credit: 'על פי ד״ר ניר עישר, מכון פסגות לטיפול והכשרה', main: 'נושא הבעיה'
+  },
+  beliefs: {
+    tag: 'תיק אמונה', cls: 'c6', title: '🌱 תיק אמונה', custom: 'belief', main: 'אמונה ישנה', alt: 'אמונה חדשה',
+    sub: 'תיק שחוזרים אליו לאורך שבועות. ממלאים רק מה שמתאים, בקצב שלך — והכל נשמר לבד.',
+    credit: 'על פי דניס גרינברגר וכריסטין א. פדסקי, "להתמודד עם מצבי רוח"'
   }
 };
-const CH_KEYS = ['chapter3', 'chapter4', 'errors'];
+const CH_KEYS = ['chapter3', 'chapter4', 'errors', 'beliefs'];
 const STAMP = 'חותמת זמן שמירה', DATE = 'תאריך מהטופס';
 const KEY = 'cbt_standalone_records_v1';   // אותו מפתח כמו בגרסאות קודמות — נתונים קיימים נשמרים
 const DRAFT = 'cbt_draft_v1', META = 'cbt_meta_v1';
@@ -332,7 +357,7 @@ function openForm(ch, idx = -1, rec = null) {
   $('form').querySelectorAll('textarea').forEach(el => el.addEventListener('input', saveDraft));
   $('editBanner').classList.toggle('hide', idx < 0);
   $('saveBtn').textContent = idx < 0 ? '💾 שמור' : '💾 שמור שינויים';
-  $('picker').classList.add('hide'); $('formWrap').classList.remove('hide');
+  $('picker').classList.add('hide'); $('beliefWrap').classList.add('hide'); $('mirrorWrap').classList.add('hide'); $('formWrap').classList.remove('hide');
   go('new'); $('picker').classList.add('hide');
 }
 function closeForm() { cur = null; editIdx = -1; $('formWrap').classList.add('hide'); $('picker').classList.remove('hide'); window.scrollTo(0, 0); }
@@ -364,16 +389,17 @@ function sortKey(r) { const m = String(r[STAMP] || '').match(/(\d+)\.(\d+)\.(\d+
 function renderDiary() {
   const q = $('q').value.trim().toLowerCase();
   let items = allRecords().sort((a, b) => sortKey(b.r) - sortKey(a.r));
-  if (q) items = items.filter(x => Object.values(x.r).join(' ').toLowerCase().includes(q));
+  if (q) items = items.filter(x => JSON.stringify(x.r).toLowerCase().includes(q));
   if (!items.length) { $('list').innerHTML = `<div class="empty">${q ? 'לא נמצאו תוצאות' : 'עדיין אין רשומות.<br>התרגול הראשון שלך יופיע כאן 🌱'}</div>`; return; }
   $('list').innerHTML = items.map(x => {
-    const c = CHAPTERS[x.ch], t = x.r[c.main] || '(ללא כותרת)';
+    const c = CHAPTERS[x.ch], t = x.r[c.main] || (c.alt && x.r[c.alt]) || (c.custom === 'belief' ? '(תיק אמונה)' : '(ללא כותרת)');
     return `<div class="item" onclick="openModal('${x.ch}',${x.i})"><span class="tag ${c.cls}">${c.tag}</span><span class="d">${esc(x.r[DATE] || x.r[STAMP] || '')}</span><div class="t">${esc(t.length > 90 ? t.slice(0, 90) + '…' : t)}</div></div>`;
   }).join('');
 }
 function updateCount() { const n = total(getDb()); $('count').textContent = n ? `(${n})` : ''; }
 
 function openModal(ch, i) {
+  if (CHAPTERS[ch].custom === 'belief') { openBelief(i); return; }
   const c = CHAPTERS[ch], r = getDb()[ch][i]; if (!r) return;
   modalRef = { ch, i };
   $('mTitle').textContent = `${c.title} · ${r[DATE] || ''}`;
@@ -463,6 +489,144 @@ function removeEmo(name) {
 }
 function syncEmo() { $('emoField').value = [...$('emoRows').children].map(r => `${r.dataset.e} ${r.querySelector('input').value}`).join(', '); saveDraft(); }
 function syncPicked() { $('errPicked').value = [...$('form').querySelectorAll('.dist.sel')].map(d => d.dataset.n).join(', '); saveDraft(); }
+
+/* ---------- 🌱 תיק אמונה (על פי גרינברגר ופדסקי, "להתמודד עם מצבי רוח") ---------- */
+/* ⛔ שום מידע לא נאסף ולא נשלח, המפתח לא רואה כלום. — תיק שחוזרים אליו לאורך שבועות; נשמר אוטומטית רק ב-localStorage. */
+const B_TYPES = { 'על עצמי': 'מה זה אומר עליי? מה פירוש הדבר לגביי?', 'על הזולת': 'מה זה אומר על הזולת? מה פירוש הדבר לגבי אנשים?', 'על החיים': 'מה זה אומר על החיים? מה פירוש הדבר לגבי החיים?' };
+const B_AGES = ['לידה עד 2', 'גיל 3 עד 5', 'גיל 6 עד 12', 'גיל 13 עד 18', 'גיל 19 עד 25', 'גיל 26 עד 35', 'גיל 36 עד 50', 'גיל 51 עד 65', 'גיל 66 ומעלה'];
+const BL = { chain: 'חץ למטה', against: 'ראיות שהאמונה הישנה לא נכונה במאה אחוז', support: 'ראיות שתומכות באמונה החדשה', conf: 'דירוגי ביטחון באמונה החדשה', hist: 'מבחן ההיסטוריה', exp: 'ניסויים', rate: 'דירוג חוויות' };
+let bf = null, bIdx = -1, bOpen = new Set(['identify']);
+const today = () => new Date().toLocaleDateString('he-IL');
+function bInit(r) {
+  const o = JSON.parse(JSON.stringify(r || {}));
+  [BL.chain, BL.against, BL.support, BL.conf, BL.exp, BL.rate].forEach(k => { if (!Array.isArray(o[k])) o[k] = []; });
+  if (!o[BL.hist] || typeof o[BL.hist] !== 'object') o[BL.hist] = {};
+  if (!o['סוג']) o['סוג'] = 'על עצמי';
+  if (!o[BL.chain].length) o[BL.chain] = [''];
+  return o;
+}
+function bHasContent(o) {
+  return Object.entries(o).some(([k, v]) => k !== STAMP && k !== DATE && k !== 'סוג' &&
+    (typeof v === 'string' ? v.trim() : Array.isArray(v) ? v.some(x => typeof x === 'string' ? x.trim() : true) : Object.values(v || {}).some(s => String(s).trim())));
+}
+function bPersist() {
+  if (!bHasContent(bf)) return;
+  const now = new Date().toLocaleString('he-IL');
+  if (!bf[STAMP]) { bf[STAMP] = now; bf[DATE] = now; }
+  const db = getDb();
+  if (bIdx < 0 || !db.beliefs[bIdx]) { db.beliefs.push(bf); bIdx = db.beliefs.length - 1; } else db.beliefs[bIdx] = bf;
+  if (!write(KEY, db)) { toast('לא הצלחנו לשמור במכשיר. שמור/י גיבוי ובדוק/י שיש מקום פנוי.', true); return; }
+  updateCount(); updateNudge();
+  const s = $('bSaved'); if (s) { s.textContent = '✓ נשמר'; clearTimeout(bPersist.t); bPersist.t = setTimeout(() => { s.textContent = ''; }, 1500); }
+}
+function openBelief(i = -1) {
+  bIdx = i; bf = bInit(i >= 0 ? getDb().beliefs[i] : null); bOpen = new Set(i >= 0 ? [] : ['identify']);
+  go('new'); ['picker', 'formWrap', 'mirrorWrap'].forEach(id => $(id).classList.add('hide')); $('beliefWrap').classList.remove('hide');
+  renderBelief(); window.scrollTo(0, 0);
+}
+function closeBelief() { bPersist(); bf = null; $('beliefWrap').classList.add('hide'); $('picker').classList.remove('hide'); window.scrollTo(0, 0); }
+function bConfChart(list) {
+  if (!list.length) return '';
+  const W = 300, H = 140, L = 48, R = 38, T = 18, B = 30, n = list.length;
+  const x = i => n === 1 ? (W + L - R) / 2 : W - R - i * (W - L - R) / (n - 1);   // מימין לשמאל — הדירוג הראשון מימין
+  const y = v => T + (100 - v) * (H - T - B) / 100;
+  const grid = [0, 50, 100].map(v => `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="#e5e7eb"/><text x="6" y="${y(v) + 4}" font-size="11" fill="#6b7280" text-anchor="start">${v}</text>`).join('');
+  const pts = list.map((p, i) => `${x(i)},${y(+p.v)}`).join(' ');
+  const last = list[n - 1];
+  return `<svg viewBox="0 0 ${W} ${H}" class="chart" role="img" aria-label="גרף הביטחון באמונה החדשה">${grid}
+    <polyline points="${pts}" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linejoin="round"/>
+    ${list.map((p, i) => `<circle cx="${x(i)}" cy="${y(+p.v)}" r="${i === n - 1 ? 5 : 3.5}" fill="${i === n - 1 ? '#16a34a' : '#fff'}" stroke="#16a34a" stroke-width="2"/>`).join('')}
+    <text x="${x(n - 1)}" y="${y(+last.v) - 10}" font-size="12" font-weight="700" fill="#166534" text-anchor="middle">${esc(last.v)}</text>
+    <text x="${x(0)}" y="${H - 8}" font-size="10" fill="#6b7280" text-anchor="middle">${esc(list[0].d)}</text>
+    ${n > 1 ? `<text x="${x(n - 1)}" y="${H - 8}" font-size="10" fill="#6b7280" text-anchor="middle">${esc(last.d)}</text>` : ''}</svg>`;
+}
+function bList(key, empty) {
+  const l = bf[key];
+  return l.length ? `<ol class="blist">${l.map((e, i) => `<li><span class="bd">${esc(e.d)}</span><span class="bt">${esc(e.t)}</span><button type="button" class="x" data-act="del" data-list="${esc(key)}" data-i="${i}" aria-label="הסרה">✕</button></li>`).join('')}</ol>`
+    : `<p class="sub">${empty}</p>`;
+}
+function bSec(id, title, count, body) {
+  return `<details class="bsec" data-sec="${id}" ${bOpen.has(id) ? 'open' : ''}><summary><span>${title}</span>${count ? `<span class="cnt">${count}</span>` : ''}</summary><div class="bbody">${body}</div></details>`;
+}
+function renderBelief() {
+  const t = bf['סוג'], q = B_TYPES[t];
+  const ta = (k, label, rows = 2) => `<label for="b_${esc(k)}">${esc(label)}</label><textarea id="b_${esc(k)}" data-f="${esc(k)}" rows="${rows}">${esc(bf[k] || '')}</textarea>`;
+  const conf = bf[BL.conf], lastV = conf.length ? conf[conf.length - 1].v : 50;
+  let h = `<div class="bhead"><h2>🌱 תיק אמונה</h2><span id="bSaved" class="saved"></span></div>
+    <p class="sub">${esc(CHAPTERS.beliefs.sub)}</p><p class="credit">${esc(CHAPTERS.beliefs.credit)}</p>`;
+  h += bSec('identify', '🔽 לזהות את האמונה', '', `
+    <label>על מה האמונה?</label><div class="chips">${Object.keys(B_TYPES).map(k => `<button type="button" class="chip ${k === t ? 'on g' : ''}" data-act="type" data-v="${k}">${k}</button>`).join('')}</div>
+    ${ta('אירוע', 'אירוע או מצב שעורר רגשות חזקים')}
+    <div class="chain">${bf[BL.chain].map((s, i) => `${i ? '<div class="arr">↓</div>' : ''}<div class="step"><span class="n">${i + 1}</span><label for="bc${i}">${esc(q)}</label><textarea id="bc${i}" data-chain="${i}" rows="2">${esc(s)}</textarea></div>`).join('')}</div>
+    <button type="button" class="btn ghost" data-act="chainAdd">➕ עוד שלב למטה</button>
+    ${ta('אמונה ישנה', 'האמונה השורשית שהתגלתה')}`);
+  h += bSec('new', '🌱 האמונה החדשה', '', ta('אמונה חדשה', 'אמונה חלופית — במילים שלך'));
+  const addRow = (key, label) => `<div class="addrow"><textarea data-new="${esc(key)}" rows="2" aria-label="${esc(label)}"></textarea><button type="button" class="btn" data-act="add" data-list="${esc(key)}">הוספה</button></div>`;
+  h += bSec('against', '📝 ראיות שהאמונה הישנה לא נכונה במאה אחוז', bf[BL.against].length,
+    `<p class="sub">גם חוויות קטנות נחשבות. מוסיפים מתי שעולה משהו.</p>${addRow(BL.against, 'ראיה חדשה')}${bList(BL.against, 'עדיין אין ראיות ברשימה.')}`);
+  h += bSec('support', '📝 ראיות שתומכות באמונה החדשה', bf[BL.support].length,
+    `<p class="sub">גם חוויות קטנות נחשבות. מוסיפים מתי שעולה משהו.</p>${addRow(BL.support, 'ראיה חדשה')}${bList(BL.support, 'עדיין אין ראיות ברשימה.')}`);
+  h += bSec('conf', '📈 עד כמה אני מאמין/ה באמונה החדשה', conf.length,
+    `<p class="sub">מדרגים מדי פעם, מתי שמתאים, ורואים איך זה משתנה לאורך זמן. גם שינוי קטן הוא שינוי.</p>
+    <div class="emo g"><b>עכשיו</b><input type="range" id="bConfIn" min="0" max="100" value="${esc(lastV)}" aria-label="ביטחון באמונה החדשה"><span class="v" id="bConfV">${esc(lastV)}</span></div>
+    <button type="button" class="btn ghost" data-act="conf">שמירת הדירוג</button>${bConfChart(conf)}
+    ${conf.length ? `<ol class="blist">${conf.map((c, i) => `<li><span class="bd">${esc(c.d)}</span><span class="bt"><b>${esc(c.v)}</b></span><button type="button" class="x" data-act="del" data-list="${esc(BL.conf)}" data-i="${i}" aria-label="הסרה">✕</button></li>`).join('')}</ol>` : ''}`);
+  h += bSec('hist', '🕰️ מבחן ההיסטוריה', Object.values(bf[BL.hist]).filter(s => String(s).trim()).length,
+    `<p class="sub">עוברים על תקופות החיים ומחפשים חוויות שמתאימות לאמונה החדשה. ממלאים רק תקופות שמתאימות.</p>
+    ${B_AGES.map((a, i) => `<label for="bh${i}">${a}</label><textarea id="bh${i}" data-hist="${a}" rows="2">${esc(bf[BL.hist][a] || '')}</textarea>`).join('')}
+    ${ta('סיכום מבחן ההיסטוריה', 'סיכום — איך כל זה תומך באמונה החדשה?')}`);
+  h += bSec('exp', '🧪 ניסויים', bf[BL.exp].length,
+    `<p class="sub">בודקים את האמונה הישנה במציאות. את התוצאה אפשר להשלים אחרי הניסוי.</p>
+    ${bf[BL.exp].map((e, i) => `<div class="expc"><button type="button" class="x" data-act="del" data-list="${esc(BL.exp)}" data-i="${i}" aria-label="הסרה">✕</button>
+      <label>תיאור הניסוי</label><textarea data-exp="${i}" data-k="t" rows="2">${esc(e.t || '')}</textarea>
+      <label>מה האמונה הישנה ניבאה?</label><textarea data-exp="${i}" data-k="p" rows="2">${esc(e.p || '')}</textarea>
+      <label>מה קרה במציאות?</label><textarea data-exp="${i}" data-k="r" rows="2">${esc(e.r || '')}</textarea></div>`).join('')}
+    <button type="button" class="btn ghost" data-act="expAdd">➕ ניסוי חדש</button>`);
+  h += bSec('rate', '⚖️ דירוג חוויות על סולם', bf[BL.rate].length,
+    `<p class="sub">במקום "הכל או לא כלום" — מסמנים איפה על הסולם החוויה נמצאת באמת.</p>
+    <label for="bRateE">אירוע / נסיבות</label><textarea id="bRateE" rows="2"></textarea>
+    <label for="bRateQ">התכונה שאני מדרג/ת</label><input type="text" id="bRateQ" class="tin">
+    <div class="emo g"><b>דירוג</b><input type="range" id="bRateIn" min="0" max="100" value="50" aria-label="דירוג"><span class="v" id="bRateV">50</span></div>
+    <button type="button" class="btn ghost" data-act="rateAdd">הוספה לרשימה</button>
+    ${bf[BL.rate].length ? `<ol class="blist">${bf[BL.rate].map((r, i) => `<li><span class="bd">${esc(r.d)}</span><span class="bt">${esc(r.e)}${r.q ? ` · <i>${esc(r.q)}</i>` : ''}<span class="bar"><span style="width:${+r.v}%"></span></span><b>${esc(r.v)}</b></span><button type="button" class="x" data-act="del" data-list="${esc(BL.rate)}" data-i="${i}" aria-label="הסרה">✕</button></li>`).join('')}</ol>` : ''}
+    ${ta('מה למדתי מהדירוגים', 'מה למדתי מהדירוגים?')}`);
+  h += `<p class="sub" style="text-align:center;margin-top:16px">הכל נשמר לבד. אפשר לסגור ולחזור לתיק מתי שרוצים, דרך "היומן שלי".</p>
+    <button type="button" class="btn red" data-act="delFile">🗑️ מחיקת התיק</button>`;
+  $('beliefCard').innerHTML = h;
+}
+function bSetupEvents() {
+  const c = $('beliefCard');
+  c.addEventListener('toggle', e => { const d = e.target.closest && e.target.closest('details'); if (d) d.open ? bOpen.add(d.dataset.sec) : bOpen.delete(d.dataset.sec); }, true);
+  c.addEventListener('input', e => {
+    const el = e.target, ds = el.dataset;
+    if (ds.f) bf[ds.f] = el.value;
+    else if (ds.chain !== undefined) bf[BL.chain][+ds.chain] = el.value;
+    else if (ds.hist) bf[BL.hist][ds.hist] = el.value;
+    else if (ds.exp !== undefined) bf[BL.exp][+ds.exp][ds.k] = el.value;
+    else if (el.id === 'bConfIn') { $('bConfV').textContent = el.value; return; }
+    else if (el.id === 'bRateIn') { $('bRateV').textContent = el.value; return; }
+    else return;
+    bPersist();
+  });
+  c.addEventListener('click', e => {
+    const b = e.target.closest('[data-act]'); if (!b) return;
+    const a = b.dataset.act;
+    if (a === 'type') { bf['סוג'] = b.dataset.v; }
+    else if (a === 'chainAdd') { bf[BL.chain].push(''); }
+    else if (a === 'add') { const ta = c.querySelector(`[data-new="${CSS.escape(b.dataset.list)}"]`), v = ta.value.trim(); if (!v) { ta.focus(); return; } bf[b.dataset.list].push({ d: today(), t: v }); }
+    else if (a === 'del') { if (!confirm('להסיר את הפריט הזה?')) return; bf[b.dataset.list].splice(+b.dataset.i, 1); }
+    else if (a === 'conf') { bf[BL.conf].push({ d: today(), v: +$('bConfIn').value }); toast('✓ הדירוג נשמר'); }
+    else if (a === 'expAdd') { bf[BL.exp].push({ t: '', p: '', r: '' }); }
+    else if (a === 'rateAdd') { const ev = $('bRateE').value.trim(); if (!ev) { $('bRateE').focus(); return; } bf[BL.rate].push({ d: today(), e: ev, q: $('bRateQ').value.trim(), v: +$('bRateIn').value }); }
+    else if (a === 'delFile') {
+      if (!confirm('למחוק את כל התיק? אי אפשר לשחזר אותו (אלא מגיבוי).')) return;
+      const db = getDb(); if (bIdx >= 0) { db.beliefs.splice(bIdx, 1); write(KEY, db); }
+      bf = null; $('beliefWrap').classList.add('hide'); $('picker').classList.remove('hide'); updateCount(); toast('התיק נמחק'); return;
+    }
+    else return;
+    bPersist(); renderBelief();
+  });
+}
 
 /* ---------- 🪞 תרגיל המראה (מודרך, בלי מילוי) ---------- */
 /* ⛔ שום מידע לא נאסף ולא נשלח, המפתח לא רואה כלום. — האיורים מצוירים כאן בקוד (SVG), בלי תמונות מבחוץ. נשמר רק מונה תרגולים מקומי. */
@@ -573,7 +737,7 @@ function mirrorCount() {
   return list.filter(t => t > weekAgo).length;
 }
 function openMirror() {
-  go('new'); $('picker').classList.add('hide'); $('formWrap').classList.add('hide'); $('mirrorWrap').classList.remove('hide');
+  go('new'); $('picker').classList.add('hide'); $('formWrap').classList.add('hide'); $('beliefWrap').classList.add('hide'); $('mirrorWrap').classList.remove('hide');
   mStep = 0; renderMirror();
 }
 function closeMirror() { $('mirrorWrap').classList.add('hide'); $('picker').classList.remove('hide'); window.scrollTo(0, 0); }
@@ -656,6 +820,7 @@ function wipe() {
 /* ---------- התחלה ---------- */
 /* ⛔ שום מידע לא נאסף ולא נשלח, המפתח לא רואה כלום. — אין כאן טעינת נתונים מבחוץ ואין דיווח החוצה. */
 try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
+bSetupEvents();
 function showWelcome() { $('welcome').classList.remove('hide'); }
 function closeWelcome() { $('welcome').classList.add('hide'); const m = read(META, {}); m.welcomed = true; write(META, m); }
 
