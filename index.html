@@ -95,7 +95,7 @@
   .msteps { padding-right:20px; margin:10px 0; } .msteps li { margin-bottom:8px; }
   .quote { background:#eff6ff; border-right:5px solid var(--blue); border-radius:12px; padding:14px 16px; font-size:21px; font-weight:700; color:var(--blue-d); text-align:center; margin:10px 0; }
   .exs { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; font-size:14px; } .ex { border-radius:12px; padding:10px; } .ex b { display:block; margin-bottom:4px; } .ex div { margin-bottom:4px; }
-  .ex.ok { background:#f0fdf4; border:1px solid #bbf7d0; color:#166534; } .ex.no { background:#fef2f2; border:1px solid #fecaca; color:#991b1b; } .ex.no div { }
+  .ex.ok { background:#f0fdf4; border:1px solid #bbf7d0; color:#166534; } .ex.no { background:#fef2f2; border:1px solid #fecaca; color:#991b1b; } .ex.no div { text-decoration:line-through; text-decoration-color:#fca5a5; }
   .mnav { display:grid; grid-template-columns:1fr 2fr; gap:10px; } .mnav .btn { margin-top:16px; }
   small.mut { color:var(--mut); display:block; margin-top:6px; font-size:14px; }
 </style>
@@ -246,10 +246,10 @@ const CHAPTERS = {
     main: 'המצב / הטריגר',
     sections: [
       ['א׳ · מה קורה עכשיו', [
-        ['המצב / הטריגר', 'מה קרה או עומד לקרות?', ''],
-        ['רגשות ותחושות', 'מה אני מרגיש/ה? (עוצמה 0–100)', ''],
+        ['המצב / הטריגר', 'מה קרה או עומד לקרות?', 'למשל: שיחה עם המנהל, מפגש חברתי...'],
+        ['רגשות ותחושות', 'מה אני מרגיש/ה? (עוצמה 0–100)', 'למשל: חרדה (80), דופק מהיר...'],
         ['התחזית החרדתית', 'ממה אני חושש/ת? מה יישתבש?', ''],
-        ['אמצעי זהירות', 'מה אני עושה כדי למנוע את זה?', '']]],
+        ['אמצעי זהירות', 'מה אני עושה כדי למנוע את זה?', 'למשל: שותק, מתנצל מראש, נמנע...']]],
       ['ב׳ · בדיקה מחדש', [
         ['ראיות בעד', 'מה מראה שהחשש יקרה?', ''],
         ['ראיות נגד', 'מה מראה שהחשש לא יקרה?', ''],
@@ -269,7 +269,7 @@ const CHAPTERS = {
     sections: [
       ['1 · מה קרה', [
         ['תיאור המצב', 'מה קרה? איפה? עם מי?', ''],
-        ['כלל שהופר', 'איזה "כלל לחיים" שלי הופר או היה בסכנה?', '']]],
+        ['כלל שהופר', 'איזה "כלל לחיים" שלי הופר או היה בסכנה?', "למשל: 'אסור לי לאכזב אף אחד'"]]],
       ['2 · מעגל הקסמים', [
         ['שורה תחתונה', 'איזו אמונה שלילית על עצמי התעוררה?', ''],
         ['ניבויים שליליים', 'ממה חששתי? אילו תחושות גופניות היו לי?', ''],
@@ -555,12 +555,12 @@ const MIRROR_STEPS = [
     tip: 'להישאר על אותו מקום יכול להרגיש מוזר. זה בסדר — זה חלק מהתרגול.' },
   { art: 'faceScan', title: 'שלב 2 · סריקה איטית של הפנים',
     items: ['עוברים לאט על שאר החלקים: עיניים, אף, פה, לחיים, קו לסת, שיער.', 'מתארים לעצמך בראש רק עובדות: צורה, צבע, מרקם, סימטריה.', 'עלתה מחשבה ביקורתית? שמים לב אליה — ומחזירים את המבט למה שהעין רואה.'],
-    ex: { ok: ['"העיניים בצבע ___, בצורת ___"', '"השיער ___, באורך ___"'], no: ['מילים כמו יפה / מכוער', 'טוב / רע, "יותר מדי", "לא מספיק"'] } },
+    ex: [['העיניים חומות, בצורת שקד', 'העיניים שלי קטנות מדי'], ['השיער כהה ומתולתל בקצוות', 'השיער שלי נראה נורא']] },
   { art: 'torsoPleasant', title: 'שלב 3 · פלג הגוף העליון — מתחילים מהנוח',
     items: ['מורידים את המבט: צוואר, כתפיים, חזה, בטן, זרועות.', 'מתחילים באזור שהכי נוח או נעים להתבונן בו.', 'נשארים בו כמה רגעים, בנחת.'] },
   { art: 'torsoScan', title: 'שלב 3 · סריקה עניינית',
     items: ['סורקים לאט את שאר פלג הגוף העליון — בשקט ובעובדות.', 'שוב: רק מה שהעין רואה. מחשבה שיפוטית? שמים לב, וחוזרים לראות.'],
-    ex: { ok: ['"הכתפיים ___, החולצה בצבע ___"', '"על הזרוע יש ___"'], no: ['השוואות לאחרים או לעבר', 'מילים של שיפוט או תיקון'] } },
+    ex: [['הכתפיים ישרות, החולצה כחולה', 'הבטן שלי מכוערת'], ['על הזרוע יש נקודת חן קטנה', 'הזרועות שלי שמנות']] },
   { art: 'accept', title: 'שלב 4 · מה שיש זה מה שיש',
     items: ['מרחיבים שוב את המבט: כל הגוף והפנים, וגם החדר שמסביב.', 'משחררים את הצורך לשנות, לתקן או לשפר משהו — ברגע הזה.', 'אומרים לעצמך, בלב או בקול:'],
     quote: 'ככה אני נראה/ית כרגע.<br>מה שיש — זה מה שיש.', after: 'נשארים בתחושה הזו עוד רגע, ומסיימים כשמרגיש נכון.' },
@@ -586,7 +586,7 @@ function renderMirror() {
   h += `<ul class="msteps">${s.items.map(t => `<li>${t}</li>`).join('')}</ul>`;
   if (s.quote) h += `<div class="quote">״${s.quote}״</div>`;
   if (s.after) h += `<p style="margin:6px 0 0">${s.after}</p>`;
-  if (s.ex) h += `<div class="exs"><div class="ex ok"><b>✓ מתארים (עובדות)</b>${s.ex.ok.map(e => `<div>${esc(e)}</div>`).join('')}</div><div class="ex no"><b>✗ משחררים (שיפוט)</b>${s.ex.no.map(e => `<div>${esc(e)}</div>`).join('')}</div></div><p class="sub" style="margin-top:6px">משלימים את המקום הריק במה שהעין רואה.</p>`;
+  if (s.ex) h += `<div class="exs"><div class="ex ok"><b>✓ ככה (עובדות)</b>${s.ex.map(e => `<div>"${e[0]}"</div>`).join('')}</div><div class="ex no"><b>✗ לא ככה (שיפוט)</b>${s.ex.map(e => `<div>"${e[1]}"</div>`).join('')}</div></div>`;
   if (s.tip) h += `<div class="banner warn" style="margin:12px 0 0">💡 ${s.tip}</div>`;
   if (s.done) h += `<button class="btn green" onclick="finishMirror()">✓ סיימתי — לסמן שתרגלתי</button>`;
   else h += `<div class="mnav"><button class="btn ghost" onclick="mirrorGo(-1)" ${mStep ? '' : 'style="visibility:hidden"'}>→ הקודם</button><button class="btn" onclick="mirrorGo(1)">${mStep === n - 2 ? 'סיום' : mStep === 0 ? 'מתחילים ←' : 'הבא ←'}</button></div>`;
