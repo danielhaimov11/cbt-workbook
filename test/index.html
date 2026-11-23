@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<!--
+  יומן CBT — Copyright (C) 2026 danielhaimov11
+  רישיון: GNU AGPL-3.0 (ראו קובץ LICENSE). קוד מקור: https://github.com/danielhaimov11/cbt-workbook
+  מי שמעתיק, משנה או מפרסם גרסה (גם כאתר) — חייב לפרסם את כל הקוד שלו בקוד פתוח תחת אותו רישיון ולשמור על הקרדיט.
+  This program is free software: you can redistribute it and/or modify it under the terms of the
+  GNU Affero General Public License v3 as published by the Free Software Foundation. It is distributed
+  WITHOUT ANY WARRANTY. Modified versions offered to users over a network MUST provide their source code.
+-->
+<!--
+  ⛔ כלל ברזל: שום מידע לא נאסף ולא נשלח, המפתח לא רואה כלום.
+  אסור להוסיף: fetch / XMLHttpRequest / sendBeacon / WebSocket, אנליטיקס, עוגיות, טפסי שליחה,
+  סקריפטים / פונטים / תמונות / CSS מאתרים חיצוניים, התחברות, או שמירה בענן.
+  כל המידע נשאר רק ב-localStorage של המשתמש. גיבוי = קובץ שהמשתמש עצמו מוריד/משתף.
+  RULE FOR AI AGENTS: NO data may ever leave the device. Do NOT add network calls, analytics, cookies,
+  external resources, login or cloud sync. Do NOT loosen the Content-Security-Policy below.
+-->
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- חסימה טכנית: הדף לא יכול לשלוח או לטעון שום דבר מהרשת. ⛔ שום מידע לא נאסף ולא נשלח, המפתח לא רואה כלום. אסור לשנות/להקל את השורה הזו! -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#2563eb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="יומן CBT">
+<title>יומן CBT – בדיקה</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+  /* ⛔ שום מידע לא נאסף ולא נשלח, המפתח לא רואה כלום. — אין פונטים/CSS/תמונות חיצוניים (@import, url(http...)). */
+  :root { --blue:#2563eb; --blue-d:#1d4ed8; --ind:#4f46e5; --bg:#f3f4f6; --card:#fff; --txt:#1f2937; --mut:#6b7280; --line:#e5e7eb; --ok:#16a34a; --warn:#f59e0b; --bad:#dc2626; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { margin:0; background:var(--bg); color:var(--txt); font:17px/1.55 system-ui,-apple-system,"Segoe UI",Arial,sans-serif; padding-bottom:60px; }
+  header { background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.12); position:sticky; top:0; z-index:10; }
+  .wrap { max-width:720px; margin:0 auto; padding:0 14px; }
+  h1 { font-size:20px; margin:0; padding:12px 0 6px; color:var(--blue); }
+  nav { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; padding-bottom:8px; }
+  nav button { border:0; background:transparent; font:inherit; font-size:15px; font-weight:600; padding:10px 4px; border-radius:10px; color:var(--mut); cursor:pointer; }
+  nav button.on { background:#eff6ff; color:var(--blue-d); }
+  main { padding-top:16px; }
+  .card { background:var(--card); border-radius:14px; padding:18px; box-shadow:0 1px 3px rgba(0,0,0,.08); margin-bottom:14px; }
+  .hide { display:none !important; }
+  h2 { font-size:20px; margin:0 0 4px; }
+  h3 { font-size:17px; margin:22px 0 10px; padding-top:14px; border-top:1px solid var(--line); color:var(--blue-d); }
+  h3:first-of-type { border-top:0; padding-top:0; margin-top:6px; }
+  p.sub { color:var(--mut); margin:0 0 12px; font-size:15px; }
+  label { display:block; font-weight:600; margin:14px 0 5px; font-size:16px; }
+  textarea, input[type=search] { width:100%; font:inherit; font-size:16px; padding:11px 12px; border:1.5px solid #d1d5db; border-radius:10px; background:#fafafa; resize:vertical; }
+  textarea:focus, input:focus { outline:0; border-color:var(--blue); background:#fff; box-shadow:0 0 0 3px #bfdbfe; }
+  .btn { display:block; width:100%; border:0; font:inherit; font-weight:700; font-size:18px; padding:15px; border-radius:12px; background:var(--blue); color:#fff; cursor:pointer; margin-top:14px; text-align:center; }
+  .btn:active { background:var(--blue-d); }
+  .btn.green { background:var(--ok); }
+  .btn.ghost { background:#fff; color:var(--txt); border:1.5px solid #d1d5db; font-weight:600; font-size:16px; }
+  .btn.red { background:#fff; color:var(--bad); border:1.5px solid #fecaca; font-weight:600; font-size:15px; }
+  .pick { display:block; width:100%; text-align:right; border:2px solid var(--line); background:#fff; border-radius:14px; padding:16px; margin-bottom:12px; font:inherit; cursor:pointer; }
+  .pick:active { border-color:var(--blue); }
+  .pick b { display:block; font-size:19px; margin-bottom:2px; }
+  .pick span { color:var(--mut); font-size:15px; }
+  .back { background:none; border:0; color:var(--blue-d); font:inherit; font-weight:600; padding:0 0 8px; cursor:pointer; }
+  .item { border:1.5px solid var(--line); border-radius:12px; padding:12px 14px; margin-bottom:10px; cursor:pointer; background:#fff; }
+  .item:active { background:#f9fafb; }
+  .item .t { font-weight:700; }
+  .item .d { color:var(--mut); font-size:14px; }
+  .tag { display:inline-block; font-size:12px; font-weight:700; padding:1px 8px; border-radius:99px; margin-left:6px; }
+  .tag.c4 { background:#dbeafe; color:#1d4ed8; } .tag.c3 { background:#e0e7ff; color:#4338ca; } .tag.c5 { background:#fce7f3; color:#9d174d; } .tag.c6 { background:#dcfce7; color:#166534; }
+  .bhead { display:flex; align-items:center; justify-content:space-between; } .saved { color:#16a34a; font-size:14px; font-weight:600; }
+  .bsec { border:1.5px solid var(--line); border-radius:14px; margin-top:10px; background:#fff; } .bsec[open] { border-color:#86efac; }
+  .bsec summary { list-style:none; cursor:pointer; padding:13px 14px; font-weight:700; display:flex; justify-content:space-between; align-items:center; gap:8px; } .bsec summary::-webkit-details-marker { display:none; }
+  .bsec summary::after { content:"▾"; color:#9ca3af; } .bsec[open] summary::after { content:"▴"; } .bsec summary span:first-child { flex:1; }
+  .cnt { background:#dcfce7; color:#166534; border-radius:99px; font-size:13px; padding:1px 9px; } .bbody { padding:0 14px 14px; }
+  .chip.on.g { background:#dcfce7; border-color:#4ade80; color:#166534; } .emo.g { background:#f0fdf4; } .emo.g input { accent-color:#16a34a; } .emo.g .v { color:#166534; }
+  .addrow { display:flex; gap:8px; align-items:flex-end; } .addrow textarea { flex:1; min-width:0; } .addrow .btn { width:auto; margin:0; padding:11px 14px; font-size:16px; }
+  .blist { list-style:none; padding:0; margin:10px 0 0; display:grid; gap:6px; } .blist li { display:flex; gap:8px; align-items:flex-start; background:#f8fafc; border-radius:10px; padding:8px 10px; }
+  .blist .bd { color:var(--mut); font-size:13px; white-space:nowrap; padding-top:2px; } .blist .bt { flex:1; min-width:0; white-space:pre-wrap; } .blist .x, .expc .x { border:0; background:none; color:#9ca3af; cursor:pointer; font-size:14px; padding:2px 4px; }
+  .bar { display:block; height:6px; background:#e5e7eb; border-radius:99px; margin:5px 0 2px; overflow:hidden; } .bar span { display:block; height:100%; background:#16a34a; }
+  svg.chart { width:100%; height:auto; display:block; margin-top:12px; background:#f8fafc; border-radius:12px; }
+  .expc { position:relative; border:1px solid var(--line); border-radius:12px; padding:2px 12px 12px; margin-top:10px; background:#fafafa; } .expc .x { position:absolute; left:6px; top:6px; }
+  .tin { width:100%; font:inherit; font-size:16px; padding:11px 12px; border:1.5px solid #d1d5db; border-radius:10px; background:#fafafa; }
+  .credit { font-size:13px; color:#6b7280; margin:-6px 0 12px; }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; } .chip { border:1.5px solid #d1d5db; background:#fff; border-radius:99px; padding:7px 14px; font:inherit; font-size:15px; cursor:pointer; } .chip.on { background:#fce7f3; border-color:#f472b6; color:#9d174d; font-weight:700; }
+  .emo { display:grid; grid-template-columns:minmax(60px,auto) 1fr 34px 28px; align-items:center; gap:10px; background:#fdf2f8; border-radius:12px; padding:8px 12px; margin-top:8px; } .emo input { width:100%; accent-color:#db2777; } .emo .v { font-weight:700; color:#9d174d; text-align:center; } .emo .x { border:0; background:none; color:#9d174d; font-size:15px; cursor:pointer; padding:4px; }
+  .chip.add { border-style:dashed; color:#6b7280; } .other { display:flex; gap:8px; margin-top:8px; } .other input { flex:1; min-width:0; font:inherit; font-size:16px; padding:9px 12px; border:1.5px solid #d1d5db; border-radius:10px; } .other .btn { width:auto; margin:0; padding:9px 16px; font-size:16px; }
+  .chain .step { position:relative; background:#f8fafc; border:1px solid var(--line); border-radius:14px; padding:4px 14px 12px 14px; } .chain .step label { margin-top:8px; padding-right:30px; } .chain .n { position:absolute; right:12px; top:10px; width:22px; height:22px; border-radius:99px; background:var(--blue); color:#fff; font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+  .chain .arr { text-align:center; color:#93c5fd; font-size:22px; line-height:1; margin:4px 0; }
+  .dists { display:grid; grid-template-columns:1fr; gap:8px; } .dist { border:1.5px solid var(--line); border-radius:14px; background:#fff; overflow:hidden; } .dist.sel { grid-column:1 / -1; border-color:#f472b6; background:#fff7fb; }
+  .dhead { display:flex; gap:8px; align-items:flex-start; width:100%; text-align:right; background:none; border:0; font:inherit; padding:10px; cursor:pointer; } .dhead .ic { font-size:22px; line-height:1.2; } .dhead b { display:block; font-size:15px; } .dhead small { display:block; color:var(--mut); font-size:13px; line-height:1.35; } .dhead .ck { margin-right:auto; width:22px; height:22px; flex:none; border-radius:99px; border:1.5px solid #d1d5db; color:transparent; font-size:13px; display:flex; align-items:center; justify-content:center; } .dist.sel .ck { background:#db2777; border-color:#db2777; color:#fff; }
+  .dbody { display:none; padding:0 12px 12px; } .dist.sel .dbody { display:block; } .dbody label { margin-top:6px; color:#166534; } .eg { background:#f3f4f6; border-radius:10px; padding:7px 10px; font-size:14px; color:#4b5563; }
+  .banner { border-radius:12px; padding:12px 14px; margin-bottom:14px; font-size:15px; }
+  .banner.warn { background:#fffbeb; border:1px solid #fcd34d; color:#92400e; }
+  .banner.edit { background:#fef3c7; border:1px solid #fcd34d; color:#92400e; font-weight:600; }
+  .banner button { margin-top:8px; }
+  .empty { text-align:center; color:var(--mut); padding:30px 10px; }
+  #toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#166534; color:#fff; padding:13px 20px; border-radius:12px; font-weight:600; z-index:50; max-width:92%; text-align:center; box-shadow:0 4px 14px rgba(0,0,0,.25); }
+  #toast.err { background:var(--bad); }
+  #modal, #welcome { position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:30; display:flex; align-items:flex-end; justify-content:center; }
+  #welcome { z-index:40; }
+  .top { display:flex; align-items:center; justify-content:space-between; }
+  .help { border:1.5px solid var(--line); background:#fff; border-radius:99px; font:inherit; font-size:14px; font-weight:600; color:var(--blue-d); padding:5px 12px; cursor:pointer; margin-top:6px; }
+  .how { list-style:none; padding:0; margin:12px 0; } .how li { margin-bottom:12px; padding-right:2px; } .how b { display:block; font-size:17px; }
+  #modal .box, #welcome .box { background:#fff; width:100%; max-width:720px; max-height:90vh; overflow:auto; border-radius:18px 18px 0 0; padding:18px; }
+  .fld { margin-bottom:12px; } .fld b { display:block; color:var(--blue-d); font-size:14px; } .fld div { white-space:pre-wrap; }
+  .steps { padding-right:20px; margin:8px 0; } .steps li { margin-bottom:6px; }
+  footer { text-align:center; color:var(--mut); font-size:13px; padding:20px 14px 0; }
+  .mirror-pick { background:linear-gradient(135deg,#fffbeb,#fff); border-color:#fde68a; }
+  svg.art { width:100%; height:auto; max-height:260px; display:block; border-radius:16px; }
+  .dots { display:flex; gap:6px; justify-content:center; margin-bottom:12px; } .dots span { width:9px; height:9px; border-radius:99px; background:#e5e7eb; } .dots span.past { background:#93c5fd; } .dots span.on { background:var(--blue); width:24px; }
+  .msteps { padding-right:20px; margin:10px 0; } .msteps li { margin-bottom:8px; }
+  .quote { background:#eff6ff; border-right:5px solid var(--blue); border-radius:12px; padding:14px 16px; font-size:21px; font-weight:700; color:var(--blue-d); text-align:center; margin:10px 0; }
+  .exs { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; font-size:14px; } .ex { border-radius:12px; padding:10px; } .ex b { display:block; margin-bottom:4px; } .ex div { margin-bottom:4px; }
+  .ex.ok { background:#f0fdf4; border:1px solid #bbf7d0; color:#166534; } .ex.no { background:#fef2f2; border:1px solid #fecaca; color:#991b1b; } .ex.no div { text-decoration:line-through; text-decoration-color:#fca5a5; }
+  .mnav { display:grid; grid-template-columns:1fr 2fr; gap:10px; } .mnav .btn { margin-top:16px; }
+  small.mut { color:var(--mut); display:block; margin-top:6px; font-size:14px; }
+</style>
+</head>
+<body>
+
+<div style="background:#fef3c7;color:#92400e;text-align:center;font-size:14px;padding:8px 16px">🔍 גרסת בדיקה. מה שנכתב כאן נשמר בנפרד מהיומן האמיתי. <a href="../" style="color:#92400e;font-weight:700">לאתר הרגיל ←</a></div>
+<header>
+  <div class="wrap">
+    <div class="top"><h1>🧠 יומן CBT</h1><button class="help" onclick="showWelcome()">❓ איך זה עובד?</button></div>
+    <nav>
+      <button id="nav-new" class="on" onclick="go('new')">✍️ תרגול חדש</button>
+      <button id="nav-diary" onclick="go('diary')">📋 היומן שלי <span id="count"></span></button>
+      <button id="nav-backup" onclick="go('backup')">💾 גיבוי</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div id="nudge" class="banner warn hide">
+    💡 כדאי לשמור גיבוי של היומן, כדי שלא יאבד אם הטלפון יוחלף או יימחק.
+    <button class="btn" style="font-size:16px;padding:10px" onclick="backup()">💾 שמור גיבוי עכשיו</button>
+  </div>
+
+  <!-- ===== תרגול חדש ===== -->
+  <section id="v-new">
+    <div id="picker">
+      <p class="sub" style="font-size:17px;margin-bottom:14px">מה תרצה/י לתרגל עכשיו? כל מה שנכתב נשמר אוטומטית — אצלך במכשיר בלבד.</p>
+      <button class="pick" onclick="openForm('chapter3')"><b>🔄 קרה משהו והרגשתי רע</b><span>להבין את מעגל הקסמים והטריגר (פרק 3)</span></button>
+      <button class="pick" onclick="openForm('chapter4')"><b>😟 יש לי חשש / חרדה ממשהו</b><span>בדיקת התחזית ותכנון ניסוי קטן (פרק 4)</span></button>
+      <button class="pick" onclick="openForm('errors')"><b>🧩 זיהוי טעויות חשיבה</b><span>לזהות מחשבות "מטעות" ולמצוא להן מענה מאוזן</span></button>
+      <button class="pick" onclick="openBelief()"><b>🌱 תיק אמונה</b><span>לזהות אמונה שורשית ולבדוק אותה לאורך זמן — ראיות, סולם, ניסויים</span></button>
+      <button class="pick mirror-pick" onclick="openMirror()"><b>🪞 תרגיל המראה</b><span>תרגיל מודרך עם איורים — להסתכל על עצמי בלי שיפוטיות. בלי לכתוב כלום.</span></button>
+    </div>
+
+    <div id="formWrap" class="hide">
+      <button class="back" onclick="closeForm()">← חזרה</button>
+      <div id="editBanner" class="banner edit hide">✏️ את/ה עורך/ת רשומה קיימת. לחיצה על "שמור" תעדכן אותה.</div>
+      <div class="card">
+        <h2 id="formTitle"></h2>
+        <p class="sub" id="formSub"></p>
+        <p class="credit" id="formCredit"></p>
+        <form id="form" onsubmit="save(event)"></form>
+        <button class="btn" type="submit" form="form" id="saveBtn">💾 שמור</button>
+      </div>
+    </div>
+
+    <div id="beliefWrap" class="hide">
+      <button class="back" onclick="closeBelief()">← חזרה</button>
+      <div class="card" id="beliefCard"></div>
+    </div>
+
+    <div id="mirrorWrap" class="hide">
+      <button class="back" onclick="closeMirror()">← חזרה</button>
+      <div class="card" id="mirrorCard"></div>
+    </div>
+  </section>
+
+  <!-- ===== היומן ===== -->
+  <section id="v-diary" class="hide">
+    <input type="search" id="q" placeholder="🔍 חיפוש בכל היומן..." oninput="renderDiary()">
+    <div id="list" style="margin-top:14px"></div>
+  </section>
+
+  <!-- ===== גיבוי ===== -->
+  <section id="v-backup" class="hide">
+    <div class="card">
+      <h2>🔒 הנתונים שלך נשארים אצלך</h2>
+      <p class="sub">הכל נשמר רק בדפדפן של המכשיר הזה. שום דבר לא נשלח לשום מקום ואין צורך בהרשמה.</p>
+      <p style="margin:0">כדי שלא תאבד/י כלום (למשל אם תחליף/י טלפון), מומלץ לשמור גיבוי פעם בשבוע:</p>
+      <button class="btn green" onclick="backup()">💾 שמור גיבוי</button>
+      <small class="mut" id="lastBackup"></small>
+      <small class="mut">בטלפון יופיע תפריט — אפשר לשלוח את הקובץ לעצמך בוואטסאפ, או לשמור בגוגל דרייב / בקבצים.</small>
+    </div>
+    <div class="card">
+      <h2>📥 שחזור מגיבוי</h2>
+      <p class="sub">עברת למכשיר חדש? יש לך קובץ גיבוי? בחר/י אותו כאן והרשומות יחזרו.</p>
+      <label class="btn ghost" style="margin:0;cursor:pointer">📂 בחירת קובץ גיבוי
+        <input type="file" id="restoreFile" accept=".json,application/json" class="hide" onchange="restore(event)">
+      </label>
+    </div>
+    <div class="card">
+      <h2>📲 טיפ לטלפון</h2>
+      <ol class="steps">
+        <li><b>אייפון (Safari):</b> לחץ/י על כפתור השיתוף ⬆️ ← "הוסף למסך הבית".</li>
+        <li><b>אנדרואיד (Chrome):</b> תפריט ⋮ ← "הוסף למסך הבית".</li>
+      </ol>
+      <small class="mut">כך היומן נפתח כמו אפליקציה, ואייפון לא ימחק את הנתונים אם לא נכנסים זמן רב.</small>
+    </div>
+    <div class="card">
+      <h2>🙏 קרדיטים</h2>
+      <ul class="steps">
+        <li>הפרויקט נבנה <b>בהובלת הילי עשירי</b>.</li>
+        <li>"קרה משהו והרגשתי רע" (פרק 3) ו"יש לי חשש" (פרק 4) — על פי שיטתה של <b>ד״ר מלאני פנל</b> (Melanie Fennell).</li>
+        <li>"זיהוי טעויות חשיבה" — על פי <b>ד״ר ניר עישר, מכון פסגות לטיפול והכשרה</b>.</li>
+        <li>"תיק אמונה" — על פי <b>דניס גרינברגר וכריסטין א. פדסקי</b>, "להתמודד עם מצבי רוח".</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>📜 פרטיות ואחריות</h2>
+      <ul class="steps">
+        <li><b>אין איסוף מידע:</b> אין שרת, אין הרשמה, אין עוגיות, אין סטטיסטיקות. מפתח האפליקציה לא רואה ולא מקבל שום דבר ממה שנכתב.</li>
+        <li>המידע נשמר רק בדפדפן של המכשיר הזה. קובץ גיבוי נשלח רק לאן שאת/ה בוחר/ת.</li>
+        <li><b>זה לא טיפול:</b> היומן הוא כלי עזר לתרגול עצמי, ואינו מחליף ייעוץ או טיפול של איש מקצוע.</li>
+        <li><b>במצוקה?</b> ער״ן — 1201 (24/7), מד״א — 101.</li>
+        <li><b>קוד פתוח</b> (רישיון AGPL-3.0), ניתן כמות שהוא וללא אחריות: <a href="https://github.com/danielhaimov11/cbt-workbook" target="_blank" rel="noopener noreferrer">קוד המקור</a>.</li>
+      </ul>
+    </div>
+    <button class="btn red" onclick="wipe()">🗑️ מחיקת כל הנתונים ממכשיר זה</button>
+  </section>
+
+</main>
+
+<footer>🔒 שום מידע לא נאסף ולא נשלח · אינו תחליף לטיפול מקצועי · במצוקה: ער״ן 1201</footer>
+
+<div id="welcome" class="hide">
+  <div class="box">
+    <h2>👋 ברוך/ה הבא/ה ליומן שלך</h2>
+    <p class="sub">ככה זה עובד — בפשטות:</p>
+    <ol class="how">
+      <li><b>✍️ כותבים</b>לוחצים "תרגול חדש", בוחרים מה קרה וכותבים במילים שלך. אפשר למלא רק חלק ולהשלים אחר כך.</li>
+      <li><b>💾 נשמר לבד</b>כל מה שנכתב נשמר אוטומטית בטלפון הזה — גם תוך כדי כתיבה. אין הרשמה, ושום דבר לא נשלח לאף אחד.</li>
+      <li><b>📋 חוזרים לקרוא</b>ב"היומן שלי" רואים את כל מה שכתבת, ואפשר לערוך או להשלים.</li>
+      <li><b>🛟 גיבוי פעם בשבוע</b>לוחצים "💾 גיבוי" ← "שמור גיבוי" ושולחים את הקובץ לעצמך בוואטסאפ. כך גם אם הטלפון יוחלף — כלום לא הולך לאיבוד.</li>
+    </ol>
+    <div class="banner warn" style="margin:0">⚠️ חשוב: לפתוח תמיד מאותו טלפון ומאותו דפדפן, ולא למחוק "היסטוריית גלישה / נתוני אתרים" — זה מוחק את היומן.<br>
+      ℹ️ היומן הוא כלי עזר לתרגול ואינו מחליף טיפול מקצועי. במצוקה: ער״ן 1201.<br>
+      💡 טיפ: "הוסף למסך הבית" (באייפון דרך כפתור השיתוף ⬆️, באנדרואיד דרך ⋮) — ויהיה לך אייקון כמו אפליקציה.</div>
+    <p class="credit" style="text-align:center;margin:12px 0 0">נבנה בהובלת הילי עשירי 🙏</p>
+    <button class="btn" onclick="closeWelcome()">הבנתי, בוא/י נתחיל 👍</button>
+  </div>
+</div>
+
+<div id="modal" class="hide" onclick="if(event.target===this)closeModal()">
+  <div class="box">
+    <h2 id="mTitle"></h2>
+    <div id="mBody"></div>
+    <button class="btn" onclick="editFromModal()">✏️ עריכה</button>
+    <button class="btn red" onclick="deleteFromModal()">🗑️ מחיקה</button>
+    <button class="btn ghost" onclick="closeModal()">סגירה</button>
+  </div>
+</div>
+<div id="toast" class="hide"></div>
+
+<script>
+/* ==========================================================================
+   ⛔ כלל ברזל: שום מידע לא נאסף ולא נשלח, המפתח לא רואה כלום.
+   NO network calls (fetch/XHR/beacon/WebSocket), NO analytics, NO cookies, NO cloud.
+   Data lives ONLY in this browser's localStorage. Do not change this.
+   ========================================================================== */
+/* ---------- הגדרת הטפסים (השדות נשמרים בשמות עבריים כמו בגרסאות קודמות) ---------- */
+const CHAPTERS = {
+  chapter4: {
+    tag: 'פרק 4', cls: 'c4', title: '😟 בדיקת חשש', sub: 'כתוב/י במילים שלך. אפשר למלא רק חלק מהשדות, ולחזור להשלים אחר כך.', credit: 'על פי ד״ר מלאני פנל (Melanie Fennell)',
+    main: 'המצב / הטריגר',
+    sections: [
+      ['א׳ · מה קורה עכשיו', [
+        ['המצב / הטריגר', 'מה קרה או עומד לקרות?', 'למשל: שיחה עם המנהל, מפגש חברתי...'],
+        ['רגשות ותחושות', 'מה אני מרגיש/ה? (עוצמה 0–100)', 'למשל: חרדה (80), דופק מהיר...'],
+        ['התחזית החרדתית', 'ממה אני חושש/ת? מה יישתבש?', ''],
+        ['אמצעי זהירות', 'מה אני עושה כדי למנוע את זה?', 'למשל: שותק, מתנצל מראש, נמנע...']]],
+      ['ב׳ · בדיקה מחדש', [
+        ['ראיות בעד', 'מה מראה שהחשש יקרה?', ''],
+        ['ראיות נגד', 'מה מראה שהחשש לא יקרה?', ''],
+        ['התרחיש הכי גרוע', 'מה הכי גרוע שיכול לקרות?', ''],
+        ['התרחיש הסביר ביותר', 'ומה הכי סביר שיקרה?', ''],
+        ['מחשבה חלופית', 'מחשבה מאוזנת יותר (ודירוג אמונה 0–100)', '']]],
+      ['ג׳ · ניסוי קטן', [
+        ['פעולה מתוכננת', 'מה אעשה כדי לבדוק את החשש?', ''],
+        ['ויתור על אמצעי זהירות', 'על איזה אמצעי זהירות אוותר הפעם?', ''],
+        ['תוצאות בפועל', 'מה קרה במציאות? (אפשר להשלים אחרי הניסוי)', ''],
+        ['קרדיט עצמי', '⭐ על מה מגיע לי כל הכבוד?', '']]]
+    ]
+  },
+  chapter3: {
+    tag: 'פרק 3', cls: 'c3', title: '🔄 מה קרה לי', sub: 'כתוב/י במילים שלך. אפשר למלא רק חלק מהשדות.', credit: 'על פי ד״ר מלאני פנל (Melanie Fennell)',
+    main: 'תיאור המצב',
+    sections: [
+      ['1 · מה קרה', [
+        ['תיאור המצב', 'מה קרה? איפה? עם מי?', ''],
+        ['כלל שהופר', 'איזה "כלל לחיים" שלי הופר או היה בסכנה?', "למשל: 'אסור לי לאכזב אף אחד'"]]],
+      ['2 · מעגל הקסמים', [
+        ['שורה תחתונה', 'איזו אמונה שלילית על עצמי התעוררה?', ''],
+        ['ניבויים שליליים', 'ממה חששתי? אילו תחושות גופניות היו לי?', ''],
+        ['התנהגות הגנתית', 'מה עשיתי כדי להתגונן?', ''],
+        ['אישור וביקורת', 'איך התוצאה "אישרה" את האמונה השלילית?', ''],
+        ['דיכאון/מצב רוח', 'איך הרגשתי בסוף?', '']]],
+      ['3 · מסקנות', [
+        ['רפלקציה ותובנות', 'מה אפשר ללמוד מזה? אילו דפוסים חוזרים?', '']]]
+    ]
+  },
+  errors: {
+    tag: 'טעויות חשיבה', cls: 'c5', title: '🧩 זיהוי טעויות חשיבה', custom: true,
+    sub: 'מזהים את המחשבה שהכאיבה, בודקים אותה, ומוצאים לה מענה מאוזן. אפשר למלא רק חלק.',
+    credit: 'על פי ד״ר ניר עישר, מכון פסגות לטיפול והכשרה', main: 'נושא הבעיה'
+  },
+  beliefs: {
+    tag: 'תיק אמונה', cls: 'c6', title: '🌱 תיק אמונה', custom: 'belief', main: 'אמונה ישנה', alt: 'אמונה חדשה',
+    sub: 'תיק שחוזרים אליו לאורך שבועות. ממלאים רק מה שמתאים, בקצב שלך — והכל נשמר לבד.',
+    credit: 'על פי דניס גרינברגר וכריסטין א. פדסקי, "להתמודד עם מצבי רוח"'
+  }
+};
+const CH_KEYS = ['chapter3', 'chapter4', 'errors', 'beliefs'];
+const STAMP = 'חותמת זמן שמירה', DATE = 'תאריך מהטופס';
+// 🔍 גרסת בדיקה: מפתחות אחסון נפרדים בכוונה, כדי שלא תתערבב עם הנתונים האמיתיים באתר הראשי (אותו דומיין).
+// כשהגרסה עוברת לאתר הראשי — להחזיר ל-'cbt_standalone_records_v1', 'cbt_draft_v1', 'cbt_meta_v1'.
+const KEY = 'cbt_test_records_v1';
+const DRAFT = 'cbt_test_draft_v1', META = 'cbt_test_meta_v1';
+
+/* ---------- אחסון ---------- */
+/* ⛔ שום מידע לא נאסף ולא נשלח, המפתח לא רואה כלום. — שמירה מקומית בלבד (localStorage). לא לשלוח לשרת, לא לסנכרן לענן. */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function read(k, def) { try { const r = localStorage.getItem(k); return r ? JSON.parse(r) : def; } catch (e) { return def; } }
+function write(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
+function getDb() { const d = read(KEY, {}), o = {}; CH_KEYS.forEach(k => o[k] = Array.isArray(d[k]) ? d[k] : []); return o; }
+function total(db) { return CH_KEYS.reduce((n, k) => n + db[k].length, 0); }
+
+let cur = null, editIdx = -1, modalRef = null;
+
+/* ---------- ניווט ---------- */
+function go(tab) {
+  ['new', 'diary', 'backup'].forEach(t => { $('v-' + t).classList.toggle('hide', t !== tab); $('nav-' + t).classList.toggle('on', t === tab); });
+  if (tab === 'diary') renderDiary();
+  if (tab === 'backup') renderBackupInfo();
+  window.scrollTo(0, 0);
+}
+
+function toast(msg, err) {
+  const t = $('toast'); t.textContent = msg; t.className = err ? 'err' : ''; clearTimeout(toast.t);
+  toast.t = setTimeout(() => t.classList.add('hide'), 4500);
+}
+
+/* ---------- טופס ---------- */
+function openForm(ch, idx = -1, rec = null) {
+  cur = ch; editIdx = idx; const c = CHAPTERS[ch];
+  $('formTitle').textContent = c.title; $('formSub').textContent = c.sub; $('formCredit').textContent = c.credit || '';
+  const draft = idx < 0 ? (read(DRAFT, {})[ch] || {}) : (rec || {});
+  if (c.custom) renderErrorsForm(draft); else {
+  let html = '';
+  c.sections.forEach(([h, fields]) => {
+    html += `<h3>${esc(h)}</h3>`;
+    fields.forEach(([key, label, ph], i) => { html += `<label for="f_${esc(key)}">${esc(label)}</label><textarea id="f_${esc(key)}" data-k="${esc(key)}" rows="2" placeholder="${esc(ph)}"></textarea>`; });
+  });
+  $('form').innerHTML = html;
+  $('form').querySelectorAll('textarea').forEach(el => { el.value = draft[el.dataset.k] || ''; });
+  }
+  $('form').querySelectorAll('textarea').forEach(el => el.addEventListener('input', saveDraft));
+  $('editBanner').classList.toggle('hide', idx < 0);
+  $('saveBtn').textContent = idx < 0 ? '💾 שמור' : '💾 שמור שינויים';
+  $('picker').classList.add('hide'); $('beliefWrap').classList.add('hide'); $('mirrorWrap').classList.add('hide'); $('formWrap').classList.remove('hide');
+  go('new'); $('picker').classList.add('hide');
+}
+function closeForm() { cur = null; editIdx = -1; $('formWrap').classList.add('hide'); $('picker').classList.remove('hide'); window.scrollTo(0, 0); }
+function formValues() { const o = {}; $('form').querySelectorAll('[data-k]').forEach(el => { if (!el.closest('.dist:not(.sel)')) o[el.dataset.k] = el.value.trim(); }); return o; }
+function saveDraft() { if (editIdx >= 0 || !cur) return; const d = read(DRAFT, {}); d[cur] = formValues(); write(DRAFT, d); }
+function clearDraft(ch) { const d = read(DRAFT, {}); delete d[ch]; write(DRAFT, d); }
+
+function save(e) {
+  e.preventDefault();
+  const vals = formValues();
+  if (!Object.values(vals).some(v => v)) { toast('כתוב/י לפחות משהו אחד לפני השמירה', true); return; }
+  const db = getDb(), now = new Date().toLocaleString('he-IL');
+  const old = editIdx >= 0 ? db[cur][editIdx] : null;
+  const rec = Object.assign({ [STAMP]: old ? old[STAMP] || now : now, [DATE]: old ? old[DATE] || now : now }, vals);
+  if (old) db[cur][editIdx] = rec; else db[cur].push(rec);
+  if (!write(KEY, db)) { toast('לא הצלחנו לשמור במכשיר. שמור/י גיבוי ובדוק/י שיש מקום פנוי.', true); return; }
+  if (!old) clearDraft(cur);
+  toast(old ? '✓ השינויים נשמרו' : '✓ נשמר ביומן שלך');
+  closeForm(); updateCount(); updateNudge(); go('diary');
+}
+
+/* ---------- יומן ---------- */
+function allRecords() {
+  const db = getDb(), out = [];
+  CH_KEYS.forEach(ch => db[ch].forEach((r, i) => out.push({ ch, i, r })));
+  return out;   // ממוין לפי תאריך ב-renderDiary
+}
+function sortKey(r) { const m = String(r[STAMP] || '').match(/(\d+)\.(\d+)\.(\d+),?\s*(\d+):(\d+)/); return m ? new Date(+m[3], +m[2] - 1, +m[1], +m[4], +m[5]).getTime() : 0; }
+function renderDiary() {
+  const q = $('q').value.trim().toLowerCase();
+  let items = allRecords().sort((a, b) => sortKey(b.r) - sortKey(a.r));
+  if (q) items = items.filter(x => JSON.stringify(x.r).toLowerCase().includes(q));
+  if (!items.length) { $('list').innerHTML = `<div class="empty">${q ? 'לא נמצאו תוצאות' : 'עדיין אין רשומות.<br>התרגול הראשון שלך יופיע כאן 🌱'}</div>`; return; }
+  $('list').innerHTML = items.map(x => {
+    const c = CHAPTERS[x.ch], t = x.r[c.main] || (c.alt && x.r[c.alt]) || (c.custom === 'belief' ? '(תיק אמונה)' : '(ללא כותרת)');
+    return `<div class="item" onclick="openModal('${x.ch}',${x.i})"><span class="tag ${c.cls}">${c.tag}</span><span class="d">${esc(x.r[DATE] || x.r[STAMP] || '')}</span><div class="t">${esc(t.length > 90 ? t.slice(0, 90) + '…' : t)}</div></div>`;
+  }).join('');
+}
+function updateCount() { const n = total(getDb()); $('count').textContent = n ? `(${n})` : ''; }
+
+function openModal(ch, i) {
+  if (CHAPTERS[ch].custom === 'belief') { openBelief(i); return; }
+  const c = CHAPTERS[ch], r = getDb()[ch][i]; if (!r) return;
+  modalRef = { ch, i };
+  $('mTitle').textContent = `${c.title} · ${r[DATE] || ''}`;
+  const keys = c.sections ? c.sections.flatMap(s => s[1].map(f => [f[0], f[1]])) : Object.keys(r).filter(k => k !== STAMP && k !== DATE).map(k => [k]);
+  $('mBody').innerHTML = keys.filter(([k]) => r[k]).map(([k]) => `<div class="fld"><b>${esc(k)}</b><div>${esc(r[k])}</div></div>`).join('') || '<p class="sub">הרשומה ריקה.</p>';
+  $('modal').classList.remove('hide');
+}
+function closeModal() { $('modal').classList.add('hide'); }
+function editFromModal() { const { ch, i } = modalRef; const r = getDb()[ch][i]; closeModal(); openForm(ch, i, r); }
+function deleteFromModal() {
+  if (!confirm('למחוק את הרשומה הזו? אי אפשר לשחזר אותה (אלא מגיבוי).')) return;
+  const { ch, i } = modalRef, db = getDb(); db[ch].splice(i, 1); write(KEY, db);
+  closeModal(); renderDiary(); updateCount(); toast('הרשומה נמחקה');
+}
+
+/* ---------- 🧩 זיהוי טעויות חשיבה (על פי ד״ר ניר עישר, מכון פסגות) ---------- */
+/* ⛔ שום מידע לא נאסף ולא נשלח, המפתח לא רואה כלום. — הכל נשמר רק ב-localStorage, כמו שאר התרגילים. */
+const EMOTIONS = ['עצב', 'חרדה', 'כעס', 'שנאה', 'קנאה', 'בושה', 'אשמה', 'בדידות'];
+const DISTORTIONS = [
+  ['הכל או לא כלום', '⚫', 'רואים רק שחור או לבן, בלי אמצע.', 'אם זה לא מושלם — זה כישלון.'],
+  ['הכללה מוגזמת', '🔁', 'מאירוע אחד מסיקים "תמיד" או "אף פעם".', 'אף פעם שום דבר לא מצליח לי.'],
+  ['פילטר שכלי', '🔍', 'רואים רק את הפרט השלילי, ומפספסים את כל השאר.', 'מכל הערב אני זוכר/ת רק את ההערה העוקצנית.'],
+  ['האדרה של השלילי', '🌋', 'מגדילים משהו רע עד שהוא נהיה אסון.', 'זה נורא, אני לא אעמוד בזה.'],
+  ['פסילת החיובי', '🚫', 'מבטלים דברים טובים — "זה לא נחשב".', 'הצלחתי רק כי היה לי מזל.'],
+  ['שאלת קושיה', '❓', 'שאלה בלי תשובה, שמשאירה אותי תקוע/ה.', 'למה זה תמיד קורה דווקא לי?'],
+  ['אם... אז...', '➡️', 'חוק נוקשה שמחבר בין שני דברים בלי הוכחה.', 'אם אטעה — אז כולם יבינו שאני לא שווה.'],
+  ['מסקנות מוטעות', '🦘', 'קופצים למסקנה בלי מספיק ראיות.', 'היא לא ענתה — בטח היא כועסת עליי.'],
+  ['ניבוי העתיד', '🔮', 'בטוחים שיודעים מה יקרה — ושזה יהיה רע.', 'זה בטוח ייגמר רע.'],
+  ['קריאת מחשבות', '💭', 'בטוחים שיודעים מה אחרים חושבים עלינו.', 'כולם חושבים שאני משעמם/ת.'],
+  ['העצמה ומזעור', '🔭', 'מגדילים את החסרונות ומקטינים את היתרונות.', 'הטעות שלי ענקית, וההצלחה — שטות.'],
+  ['חשיבה רגשית', '💓', '"אני מרגיש/ה את זה — אז זה נכון."', 'אני מרגיש/ה טיפש/ה, אז אני טיפש/ה.'],
+  ['צריך ואסור', '☝️', 'חוקים של "חייב" ו"אסור" שיוצרים לחץ ואשמה.', 'אסור לי לבקש עזרה.'],
+  ['הצמדת תוויות', '🏷️', 'מדביקים תווית לכל האדם בגלל דבר אחד.', 'אני לוזר/ית.'],
+  ['העברה לפסים אישיים', '🎯', 'לוקחים אשמה על דברים שלא בשליטתנו.', 'הוא במצב רוח רע — בטח בגללי.'],
+  ['טעות אחרת', '✏️', 'משהו שלא מופיע כאן — אפשר לתאר במילים שלך.', '']
+];
+const ERR_PICKED = 'טעויות חשיבה שזוהו', ANS = n => 'מענה – ' + n, EMO_KEY = 'רגשות ועוצמה';
+
+function renderErrorsForm(draft) {
+  const ta = (k, label, ph = '', rows = 2) => `<label for="f_${esc(k)}">${esc(label)}</label><textarea id="f_${esc(k)}" data-k="${esc(k)}" rows="${rows}" placeholder="${esc(ph)}"></textarea>`;
+  const chain = [['מחשבה מכאיבה', 'איזו מחשבה מכאיבה עלתה מייד?'], ['משמעות', 'איזו משמעות נתתי לזה?'], ['הוכחה למשמעות', 'איזו הוכחה יש לי שזה נכון?'],
+    ['מה זה אומר עליי', 'מה זה אומר עליי?'], ['הוכחה לגביי', 'איזו הוכחה יש לי שזה נכון?'],
+    ['מה אני עושה כדי שזה לא יקרה', 'מה אני עושה כדי שזה לא יקרה?'], ['ממה אני נמנע/ת', 'ממה אני נמנע/ת כדי שזה לא יקרה?']];
+  let h = `<h3>1 · מה קרה</h3>${ta('נושא הבעיה', 'על מה זה? (במשפט אחד)', '', 1)}
+    ${ta('תיאור עובדתי', 'מה קרה בפועל? רק עובדות — כמו מצלמה, בלי פרשנות', '')}
+    <h3>2 · מה הרגשתי</h3><label>אילו רגשות? (לוחצים, ואז מסמנים עוצמה)</label>
+    <div class="chips" id="emoChips">${EMOTIONS.map(e => `<button type="button" class="chip" data-e="${e}">${e}</button>`).join('')}<button type="button" class="chip add" id="emoOtherBtn">➕ רגש אחר</button></div>
+    <div class="other hide" id="emoOther"><input type="text" id="emoOtherIn" placeholder="איך קוראים לרגש?" aria-label="רגש אחר"><button type="button" class="btn" id="emoOtherAdd">הוספה</button></div>
+    <div id="emoRows"></div><textarea class="hide" data-k="${EMO_KEY}" id="emoField"></textarea>
+    ${ta('תחושות גופניות', 'מה הרגשתי בגוף? (ועוצמה 1–100)', '')}
+    ${ta('מה עשיתי בעקבות זה', 'מה עשיתי בעקבות זה?', '')}
+    <h3>3 · המחשבות — יורדים צעד אחרי צעד</h3><p class="sub">עונים רק על מה שמתאים. כל שאלה יורדת שכבה אחת עמוק יותר.</p>
+    <div class="chain">${chain.map(([k, l], i) => `<div class="step"><span class="n">${i + 1}</span>${ta(k, l)}</div>`).join('<div class="arr">↓</div>')}</div>
+    <h3>4 · איזו טעות חשיבה יש כאן?</h3><p class="sub">קרא/י את המחשבות שכתבת. לוחצים על כרטיס שמתאים (אפשר כמה), וכותבים לו מענה נכון — מחשבה מאוזנת יותר.</p>
+    <input type="hidden" data-k="${ERR_PICKED}" id="errPicked">
+    <div class="dists">${DISTORTIONS.map(([n, ic, ex, eg]) => `<div class="dist" data-n="${esc(n)}">
+      <button type="button" class="dhead"><span class="ic">${ic}</span><span><b>${esc(n)}</b><small>${esc(ex)}</small></span><span class="ck">✓</span></button>
+      <div class="dbody">${eg ? `<div class="eg">דוגמה כללית למחשבה כזו: "${esc(eg)}"</div>` : ''}<label>✅ המענה הנכון:</label><textarea data-k="${esc(ANS(n))}" rows="2" placeholder="איך אפשר לראות את זה אחרת, בצורה מאוזנת?"></textarea></div></div>`).join('')}</div>
+    <h3>5 · הערות</h3>${ta('הערות', 'משהו נוסף שחשוב לי לזכור?', '')}`;
+  $('form').innerHTML = h;
+  // מילוי מטיוטה / עריכה
+  $('form').querySelectorAll('[data-k]').forEach(el => { el.value = draft[el.dataset.k] || ''; });
+  String(draft[EMO_KEY] || '').split(',').map(s => s.trim()).filter(Boolean).forEach(s => {
+    const m = s.match(/^(.*?)\s*(\d+)?$/); addEmo(m[1], m[2] ? +m[2] : 50, true);
+  });
+  String(draft[ERR_PICKED] || '').split(',').map(s => s.trim()).filter(Boolean).forEach(n => { const d = $('form').querySelector(`.dist[data-n="${CSS.escape(n)}"]`); if (d) d.classList.add('sel'); });
+  $('emoChips').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return;
+    if (b.id === 'emoOtherBtn') { $('emoOther').classList.toggle('hide'); $('emoOtherIn').focus(); return; }
+    if (b.classList.contains('on')) removeEmo(b.dataset.e); else addEmo(b.dataset.e, 50); });
+  const addOther = () => { const v = $('emoOtherIn').value.replace(/[,\d]/g, '').trim(); if (!v) return; addEmo(v, 50); $('emoOtherIn').value = ''; $('emoOther').classList.add('hide'); };
+  $('emoOtherAdd').addEventListener('click', addOther);
+  $('emoOtherIn').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addOther(); } });
+  $('emoRows').addEventListener('click', e => { const x = e.target.closest('.x'); if (x) removeEmo(x.parentElement.dataset.e); });
+  $('form').querySelectorAll('.dhead').forEach(b => b.addEventListener('click', () => { b.parentElement.classList.toggle('sel'); syncPicked(); }));
+}
+function addEmo(name, val, silent) {
+  if (!name || $('emoRows').querySelector(`[data-e="${CSS.escape(name)}"]`)) return;
+  const chip = $('emoChips').querySelector(`.chip[data-e="${CSS.escape(name)}"]`); if (chip) chip.classList.add('on');
+  const row = document.createElement('div'); row.className = 'emo'; row.dataset.e = name;
+  row.innerHTML = `<b>${esc(name)}</b><input type="range" min="1" max="100" value="${val}" aria-label="עוצמה"><span class="v">${val}</span><button type="button" class="x" aria-label="הסרה">✕</button>`;
+  row.querySelector('input').addEventListener('input', ev => { row.querySelector('.v').textContent = ev.target.value; syncEmo(); });
+  $('emoRows').appendChild(row); if (!silent) syncEmo();
+}
+function removeEmo(name) {
+  const r = $('emoRows').querySelector(`[data-e="${CSS.escape(name)}"]`); if (r) r.remove();
+  const chip = $('emoChips').querySelector(`.chip[data-e="${CSS.escape(name)}"]`); if (chip) chip.classList.remove('on'); syncEmo();
+}
+function syncEmo() { $('emoField').value = [...$('emoRows').children].map(r => `${r.dataset.e} ${r.querySelector('input').value}`).join(', '); saveDraft(); }
+function syncPicked() { $('errPicked').value = [...$('form').querySelectorAll('.dist.sel')].map(d => d.dataset.n).join(', '); saveDraft(); }
+
+/* ---------- 🌱 תיק אמונה (על פי גרינברגר ופדסקי, "להתמודד עם מצבי רוח") ---------- */
+/* ⛔ שום מידע לא נאסף ולא נשלח, המפתח לא רואה כלום. — תיק שחוזרים אליו לאורך שבועות; נשמר אוטומטית רק ב-localStorage. */
+const B_TYPES = { 'על עצמי': 'מה זה אומר עליי? מה פירוש הדבר לגביי?', 'על הזולת': 'מה זה אומר על הזולת? מה פירוש הדבר לגבי אנשים?', 'על החיים': 'מה זה אומר על החיים? מה פירוש הדבר לגבי החיים?' };
+const B_AGES = ['לידה עד 2', 'גיל 3 עד 5', 'גיל 6 עד 12', 'גיל 13 עד 18', 'גיל 19 עד 25', 'גיל 26 עד 35', 'גיל 36 עד 50', 'גיל 51 עד 65', 'גיל 66 ומעלה'];
+const BL = { chain: 'חץ למטה', against: 'ראיות שהאמונה הישנה לא נכונה במאה אחוז', support: 'ראיות שתומכות באמונה החדשה', conf: 'דירוגי ביטחון באמונה החדשה', hist: 'מבחן ההיסטוריה', exp: 'ניסויים', rate: 'דירוג חוויות' };
+let bf = null, bIdx = -1, bOpen = new Set(['identify']);
+const today = () => new Date().toLocaleDateString('he-IL');
+function bInit(r) {
+  const o = JSON.parse(JSON.stringify(r || {}));
+  [BL.chain, BL.against, BL.support, BL.conf, BL.exp, BL.rate].forEach(k => { if (!Array.isArray(o[k])) o[k] = []; });
+  if (!o[BL.hist] || typeof o[BL.hist] !== 'object') o[BL.hist] = {};
+  if (!o['סוג']) o['סוג'] = 'על עצמי';
+  if (!o[BL.chain].length) o[BL.chain] = [''];
+  return o;
+}
+function bHasContent(o) {
+  return Object.entries(o).some(([k, v]) => k !== STAMP && k !== DATE && k !== 'סוג' &&
+    (typeof v === 'string' ? v.trim() : Array.isArray(v) ? v.some(x => typeof x === 'string' ? x.trim() : true) : Object.values(v || {}).some(s => String(s).trim())));
+}
+function bPersist() {
+  if (!bHasContent(bf)) return;
+  const now = new Date().toLocaleString('he-IL');
+  if (!bf[STAMP]) { bf[STAMP] = now; bf[DATE] = now; }
+  const db = getDb();
+  if (bIdx < 0 || !db.beliefs[bIdx]) { db.beliefs.push(bf); bIdx = db.beliefs.length - 1; } else db.beliefs[bIdx] = bf;
+  if (!write(KEY, db)) { toast('לא הצלחנו לשמור במכשיר. שמור/י גיבוי ובדוק/י שיש מקום פנוי.', true); return; }
+  updateCount(); updateNudge();
+  const s = $('bSaved'); if (s) { s.textContent = '✓ נשמר'; clearTimeout(bPersist.t); bPersist.t = setTimeout(() => { s.textContent = ''; }, 1500); }
+}
+function openBelief(i = -1) {
+  bIdx = i; bf = bInit(i >= 0 ? getDb().beliefs[i] : null); bOpen = new Set(i >= 0 ? [] : ['identify']);
+  go('new'); ['picker', 'formWrap', 'mirrorWrap'].forEach(id => $(id).classList.add('hide')); $('beliefWrap').classList.remove('hide');
+  renderBelief(); window.scrollTo(0, 0);
+}
+function closeBelief() { bPersist(); bf = null; $('beliefWrap').classList.add('hide'); $('picker').classList.remove('hide'); window.scrollTo(0, 0); }
+function bConfChart(list) {
+  if (!list.length) return '';
+  const W = 300, H = 140, L = 48, R = 38, T = 18, B = 30, n = list.length;
+  const x = i => n === 1 ? (W + L - R) / 2 : W - R - i * (W - L - R) / (n - 1);   // מימין לשמאל — הדירוג הראשון מימין
+  const y = v => T + (100 - v) * (H - T - B) / 100;
+  const grid = [0, 50, 100].map(v => `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="#e5e7eb"/><text x="6" y="${y(v) + 4}" font-size="11" fill="#6b7280" text-anchor="start">${v}</text>`).join('');
+  const pts = list.map((p, i) => `${x(i)},${y(+p.v)}`).join(' ');
+  const last = list[n - 1];
+  return `<svg viewBox="0 0 ${W} ${H}" class="chart" role="img" aria-label="גרף הביטחון באמונה החדשה">${grid}
+    <polyline points="${pts}" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linejoin="round"/>
+    ${list.map((p, i) => `<circle cx="${x(i)}" cy="${y(+p.v)}" r="${i === n - 1 ? 5 : 3.5}" fill="${i === n - 1 ? '#16a34a' : '#fff'}" stroke="#16a34a" stroke-width="2"/>`).join('')}
+    <text x="${x(n - 1)}" y="${y(+last.v) - 10}" font-size="12" font-weight="700" fill="#166534" text-anchor="middle">${esc(last.v)}</text>
+    <text x="${x(0)}" y="${H - 8}" font-size="10" fill="#6b7280" text-anchor="middle">${esc(list[0].d)}</text>
+    ${n > 1 ? `<text x="${x(n - 1)}" y="${H - 8}" font-size="10" fill="#6b7280" text-anchor="middle">${esc(last.d)}</text>` : ''}</svg>`;
+}
+function bList(key, empty) {
+  const l = bf[key];
+  return l.length ? `<ol class="blist">${l.map((e, i) => `<li><span class="bd">${esc(e.d)}</span><span class="bt">${esc(e.t)}</span><button type="button" class="x" data-act="del" data-list="${esc(key)}" data-i="${i}" aria-label="הסרה">✕</button></li>`).join('')}</ol>`
+    : `<p class="sub">${empty}</p>`;
+}
+function bSec(id, title, count, body) {
+  return `<details class="bsec" data-sec="${id}" ${bOpen.has(id) ? 'open' : ''}><summary><span>${title}</span>${count ? `<span class="cnt">${count}</span>` : ''}</summary><div class="bbody">${body}</div></details>`;
+}
+function renderBelief() {
+  const t = bf['סוג'], q = B_TYPES[t];
+  const ta = (k, label, rows = 2) => `<label for="b_${esc(k)}">${esc(label)}</label><textarea id="b_${esc(k)}" data-f="${esc(k)}" rows="${rows}">${esc(bf[k] || '')}</textarea>`;
+  const conf = bf[BL.conf], lastV = conf.length ? conf[conf.length - 1].v : 50;
+  let h = `<div class="bhead"><h2>🌱 תיק אמונה</h2><span id="bSaved" class="saved"></span></div>
+    <p class="sub">${esc(CHAPTERS.beliefs.sub)}</p><p class="credit">${esc(CHAPTERS.beliefs.credit)}</p>`;
+  h += bSec('identify', '🔽 לזהות את האמונה', '', `
+    <label>על מה האמונה?</label><div class="chips">${Object.keys(B_TYPES).map(k => `<button type="button" class="chip ${k === t ? 'on g' : ''}" data-act="type" data-v="${k}">${k}</button>`).join('')}</div>
+    ${ta('אירוע', 'אירוע או מצב שעורר רגשות חזקים')}
+    <div class="chain">${bf[BL.chain].map((s, i) => `${i ? '<div class="arr">↓</div>' : ''}<div class="step"><span class="n">${i + 1}</span><label for="bc${i}">${esc(q)}</label><textarea id="bc${i}" data-chain="${i}" rows="2">${esc(s)}</textarea></div>`).join('')}</div>
+    <button type="button" class="btn ghost" data-act="chainAdd">➕ עוד שלב למטה</button>
+    ${ta('אמונה ישנה', 'האמונה השורשית שהתגלתה')}`);
+  h += bSec('new', '🌱 האמונה החדשה', '', ta('אמונה חדשה', 'אמונה חלופית — במילים שלך'));
+  const addRow = (key, label) => `<div class="addrow"><textarea data-new="${esc(key)}" rows="2" aria-label="${esc(label)}"></textarea><button type="button" class="btn" data-act="add" data-list="${esc(key)}">הוספה</button></div>`;
+  h += bSec('against', '📝 ראיות שהאמונה הישנה לא נכונה במאה אחוז', bf[BL.against].length,
+    `<p class="sub">גם חוויות קטנות נחשבות. מוסיפים מתי שעולה משהו.</p>${addRow(BL.against, 'ראיה חדשה')}${bList(BL.against, 'עדיין אין ראיות ברשימה.')}`);
+  h += bSec('support', '📝 ראיות שתומכות באמונה החדשה', bf[BL.support].length,
+    `<p class="sub">גם חוויות קטנות נחשבות. מוסיפים מתי שעולה משהו.</p>${addRow(BL.support, 'ראיה חדשה')}${bList(BL.support, 'עדיין אין ראיות ברשימה.')}`);
+  h += bSec('conf', '📈 עד כמה אני מאמין/ה באמונה החדשה', conf.length,
+    `<p class="sub">מדרגים מדי פעם, מתי שמתאים, ורואים איך זה משתנה לאורך זמן. גם שינוי קטן הוא שינוי.</p>
+    <div class="emo g"><b>עכשיו</b><input type="range" id="bConfIn" min="0" max="100" value="${esc(lastV)}" aria-label="ביטחון באמונה החדשה"><span class="v" id="bConfV">${esc(lastV)}</span></div>
+    <button type="button" class="btn ghost" data-act="conf">שמירת הדירוג</button>${bConfChart(conf)}
+    ${conf.length ? `<ol class="blist">${conf.map((c, i) => `<li><span class="bd">${esc(c.d)}</span><span class="bt"><b>${esc(c.v)}</b></span><button type="button" class="x" data-act="del" data-list="${esc(BL.conf)}" data-i="${i}" aria-label="הסרה">✕</button></li>`).join('')}</ol>` : ''}`);
+  h += bSec('hist', '🕰️ מבחן ההיסטוריה', Object.values(bf[BL.hist]).filter(s => String(s).trim()).length,
+    `<p class="sub">עוברים על תקופות החיים ומחפשים חוויות שמתאימות לאמונה החדשה. ממלאים רק תקופות שמתאימות.</p>
+    ${B_AGES.map((a, i) => `<label for="bh${i}">${a}</label><textarea id="bh${i}" data-hist="${a}" rows="2">${esc(bf[BL.hist][a] || '')}</textarea>`).join('')}
+    ${ta('סיכום מבחן ההיסטוריה', 'סיכום — איך כל זה תומך באמונה החדשה?')}`);
+  h += bSec('exp', '🧪 ניסויים', bf[BL.exp].length,
+    `<p class="sub">בודקים את האמונה הישנה במציאות. את התוצאה אפשר להשלים אחרי הניסוי.</p>
+    ${bf[BL.exp].map((e, i) => `<div class="expc"><button type="button" class="x" data-act="del" data-list="${esc(BL.exp)}" data-i="${i}" aria-label="הסרה">✕</button>
+      <label>תיאור הניסוי</label><textarea data-exp="${i}" data-k="t" rows="2">${esc(e.t || '')}</textarea>
+      <label>מה האמונה הישנה ניבאה?</label><textarea data-exp="${i}" data-k="p" rows="2">${esc(e.p || '')}</textarea>
+      <label>מה קרה במציאות?</label><textarea data-exp="${i}" data-k="r" rows="2">${esc(e.r || '')}</textarea></div>`).join('')}
+    <button type="button" class="btn ghost" data-act="expAdd">➕ ניסוי חדש</button>`);
+  h += bSec('rate', '⚖️ דירוג חוויות על סולם', bf[BL.rate].length,
+    `<p class="sub">במקום "הכל או לא כלום" — מסמנים איפה על הסולם החוויה נמצאת באמת.</p>
+    <label for="bRateE">אירוע / נסיבות</label><textarea id="bRateE" rows="2"></textarea>
+    <label for="bRateQ">התכונה שאני מדרג/ת</label><input type="text" id="bRateQ" class="tin">
+    <div class="emo g"><b>דירוג</b><input type="range" id="bRateIn" min="0" max="100" value="50" aria-label="דירוג"><span class="v" id="bRateV">50</span></div>
+    <button type="button" class="btn ghost" data-act="rateAdd">הוספה לרשימה</button>
+    ${bf[BL.rate].length ? `<ol class="blist">${bf[BL.rate].map((r, i) => `<li><span class="bd">${esc(r.d)}</span><span class="bt">${esc(r.e)}${r.q ? ` · <i>${esc(r.q)}</i>` : ''}<span class="bar"><span style="width:${+r.v}%"></span></span><b>${esc(r.v)}</b></span><button type="button" class="x" data-act="del" data-list="${esc(BL.rate)}" data-i="${i}" aria-label="הסרה">✕</button></li>`).join('')}</ol>` : ''}
+    ${ta('מה למדתי מהדירוגים', 'מה למדתי מהדירוגים?')}`);
+  h += `<p class="sub" style="text-align:center;margin-top:16px">הכל נשמר לבד. אפשר לסגור ולחזור לתיק מתי שרוצים, דרך "היומן שלי".</p>
+    <button type="button" class="btn red" data-act="delFile">🗑️ מחיקת התיק</button>`;
+  $('beliefCard').innerHTML = h;
+}
+function bSetupEvents() {
+  const c = $('beliefCard');
+  c.addEventListener('toggle', e => { const d = e.target.closest && e.target.closest('details'); if (d) d.open ? bOpen.add(d.dataset.sec) : bOpen.delete(d.dataset.sec); }, true);
+  c.addEventListener('input', e => {
+    const el = e.target, ds = el.dataset;
+    if (ds.f) bf[ds.f] = el.value;
+    else if (ds.chain !== undefined) bf[BL.chain][+ds.chain] = el.value;
+    else if (ds.hist) bf[BL.hist][ds.hist] = el.value;
+    else if (ds.exp !== undefined) bf[BL.exp][+ds.exp][ds.k] = el.value;
+    else if (el.id === 'bConfIn') { $('bConfV').textContent = el.value; return; }
+    else if (el.id === 'bRateIn') { $('bRateV').textContent = el.value; return; }
+    else return;
+    bPersist();
+  });
+  c.addEventListener('click', e => {
+    const b = e.target.closest('[data-act]'); if (!b) return;
+    const a = b.dataset.act;
+    if (a === 'type') { bf['סוג'] = b.dataset.v; }
+    else if (a === 'chainAdd') { bf[BL.chain].push(''); }
+    else if (a === 'add') { const ta = c.querySelector(`[data-new="${CSS.escape(b.dataset.list)}"]`), v = ta.value.trim(); if (!v) { ta.focus(); return; } bf[b.dataset.list].push({ d: today(), t: v }); }
+    else if (a === 'del') { if (!confirm('להסיר את הפריט הזה?')) return; bf[b.dataset.list].splice(+b.dataset.i, 1); }
+    else if (a === 'conf') { bf[BL.conf].push({ d: today(), v: +$('bConfIn').value }); toast('✓ הדירוג נשמר'); }
+    else if (a === 'expAdd') { bf[BL.exp].push({ t: '', p: '', r: '' }); }
+    else if (a === 'rateAdd') { const ev = $('bRateE').value.trim(); if (!ev) { $('bRateE').focus(); return; } bf[BL.rate].push({ d: today(), e: ev, q: $('bRateQ').value.trim(), v: +$('bRateIn').value }); }
+    else if (a === 'delFile') {
+      if (!confirm('למחוק את כל התיק? אי אפשר לשחזר אותו (אלא מגיבוי).')) return;
+      const db = getDb(); if (bIdx >= 0) { db.beliefs.splice(bIdx, 1); write(KEY, db); }
+      bf = null; $('beliefWrap').classList.add('hide'); $('picker').classList.remove('hide'); updateCount(); toast('התיק נמחק'); return;
+    }
+    else return;
+    bPersist(); renderBelief();
+  });
+}
+
+/* ---------- 🪞 תרגיל המראה (מודרך, בלי מילוי) ---------- */
+/* ⛔ שום מידע לא נאסף ולא נשלח, המפתח לא רואה כלום. — האיורים מצוירים כאן בקוד (SVG), בלי תמונות מבחוץ. נשמר רק מונה תרגולים מקומי. */
+const SKIN = '#f2c7a0', HAIR = '#5b4636', SHIRT = '#7cb3f7', SHIRT_D = '#3b82f6', GOLD = '#f59e0b';
+const MIRROR_GLASS = 'M100 214 L100 68 A50 50 0 0 1 200 68 L200 214Z';
+function svgWrap(inner, bg = '#f8fafc') {
+  return `<svg viewBox="0 0 300 220" class="art" role="img" aria-hidden="true">
+  <defs>
+    <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e0f2fe"/><stop offset="1" stop-color="#f8fafc"/></linearGradient>
+    <radialGradient id="glow"><stop offset="0" stop-color="#fde68a" stop-opacity=".9"/><stop offset="1" stop-color="#fde68a" stop-opacity="0"/></radialGradient>
+    <clipPath id="clipGlass"><path d="${MIRROR_GLASS}"/></clipPath>
+  </defs>
+  <rect width="300" height="220" rx="18" fill="${bg}"/>${inner}</svg>`;
+}
+function figure(dimHead = false) {
+  const h = dimHead ? ' opacity=".35"' : '';
+  return `<g clip-path="url(#clipGlass)">
+    <path d="M112 214 L112 142 Q112 108 150 102 Q188 108 188 142 L188 214Z" fill="${SHIRT}"/>
+    <path d="M126 140 L126 214 M174 140 L174 214" stroke="${SHIRT_D}" stroke-width="2" opacity=".5"/>
+    <g${h}><rect x="143" y="88" width="14" height="16" fill="${SKIN}"/>
+    <path d="M141 102 L150 114 L159 102Z" fill="${SKIN}"/>
+    <circle cx="150" cy="72" r="21" fill="${SKIN}"/>
+    <path d="M129 72 Q126 46 150 44 Q174 46 171 72 Q165 56 150 56 Q135 56 129 72Z" fill="${HAIR}"/>
+    <circle cx="143" cy="73" r="2.2" fill="#374151"/><circle cx="157" cy="73" r="2.2" fill="#374151"/>
+    <path d="M144 82 Q150 86 156 82" stroke="#9f1239" stroke-width="2" fill="none" stroke-linecap="round"/></g>
+  </g>`;
+}
+function mirror(inner = figure()) {
+  return `<path d="M90 216 L90 66 A60 60 0 0 1 210 66 L210 216Z" fill="#c08a52"/>
+  <path d="${MIRROR_GLASS}" fill="url(#glass)"/>${inner}
+  <path d="M112 200 L170 40 M126 205 L184 60" stroke="#fff" stroke-width="5" opacity=".45" clip-path="url(#clipGlass)"/>`;
+}
+function bigFace() {
+  return `<ellipse cx="150" cy="104" rx="64" ry="60" fill="${HAIR}"/>
+  <ellipse cx="97" cy="122" rx="9" ry="14" fill="${SKIN}"/><ellipse cx="203" cy="122" rx="9" ry="14" fill="${SKIN}"/>
+  <ellipse cx="150" cy="122" rx="54" ry="64" fill="${SKIN}"/>
+  <path d="M96 112 Q92 54 150 50 Q208 54 204 112 Q190 76 150 74 Q110 76 96 112Z" fill="${HAIR}"/>
+  <path d="M114 100 Q128 92 142 99 M158 99 Q172 92 186 100" stroke="${HAIR}" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <ellipse cx="128" cy="113" rx="13" ry="8" fill="#fff"/><ellipse cx="172" cy="113" rx="13" ry="8" fill="#fff"/>
+  <circle cx="128" cy="113" r="6" fill="#8b5a2b"/><circle cx="172" cy="113" r="6" fill="#8b5a2b"/>
+  <circle cx="128" cy="113" r="3" fill="#111"/><circle cx="172" cy="113" r="3" fill="#111"/>
+  <circle cx="130" cy="111" r="1.5" fill="#fff"/><circle cx="174" cy="111" r="1.5" fill="#fff"/>
+  <path d="M150 116 Q145 136 150 140 Q155 141 158 138" stroke="#c2410c" stroke-width="2" fill="none" opacity=".6" stroke-linecap="round"/>
+  <circle cx="116" cy="140" r="9" fill="#fb7185" opacity=".22"/><circle cx="184" cy="140" r="9" fill="#fb7185" opacity=".22"/>
+  <path d="M134 156 Q150 166 166 156" stroke="#be123c" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+}
+function pill(x, y, t) { return `<g><rect x="${x - 26}" y="${y - 12}" width="52" height="24" rx="12" fill="#fff" stroke="#bfdbfe"/><text x="${x}" y="${y + 5}" text-anchor="middle" font-size="13" fill="#1d4ed8" direction="rtl">${t}</text></g>`; }
+const ART = {
+  prep: () => svgWrap(`${mirror()}
+    <circle cx="45" cy="112" r="16" fill="#bfdbfe" opacity=".7"><animate attributeName="r" values="12;28;12" dur="6s" repeatCount="indefinite"/><animate attributeName="opacity" values=".8;.25;.8" dur="6s" repeatCount="indefinite"/></circle>
+    <text x="45" y="160" text-anchor="middle" font-size="13" fill="#1d4ed8">נשימה</text>
+    <text x="242" y="96" font-size="34">🌿</text>
+    <text x="255" y="130" text-anchor="middle" font-size="13" fill="#1d4ed8" direction="rtl">בקצב שלך</text>`),
+  wide: () => svgWrap(`${mirror()}
+    <rect x="106" y="40" width="88" height="170" rx="22" fill="none" stroke="#2563eb" stroke-width="3" stroke-dasharray="8 6"><animate attributeName="stroke-dashoffset" values="0;-28" dur="1.2s" repeatCount="indefinite"/></rect>
+    ${pill(250, 60, 'הכל יחד')}<path d="M38 110 Q60 92 82 110 Q60 128 38 110Z" fill="#fff" stroke="#2563eb" stroke-width="2.5"/><circle cx="60" cy="110" r="7" fill="#2563eb"/>`),
+  facePleasant: () => svgWrap(`${bigFace()}
+    <rect x="106" y="98" width="88" height="30" rx="15" fill="none" stroke="${GOLD}" stroke-width="3.5"><animate attributeName="opacity" values="1;.35;1" dur="2s" repeatCount="indefinite"/></rect>
+    <text x="222" y="92" font-size="20">✨</text><text x="62" y="92" font-size="16">✨</text>${pill(250, 190, 'בנחת')}`, '#fffbeb'),
+  faceScan: () => svgWrap(`${bigFace()}
+    <g><rect x="78" y="0" width="144" height="8" fill="#3b82f6" opacity=".18"/><line x1="78" y1="4" x2="222" y2="4" stroke="#2563eb" stroke-width="2.5"/>
+    <animateTransform attributeName="transform" type="translate" values="0,50;0,182;0,50" dur="7s" repeatCount="indefinite"/></g>
+    ${pill(258, 70, 'צורה')}${pill(258, 115, 'צבע')}${pill(258, 160, 'מרקם')}${pill(42, 115, 'סימטריה')}`),
+  torsoPleasant: () => svgWrap(`${mirror(figure(true))}
+    <ellipse cx="150" cy="150" rx="50" ry="44" fill="url(#glow)"><animate attributeName="opacity" values="1;.4;1" dur="2.4s" repeatCount="indefinite"/></ellipse>
+    <ellipse cx="150" cy="150" rx="50" ry="44" fill="none" stroke="${GOLD}" stroke-width="3" stroke-dasharray="7 6"/>
+    <text x="214" y="120" font-size="18">✨</text>${pill(255, 190, 'בנחת')}`, '#fffbeb'),
+  torsoScan: () => svgWrap(`${mirror(figure(true))}
+    <g clip-path="url(#clipGlass)"><g><rect x="100" y="0" width="100" height="8" fill="#3b82f6" opacity=".2"/><line x1="100" y1="4" x2="200" y2="4" stroke="#2563eb" stroke-width="2.5"/>
+    <animateTransform attributeName="transform" type="translate" values="0,98;0,206;0,98" dur="6s" repeatCount="indefinite"/></g></g>
+    ${pill(255, 110, 'צוואר')}${pill(255, 145, 'כתפיים')}${pill(45, 145, 'זרועות')}${pill(45, 180, 'בטן')}`),
+  accept: () => svgWrap(`<rect x="0" y="196" width="300" height="24" fill="#e7d3bd"/>
+    <rect x="18" y="34" width="56" height="66" rx="6" fill="#dbeafe" stroke="#fff" stroke-width="5"/><path d="M46 34 L46 100 M18 67 L74 67" stroke="#fff" stroke-width="4"/>
+    <path d="M250 196 L244 168 L276 168 L270 196Z" fill="#c2410c" opacity=".8"/><path d="M260 168 Q246 136 236 130 M260 168 Q262 132 270 120 M260 168 Q276 146 288 142" stroke="#16a34a" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <ellipse cx="150" cy="120" rx="95" ry="105" fill="url(#glow)" opacity=".6"/>${mirror()}
+    <text x="40" y="150" font-size="18">💛</text>`, '#fdf4ec'),
+  done: () => svgWrap(`<ellipse cx="150" cy="110" rx="110" ry="90" fill="url(#glow)"/>
+    <circle cx="150" cy="100" r="48" fill="#16a34a"/><path d="M127 100 L144 117 L175 84" stroke="#fff" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="150" y="182" text-anchor="middle" font-size="15" fill="#166534" direction="rtl">בלי לחץ, בקצב שלך 💚</text>`, '#f0fdf4')
+};
+
+const MIRROR_STEPS = [
+  { art: 'prep', title: 'הכנה',
+    items: ['עמוד/י מול מראה גדולה, שרואים בה לפחות את פלג הגוף העליון (עדיף את כל הגוף).', 'מקום שקט, בלי הפרעות, לכמה דקות.', 'נשימה עמוקה אחת או שתיים — ולהירגע.'],
+    tip: 'הרעיון: להסתכל כמו שמסתכלים על נוף — רק לראות. בלי "יפה/מכוער", בלי "טוב/רע".' },
+  { art: 'wide', title: 'שלב 1 · המבט הרחב',
+    items: ['מסתכלים על כל הדמות במראה כיחידה אחת שלמה.', 'לא מתמקדים בשום פרט ולא מנתחים כלום.', 'פשוט קולטים: הנה אני, עומד/ת בחדר.'] },
+  { art: 'facePleasant', title: 'שלב 2 · הפנים — מתחילים מהנעים',
+    items: ['מעבירים את המבט לראש, לפנים ולשיער.', 'בוחרים את החלק שהכי נעים או קל להסתכל עליו — למשל צבע העיניים או השיער.', 'נשארים עליו קצת — בלי למהר ובלי לספור.'],
+    tip: 'להישאר על אותו מקום יכול להרגיש מוזר. זה בסדר — זה חלק מהתרגול.' },
+  { art: 'faceScan', title: 'שלב 2 · סריקה איטית של הפנים',
+    items: ['עוברים לאט על שאר החלקים: עיניים, אף, פה, לחיים, קו לסת, שיער.', 'מתארים לעצמך בראש רק עובדות: צורה, צבע, מרקם, סימטריה.', 'עלתה מחשבה ביקורתית? שמים לב אליה — ומחזירים את המבט למה שהעין רואה.'],
+    ex: [['העיניים חומות, בצורת שקד', 'העיניים שלי קטנות מדי'], ['השיער כהה ומתולתל בקצוות', 'השיער שלי נראה נורא']] },
+  { art: 'torsoPleasant', title: 'שלב 3 · פלג הגוף העליון — מתחילים מהנוח',
+    items: ['מורידים את המבט: צוואר, כתפיים, חזה, בטן, זרועות.', 'מתחילים באזור שהכי נוח או נעים להתבונן בו.', 'נשארים בו כמה רגעים, בנחת.'] },
+  { art: 'torsoScan', title: 'שלב 3 · סריקה עניינית',
+    items: ['סורקים לאט את שאר פלג הגוף העליון — בשקט ובעובדות.', 'שוב: רק מה שהעין רואה. מחשבה שיפוטית? שמים לב, וחוזרים לראות.'],
+    ex: [['הכתפיים ישרות, החולצה כחולה', 'הבטן שלי מכוערת'], ['על הזרוע יש נקודת חן קטנה', 'הזרועות שלי שמנות']] },
+  { art: 'accept', title: 'שלב 4 · מה שיש זה מה שיש',
+    items: ['מרחיבים שוב את המבט: כל הגוף והפנים, וגם החדר שמסביב.', 'משחררים את הצורך לשנות, לתקן או לשפר משהו — ברגע הזה.', 'אומרים לעצמך, בלב או בקול:'],
+    quote: 'ככה אני נראה/ית כרגע.<br>מה שיש — זה מה שיש.', after: 'נשארים בתחושה הזו עוד רגע, ומסיימים כשמרגיש נכון.' },
+  { art: 'done', title: 'כל הכבוד! 🌱', done: true,
+    items: ['רוב האנשים מסתכלים במראה כדי <b>לתקן</b> — לסדר, לבדוק פגמים. כאן המוח מתאמן להסתכל כדי <b>לראות</b>.', 'מה שעוזר הוא לחזור על זה מדי פעם — בערך 3–4 פעמים בשבוע, כמה שבועות. גם פחות זה בסדר.', 'בהתחלה זה עלול להרגיש מוזר או לא נוח — וזה לגמרי חלק מהתהליך.'] }
+];
+let mStep = 0;
+function mirrorCount() {
+  const list = read(META, {}).mirror || [], weekAgo = Date.now() - 7 * 864e5;
+  return list.filter(t => t > weekAgo).length;
+}
+function openMirror() {
+  go('new'); $('picker').classList.add('hide'); $('formWrap').classList.add('hide'); $('beliefWrap').classList.add('hide'); $('mirrorWrap').classList.remove('hide');
+  mStep = 0; renderMirror();
+}
+function closeMirror() { $('mirrorWrap').classList.add('hide'); $('picker').classList.remove('hide'); window.scrollTo(0, 0); }
+function mirrorGo(d) { mStep = Math.max(0, Math.min(MIRROR_STEPS.length - 1, mStep + d)); renderMirror(); }
+function renderMirror() {
+  const s = MIRROR_STEPS[mStep], n = MIRROR_STEPS.length;
+  let h = `<div class="dots">${MIRROR_STEPS.map((_, i) => `<span class="${i === mStep ? 'on' : i < mStep ? 'past' : ''}"></span>`).join('')}</div>`;
+  h += ART[s.art]() + `<h2 style="margin-top:12px">${s.title}</h2>`;
+  if (mStep === 0) { const c = mirrorCount(); h += `<p class="sub">${c ? `השבוע תרגלת ${c} ${c === 1 ? 'פעם' : 'פעמים'} 👏` : 'תרגיל מודרך, בלי לכתוב כלום. בקצב שלך — אין שעון ואין מבחן.'}</p>`; }
+  h += `<ul class="msteps">${s.items.map(t => `<li>${t}</li>`).join('')}</ul>`;
+  if (s.quote) h += `<div class="quote">״${s.quote}״</div>`;
+  if (s.after) h += `<p style="margin:6px 0 0">${s.after}</p>`;
+  if (s.ex) h += `<div class="exs"><div class="ex ok"><b>✓ ככה (עובדות)</b>${s.ex.map(e => `<div>"${e[0]}"</div>`).join('')}</div><div class="ex no"><b>✗ לא ככה (שיפוט)</b>${s.ex.map(e => `<div>"${e[1]}"</div>`).join('')}</div></div>`;
+  if (s.tip) h += `<div class="banner warn" style="margin:12px 0 0">💡 ${s.tip}</div>`;
+  if (s.done) h += `<button class="btn green" onclick="finishMirror()">✓ סיימתי — לסמן שתרגלתי</button>`;
+  else h += `<div class="mnav"><button class="btn ghost" onclick="mirrorGo(-1)" ${mStep ? '' : 'style="visibility:hidden"'}>→ הקודם</button><button class="btn" onclick="mirrorGo(1)">${mStep === n - 2 ? 'סיום' : mStep === 0 ? 'מתחילים ←' : 'הבא ←'}</button></div>`;
+  $('mirrorCard').innerHTML = h; window.scrollTo(0, 0);
+}
+function finishMirror() {
+  const m = read(META, {}); m.mirror = (m.mirror || []).concat(Date.now()).slice(-100); write(META, m);
+  closeMirror(); toast(`✓ כל הכבוד! השבוע תרגלת ${mirrorCount()} ${mirrorCount() === 1 ? 'פעם' : 'פעמים'}`);
+}
+
+/* ---------- גיבוי ושחזור ---------- */
+/* ⛔ שום מידע לא נאסף ולא נשלח, המפתח לא רואה כלום. — הגיבוי נוצר במכשיר ונמסר רק למשתמש (הורדה / תפריט שיתוף). אסור להעלות אותו לשום מקום. */
+function renderBackupInfo() {
+  const m = read(META, {});
+  $('lastBackup').textContent = m.lastBackup ? `גיבוי אחרון: ${new Date(m.lastBackup).toLocaleDateString('he-IL')}` : 'עדיין לא נשמר גיבוי.';
+}
+function updateNudge() {
+  const n = total(getDb()), m = read(META, {});
+  const stale = !m.lastBackup || (Date.now() - m.lastBackup) > 7 * 864e5;
+  $('nudge').classList.toggle('hide', !(n > 0 && stale));
+}
+async function backup() {
+  const db = getDb();
+  if (!total(db)) { toast('עדיין אין מה לגבות', true); return; }
+  const payload = Object.assign({ app: 'cbt-workbook', version: 5, exportedAt: new Date().toISOString() }, db);
+  const name = `CBT-TEST-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  const file = new File([JSON.stringify(payload, null, 1)], name, { type: 'application/json' });
+  let done = false;
+  if (navigator.canShare && navigator.canShare({ files: [file] }) && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+    try { await navigator.share({ files: [file], title: 'גיבוי יומן CBT' }); done = true; }
+    catch (e) { if (e.name === 'AbortError') return; }
+  }
+  if (!done) {
+    const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  }
+  const m = read(META, {}); m.lastBackup = Date.now(); write(META, m);
+  renderBackupInfo(); updateNudge(); toast('✓ הגיבוי נשמר');
+}
+function restore(ev) {
+  const f = ev.target.files[0]; if (!f) return;
+  const rd = new FileReader();
+  rd.onload = () => {
+    try {
+      const d = JSON.parse(rd.result);
+      if (!CH_KEYS.some(k => Array.isArray(d[k]))) throw 0;
+      const db = getDb(); let added = 0;
+      CH_KEYS.forEach(ch => {
+        const have = new Set(db[ch].map(r => JSON.stringify(r)));
+        (d[ch] || []).forEach(r => { if (r && typeof r === 'object' && !have.has(JSON.stringify(r))) { db[ch].push(r); added++; } });
+      });
+      if (!write(KEY, db)) throw 1;
+      updateCount(); updateNudge(); toast(`✓ שוחזרו ${added} רשומות`); go('diary');
+    } catch (e) { toast('הקובץ לא נראה כמו גיבוי של היומן', true); }
+    ev.target.value = '';
+  };
+  rd.readAsText(f);
+}
+function wipe() {
+  if (!total(getDb())) { toast('אין נתונים למחוק'); return; }
+  if (!confirm('למחוק את כל היומן ממכשיר זה? מומלץ קודם לשמור גיבוי.')) return;
+  if (!confirm('בטוח/ה? הפעולה אי אפשרית לביטול.')) return;
+  try { localStorage.removeItem(KEY); localStorage.removeItem(DRAFT); const m = read(META, {}); delete m.mirror; write(META, m); } catch (e) {}
+  updateCount(); updateNudge(); renderBackupInfo(); toast('כל הנתונים נמחקו');
+}
+
+/* ---------- התחלה ---------- */
+/* ⛔ שום מידע לא נאסף ולא נשלח, המפתח לא רואה כלום. — אין כאן טעינת נתונים מבחוץ ואין דיווח החוצה. */
+try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
+bSetupEvents();
+function showWelcome() { $('welcome').classList.remove('hide'); }
+function closeWelcome() { $('welcome').classList.add('hide'); const m = read(META, {}); m.welcomed = true; write(META, m); }
+
+updateCount(); updateNudge();
+if (total(getDb())) go('diary');
+if (!read(META, {}).welcomed) showWelcome();   // הסבר קצר רק בכניסה הראשונה
+</script>
+</body>
+</html>
