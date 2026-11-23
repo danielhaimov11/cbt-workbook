@@ -20,6 +20,7 @@
 ## קבצים
 
 * [`index.html`](index.html) — כל האפליקציה בקובץ אחד. אין תלות בספריות או שירותים חיצוניים.
+* [`test/index.html`](test/index.html) — 🔍 גרסת בדיקה של התרגילים החדשים (https://danielhaimov11.github.io/cbt-workbook/test/). שומרת נתונים בנפרד מהאתר האמיתי.
 * [`הודעה_למשתמש.md`](הודעה_למשתמש.md) — ההודעה והמדריך לשליחה למשתמש.
 * [`PLAN.md`](PLAN.md) — תכנון עתידי.
 * [`CHANGELOG.md`](CHANGELOG.md) — יומן שינויים.
